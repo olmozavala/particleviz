@@ -61,7 +61,7 @@ const MAX_ANIMATION_SPEED = 25;
 class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props);
-        console.log(`Constructor ParticlesLayer, Properties: `, this.props);
+        // console.log(`Constructor ParticlesLayer, Properties: `, this.props);
 
         // Setting up d3 objects
         this.d3Projection = d3.geoEquirectangular().scale(1).translate([0, 0]);//Corresponds to EPSG:4326
@@ -115,7 +115,6 @@ class  ParticlesLayer extends React.Component {
     }
 
     readingRawData(data) {
-        console.log("Reading data!!!!!!! ", data);
         this.readData(JSON.parse(data));
     }
 
@@ -153,9 +152,11 @@ class  ParticlesLayer extends React.Component {
         // TODO Depending on the extent is which generators we should display
         // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection);
         var blues = d3.scaleOrdinal(d3.schemeBlues[9]);
-        for(let i=0; i < 10; i++){
-            console.log(blues(i));
-        }
+        // for(let i=0; i < 10; i++){
+        //     console.log(blues(i));
+        // }
+        console.log("Resolution:", this.props.map.getView().getResolution());
+        console.log("Center:", this.props.map.getView().getCenter());
 
         this.canvasWidth = size[0];
         this.canvasHeight = size[1];

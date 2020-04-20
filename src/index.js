@@ -30,7 +30,8 @@ let background_layer = new TileLayer({
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
-        url: "http://ozavala.coaps.fsu.edu/data/countries.json",
+        // url: "http://ozavala.coaps.fsu.edu/data/countries.json",
+        url: "http://localhost/data/countries.json",
         format: new GeoJSON()
     }),
     //The style is defined on 'StatesLayer.js'
@@ -39,6 +40,12 @@ let states_layer = new VectorLayer({
     }
 });
 
+const tot_res = 7;
+let resolutions = Array(tot_res);
+for(let i=0; i < tot_res; i++){
+    resolutions[i] = .3/(2**i);
+}
+console.log("Resolutions: ", resolutions);
 
 let map = new Map({
     layers: [
@@ -47,15 +54,14 @@ let map = new Map({
     target: 'map',
     view: new View({
         projection: 'EPSG:4326', //Equirectangular
-        center: [70, 0],
-        // extent: [-180, -150, 180, 90],
-        extent: [-130, -90, 130, 100],
-        zoom: 4,
-        maxZoom: 15,
-        minZoom: 3
+        center: [0, 0],
+        extent: [-180, -90, 180, 90],
+        resolutions: resolutions,
+        zoom: 1,
+        // maxZoom: 8,
+        // minZoom: 2
         // ---------- OR ----------------
         // projection: 'EPSG:3857', // Mercator
-        // center: [70, 0],
         // zoom: 4,
         // maxZoom: 8,
         // minZoom: 2

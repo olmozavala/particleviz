@@ -43,7 +43,7 @@ const data_files = [
 class  ParticleVizManager extends React.Component{
     constructor(props){
         super(props);
-        console.log(`Constructor: particle viz`);
+        // console.log(`Constructor: particle viz`);
         this.state = {
             colors_by_country: [],
             selected_country: '',
@@ -78,10 +78,10 @@ class  ParticleVizManager extends React.Component{
         // console.log("Updating selected country in manager");
 
         let current_country = this.state.selected_country;
-        console.log(`Previous state - current: ${current_country} - ${name} `);
+        // console.log(`Previous state - current: ${current_country} - ${name} `);
         // If the name is the same as before then we 'toogle it'
         if(current_country.localeCompare(name) === 0){
-            console.log("Same country!");
+            // console.log("Same country!");
             name = '';
         }
         let colors_by_country = this.updateCountryColors(this.state.country_names, name);
@@ -100,7 +100,7 @@ class  ParticleVizManager extends React.Component{
      * @returns {{}}
      */
     updateCountryColors(country_names, selected_country) {
-        console.log("Updating colors....");
+        // console.log("Updating colors....");
         let colors_by_country = {};
         let update_alpha = false;
 
