@@ -23,7 +23,8 @@ const BACKGROUND_MAPS = {
     stamen: 1,
     nature: 2,
     osm: 3,
-    un: 4
+    un: 4,
+    empty: 5
 };
 
 class  BackgroundLayerManager extends React.Component{
@@ -46,8 +47,12 @@ class  BackgroundLayerManager extends React.Component{
     updateBackgroundLayer(e){
         console.log("Updating background layer...");
         let bk_layer = this.state.bk_layer;
-        // let bk_layer_src = bk_layer.getSource();
         switch(parseInt(e)){
+            case BACKGROUND_MAPS.empty:
+                d3.select("#title").style("color", "#212529");
+                d3.select("#map").style("background-color", "white");
+                bk_layer.setSource();
+                break;
             case BACKGROUND_MAPS.un:
                 d3.select("#title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
@@ -111,9 +116,12 @@ class  BackgroundLayerManager extends React.Component{
                         <FontAwesomeIcon icon={faMap} size="lg"/>
                     </DropdownToggle>
                     <DropdownMenu >
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >
+                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
                             <img src={img_map_un} className="rounded" width="100px"></img>
                         </DropdownItem>
+                        {/*<DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >*/}
+                        {/*    <img src={img_map_un} className="rounded" width="100px"></img>*/}
+                        {/*</DropdownItem>*/}
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
                             <img src={img_map_osm} className="rounded" width="100px"></img>
                         </DropdownItem>

@@ -124,12 +124,12 @@ class  StatesLayer extends React.Component{
             fill: new Fill({
                 color: color
             }),
-            // stroke: new Stroke({
-            //     // color: '#319FD3',
-            //     color: '#6D6D6D',
-            //     width: 0
-            // })
-            // ,
+            stroke: new Stroke({
+                // color: '#319FD3',
+                color: '#6D6D6D',
+                width: 0
+            })
+            ,
             text: new Text({
                 font: '12px Calibri,sans-serif',
                 fill: new Fill({
@@ -144,10 +144,20 @@ class  StatesLayer extends React.Component{
         });
     }
 
+    /**
+     *
+     * @param name
+     * @returns {Style}
+     */
     getDefaultStyle(name){
         return new Style({
             fill: new Fill({
                 color: 'rgba(255,255,255,.1)',
+            }),
+            stroke: new Stroke({
+                // color: '#319FD3',
+                color: '#6D6D6D',
+                width: 0
             }),
             text: new Text({
                 font: '12px Calibri,sans-serif',

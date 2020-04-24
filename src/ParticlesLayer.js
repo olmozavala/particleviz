@@ -11,7 +11,8 @@ import 'animate.css'
 import 'open-iconic/font/css/open-iconic-bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faBackward,
+    faArrowsAltH,
+    faBackward, faCircle,
     faForward,
     faMinus,
     faPause,
@@ -23,7 +24,7 @@ import {
 import JSZip from "jszip";
 import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
 import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
-import {ButtonGroup} from "react-bootstrap";
+import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 var zip = new JSZip();
 
 const STATUS = {
@@ -33,20 +34,38 @@ const STATUS = {
     playing: 3,
 };
 
-const TRANSPARENCY_LEVELS = {
-    1: .001,
-    2: .004,
-    3: .008,
-    4: .03,
-    5: .1
+// How much transparency should we add
+const TRAIL_SIZE = {
+    1: .006,
+    2: .016,
+    3: .032,
+    4: .12,
+    5: .4
 };
 
+const TRAIL_SIZE_TXT = {
+    1: 'Largest',
+    2: 'Larger',
+    3: 'Default',
+    4: 'Smaller',
+    5: 'Smallest'
+};
+
+
 const PARTICLE_SIZES= {
-    1: .3,
-    2: .7,
-    3: 1,
-    4: 2,
-    5: 3,
+    1: .6,
+    2: 1.4,
+    3: 2,
+    4: 3,
+    5: 4,
+};
+
+const PARTICLE_SIZE_TXT = {
+    1: 'Biggest ',
+    2: 'Bigger  ',
+    3: 'Default ',
+    4: 'Smaller ',
+    5: 'Smallest'
 };
 
 // Modes in how to increase/decrase a variable
@@ -55,7 +74,7 @@ const MODES={
     decrease:2
 }
 
-const DRAW_LAST_DAYS = 40;
+const DRAW_LAST_DAYS = 60;
 const MAX_ANIMATION_SPEED = 25;
 
 class  ParticlesLayer extends React.Component {
@@ -88,20 +107,20 @@ class  ParticlesLayer extends React.Component {
         this.draw_until_day = true; // Used to redraw all the positions until current time
 
         this.getFeatures = this.getFeatures.bind(this);
-        this.getFeaturesAsLines = this.getFeaturesAsLines.bind(this);
         this.drawLitter = this.drawLitter.bind(this);
         this.drawParticles = this.drawParticles.bind(this);
         this.drawLines = this.drawLines.bind(this);
         this.canvasFunction = this.canvasFunction.bind(this);
+        this.getIconColorSize= this.getIconColorSize.bind(this);
         this.drawNextDay = this.drawNextDay.bind(this);
         this.increaseSpeed = this.increaseSpeed.bind(this);
         this.decreaseSpeed = this.decreaseSpeed.bind(this);
         this.increaseSize = this.increaseSize.bind(this);
         this.decreaseSize = this.decreaseSize.bind(this);
         this.updateAnimation = this.updateAnimation.bind(this);
-        this.addTransparency = this.addTransparency.bind(this);
+        this.increaseTransparency = this.increaseTransparency.bind(this);
         this.readBinaryBlob = this.readBinaryBlob.bind(this);
-       this.decreaseTransparency = this.decreaseTransparency.bind(this);
+        this.decreaseTransparency = this.decreaseTransparency.bind(this);
         this.playPause = this.playPause.bind(this);
         this.changeDay = this.changeDay.bind(this);
         this.readData = this.readData.bind(this);
@@ -128,10 +147,12 @@ class  ParticlesLayer extends React.Component {
 
         this.country_keys = Object.keys(this.data);
         this.country_names = this.country_keys.map((x) => x.toLowerCase());
+        this.ocean_names = this.country_keys.map((x) => this.data[x]['oceans']);
         this.total_timesteps = this.data[this.country_keys[0]]["lat_lon"][0][0].length;
 
         console.log("\t Total timesteps: ", this.total_timesteps);
         console.log("\t Countries names: ", this.country_names);
+        console.log("\t Ocean names: ", this.ocean_names);
 
         if (this.state.canvas_layer === -1) {
             let canv_lay = new ImageLayer({
@@ -144,7 +165,7 @@ class  ParticlesLayer extends React.Component {
             })
             this.props.map.addLayer(canv_lay);
         }
-        this.props.updateCountryColors(this.country_names);
+        this.props.updateCountriesData(this.country_names, this.ocean_names);
     }
 
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
@@ -171,7 +192,7 @@ class  ParticlesLayer extends React.Component {
 
         this.d3canvas.attr('width', this.canvasWidth).attr('height', this.canvasHeight);
         let ctx = this.d3canvas.node().getContext('2d');
-        ctx.lineCap = 'butt';
+        ctx.lineCap = 'round'; // butt, round, square
 
         this.show_west_map = false;
         this.show_east_map = false;
@@ -283,7 +304,7 @@ class  ParticlesLayer extends React.Component {
                 // Make previous frame transparent
                 var prev = ctx.globalCompositeOperation;
                 ctx.globalCompositeOperation = "destination-out";
-                ctx.fillStyle = `rgba(255, 255, 255, ${TRANSPARENCY_LEVELS[this.state.transparency_index]})`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.globalCompositeOperation = prev;
                 ctx.fill();
@@ -312,7 +333,7 @@ class  ParticlesLayer extends React.Component {
      * @param ctx Context of the canvas object to use
      */
     drawParticles(ctx) {
-        let countries = this.getFeatures();
+        let countries = this.getFeatures('points');
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
@@ -331,7 +352,7 @@ class  ParticlesLayer extends React.Component {
      * @param ctx Context of the canvas object to use
      */
     drawLines(ctx) {
-        let countries = this.getFeaturesAsLines();
+        let countries = this.getFeatures('lines');
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
@@ -350,47 +371,17 @@ class  ParticlesLayer extends React.Component {
     }
 
     /**
-     * Gets the features as points rather than lines.
+     * Obtains the particles in the GeoJson format
+     * @param type
      * @returns {[]}
      */
-    getFeatures() {
+    getFeatures(type='lines'){
         let countries_feature_collection = [];
-        // Iterating over countries
-        for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-            // console.log(`--------------------- Country: ${cur_country_id} -----------------`);
-            let cur_country = this.data[this.country_keys[cur_country_id]];
-            let tot_part = cur_country[0].length;
-            // console.log("\t tot particles: ", tot_part);
-
-            // Iterating over particles at this time step
-            let features_array = [];
-            for (let part_id = 0; part_id < tot_part; part_id++) {
-                let coordinates = [];
-                coordinates.push([parseFloat(cur_country[1][part_id][this.state.time_step]),
-                                  parseFloat(cur_country[0][part_id][this.state.time_step])]);
-                let single_part_feature = {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "MultiPoint",
-                        "coordinates": coordinates
-                    }
-                };
-                features_array.push(single_part_feature);
-            }
-
-            let features = {
-                "type": "FeatureCollection",
-                "features": features_array,
-                "country": this.country_names[cur_country_id]
-            };
-            countries_feature_collection.push(features);
+        let start_time = this.state.time_step;
+        let end_time = this.state.time_step+1;
+        if (this.draw_until_day) {
+            start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS*(6-this.state.transparency_index)/6);
         }
-
-        return countries_feature_collection;
-    }
-
-    getFeaturesAsLines() {
-        let countries_feature_collection = [];
         // Iterating over countries
         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
             let cur_country = this.data[this.country_keys[cur_country_id]];
@@ -399,50 +390,48 @@ class  ParticlesLayer extends React.Component {
 
             // Iterating over particles at this time step
             let features_array = [];
-
-            // This if only applies when we are reloading the map, drawing more than a single day.
-            if (this.draw_until_day) {
-                // Iterate over the particles of this country
-                for (let part_id = 0; part_id < tot_part; part_id++) {
-                    let coordinates = [];
-                    let start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS);
-                    // Pushes the coordinates of the first position
-                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
-                                      parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
-                    // Pushes all the other particles
-                    for (let time_step = start_time; time_step < this.state.time_step; time_step++) {
-                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-                            parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
-                    }
-                    // Make a LineString feature from the coordinates
-                    let single_part_feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": coordinates
-                        }
-                    };
-                    // PUsh the array of 'this country' into the complete array of features
-                    features_array.push(single_part_feature);
-                }
-
-            } else {
                 // Iterate over all the particles
-                for (let part_id = 0; part_id < tot_part; part_id++) {
-                    let coordinates = [];
-                    // Add the two positions of the current particle
-                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step]),
-                                      parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step])]);
-                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step + 1]),
-                                      parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step + 1])]);
-                    let single_part_feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": coordinates
+                if(type.localeCompare('lines') == 0) {
+                    for (let part_id = 0; part_id < tot_part; part_id++) {
+                        let coordinates = [];
+                        // Add the two positions of the current particle
+                        // Pushes the coordinates of the first position
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
+                        // Pushes all the other particles times
+                        for (let time_step = start_time; time_step <= end_time; time_step++) {
+                            coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
+                                parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
                         }
-                    };
-                    features_array.push(single_part_feature);
+                        let single_part_feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": coordinates
+                            }
+                        };
+                        features_array.push(single_part_feature);
+                    }
+                }else{
+                    // THis case is when we want to draw particles rather than lines
+                    for (let part_id = 0; part_id < tot_part; part_id++) {
+                        let coordinates = [];
+                        // Add the position of the current particle
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step])]);
+                        // If drawing more than one location, then add more particles
+                        for (let time_step = start_time; time_step < end_time; time_step++) {
+                            coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
+                                parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
+                        }
+                        let single_part_feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": coordinates
+                            }
+                        };
+                        features_array.push(single_part_feature);
                 }
             }
 
@@ -527,24 +516,24 @@ class  ParticlesLayer extends React.Component {
         e.preventDefault();
     }
 
-    addTransparency(e) {
-        let new_life = this.state.transparency_index;
-        if (new_life < (Object.keys(TRANSPARENCY_LEVELS).length)) {
-            new_life += 1;
+    increaseTransparency(e) {
+        let new_trans = this.state.transparency_index;
+        if (new_trans < (Object.keys(TRAIL_SIZE).length)) {
+            new_trans += 1;
         }
         this.setState({
-            transparency_index: new_life
+            transparency_index: new_trans
         });
         e.preventDefault();
     }
 
     decreaseTransparency(e) {
-        let new_life = this.state.transparency_index;
-        if (new_life > 0) {
-            new_life -= 1;
+        let new_trans = this.state.transparency_index;
+        if (new_trans > 0) {
+            new_trans -= 1;
         }
         this.setState({
-            transparency_index: new_life
+            transparency_index: new_trans
         });
         e.preventDefault();
     }
@@ -585,18 +574,70 @@ class  ParticlesLayer extends React.Component {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
+    /**
+     * This function is used to change icon and color sizes
+     * @param value
+     * @param inv
+     * @returns {string}
+     */
+    getIconColorSize(value, inv=false, color=false){
+        if(inv){
+            value = 6 - value;
+        }
+
+        if(color) {
+            if(value == 5) {
+                return "darkred"
+            }else{
+                return "black";
+            }
+
+        }else{
+            switch (value) {
+                case 5:
+                    return "lg";
+                    break;
+                case 4:
+                    return "lg";
+                    break;
+                case 3:
+                    return "";
+                    break;
+                case 2:
+                    return "sm";
+                    break;
+                case 1:
+                    return "xs";
+                    break;
+            }
+
+        }
+    }
+
     displayTransparency(){
         let transparency = <span></span>;
-        if(this.state.status == STATUS.playing){
+        if(this.state.status !== STATUS.loading){
             transparency =
-                <span className="navbar-brand"> Transparency: {this.state.transparency_index} {" "}
-                    <button className="btn btn-info btn-sm " onClick={this.decreaseTransparency}
-                            disabled={this.state.transparency_index == 1}>
+                <span className="navbar-brand">
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id="button-tooltip">
+                                Trail size
+                            </Tooltip>
+                        }
+                        delay={{show:50, hide:50}}
+                        placement="left">
+                    <span> <FontAwesomeIcon icon={faArrowsAltH} color={this.getIconColorSize(this.state.transparency_index, true, true)}
+                                                                           size={this.getIconColorSize(this.state.transparency_index, true)}/> </span>
+
+                                        </OverlayTrigger>
+                    <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
+                            disabled={this.state.transparency_index == (Object.keys(TRAIL_SIZE).length)}>
                                     <FontAwesomeIcon icon={faMinus} size="xs"/>
                     </button>
                     {" "}
-                    <button className="btn btn-info btn-sm" onClick={this.addTransparency}
-                            disabled={this.state.transparency_index == (Object.keys(TRANSPARENCY_LEVELS).length)}>
+                    <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                            disabled={this.state.transparency_index == 1}>
                                     <FontAwesomeIcon icon={faPlus} size="xs"/>
                     </button>
                 </span>
@@ -606,13 +647,26 @@ class  ParticlesLayer extends React.Component {
 
     displayParticleSize(){
         let particleSize= <span></span>;
-        if(this.state.status == STATUS.playing){
+        // if(this.state.status == STATUS.playing){
+        if(this.state.status !== STATUS.loading){
             particleSize =
-                <span className="navbar-brand"> Particle size: {this.state.particle_size_index} {" "}
+                <span className="navbar-brand">
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id="button-tooltip">
+                                Particle size
+                            </Tooltip>
+                        }
+                        delay={{show:50, hide:50}}
+                        placement="left">
+                        <span> <FontAwesomeIcon icon={faCircle} color={this.getIconColorSize(this.state.particle_size_index, false, true)}
+                                                size={this.getIconColorSize(this.state.particle_size_index)}/> </span>
+
+                    </OverlayTrigger>
                     <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
                             disabled={this.state.particle_size_index == 1}>
-                            <FontAwesomeIcon icon={faMinus} size="xs"/>
-                    </button>
+                                <FontAwesomeIcon icon={faMinus} size="xs"/>
+                        </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.increaseSize}
                             disabled={this.state.particle_size_index == (Object.keys(PARTICLE_SIZES).length)}>
@@ -668,10 +722,13 @@ class  ParticlesLayer extends React.Component {
                         <span className="navbar-brand">
                             <ButtonGroup>
                                 <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
-                                        disabled={this.state.status !== STATUS.playing}>
+                                        title="Decrease animation speed"
+                                        disabled={(this.state.status !== STATUS.playing) ||
+                                        (this.state.speed_hz <= .6)}>
                                 <FontAwesomeIcon icon={faBackward} size="xs"/>
                                 </button>
                                 <button className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
+                                        title="Previous time step"
                                         disabled={this.state.status !== STATUS.paused}>
                                 <FontAwesomeIcon icon={faStepBackward} size="xs"/>
                                 </button>
@@ -681,10 +738,12 @@ class  ParticlesLayer extends React.Component {
                                     <FontAwesomeIcon icon={faPlay} size="xs"/>}
                                 </button>
                                 <button className="btn btn-info btn-sm" onClick={this.nextDay}
+                                        title="Next time step"
                                         disabled={this.state.status !== STATUS.paused}>
                                 <FontAwesomeIcon icon={faStepForward} size="xs"/>
                                 </button>
                                 <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
+                                        title="Incrase animation speed"
                                         disabled={(this.state.status !== STATUS.playing) ||
                                         (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
                                 <FontAwesomeIcon icon={faForward} size="xs"/>
