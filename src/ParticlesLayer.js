@@ -24,7 +24,7 @@ import {
 import JSZip from "jszip";
 import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
 import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
-import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {ButtonGroup, OverlayTrigger, Tooltip, Form} from "react-bootstrap";
 var zip = new JSZip();
 
 const STATUS = {
@@ -618,7 +618,7 @@ class  ParticlesLayer extends React.Component {
         let transparency = <span></span>;
         if(this.state.status !== STATUS.loading){
             transparency =
-                <span className="navbar-brand">
+                <span className="navbar-brand col">
                     <OverlayTrigger
                         overlay={
                             <Tooltip id="button-tooltip">
@@ -650,7 +650,7 @@ class  ParticlesLayer extends React.Component {
         // if(this.state.status == STATUS.playing){
         if(this.state.status !== STATUS.loading){
             particleSize =
-                <span className="navbar-brand">
+                <span className="navbar-brand col">
                     <OverlayTrigger
                         overlay={
                             <Tooltip id="button-tooltip">
@@ -692,7 +692,7 @@ class  ParticlesLayer extends React.Component {
         return (
             <span>
                 {((this.state.status == STATUS.loading) || (this.state.status == STATUS.decompressing)) ?
-                    <div>
+                    <div className="row">
                         {this.state.status == STATUS.loading ?
                             <div>
                                 <div className="spinner-border" role="status">
@@ -706,20 +706,20 @@ class  ParticlesLayer extends React.Component {
                         }
                     </div>
                     :
-                    <div>
+                    <div className="row">
                         {/*---- Transparency ---------*/}
                         {this.displayTransparency()}
                         {/*---- Particle size ---------*/}
                         {this.displayParticleSize()}
                         {/*---- Current day ------------*/}
-                        <span className="navbar-brand">
-                            <input type="range"
+                        <span className="navbar-brand col d-none d-lg-inline">
+                            <input type="range" style={{width: "50"}}
                                    onChange={this.changeDay}
                                    value={this.state.time_step}
                                    min="0" max={this.total_timesteps}/>
                         </span>
                         {/*---- Play/Pause---------*/}
-                        <span className="navbar-brand">
+                        <span className="navbar-brand col">
                             <ButtonGroup>
                                 <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
                                         title="Decrease animation speed"

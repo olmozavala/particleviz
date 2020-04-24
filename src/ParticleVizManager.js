@@ -208,10 +208,10 @@ class  ParticleVizManager extends React.Component{
         return (
             <div className="container-fluid">
                 <div className="row justify-content-center">
-                    <div className="col-lg-2 col-md-1 navbar-brand ml-2">
+                    <div className="col-1 navbar-brand ml-2 d-none d-lg-inline">
                         <FontAwesomeIcon icon={faGlobeAfrica} size="lg"/>
                     </div>
-                    <div className="col-lg-6 col-md-8 col-sm-12">
+                    <div className="col-12 col-md-8 col-lg-8 col-xl-6">
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesAll}
                                         selected_color={selected_color}
@@ -219,7 +219,7 @@ class  ParticleVizManager extends React.Component{
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
                     </div>
-                    <div className="col-lg-2 col-md-3 navbar-brand ml-2">
+                    <div className="col-5 col-md-2 col-lg-2 navbar-brand  ml-2">
                         <Dropdown >
                             <Dropdown.Toggle variant="info">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
@@ -231,7 +231,7 @@ class  ParticleVizManager extends React.Component{
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    <div className="col-1">
+                    <div className="col-5 col-md-2 col-lg-1">
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map} />
                     </div>
