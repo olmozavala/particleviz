@@ -47,7 +47,7 @@ class  BackgroundLayerManager extends React.Component{
     updateBackgroundLayer(e){
         console.log("Updating background layer...");
         let bk_layer = this.state.bk_layer;
-        switch(parseInt(e)){
+        switch(parseInt(e)) {
             case BACKGROUND_MAPS.empty:
                 d3.select("#title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
@@ -58,18 +58,18 @@ class  BackgroundLayerManager extends React.Component{
                 d3.select("#map").style("background-color", "white");
                 bk_layer.setSource(
                     new TileWMS({
-                            url: 'https://geonode.wfp.org/geoserver/wms',
-                            params: {
-                                'LAYERS': 'geonode:wld_bnd_admin0_l_unmap_2019',
-                                'TILED': true
-                            }
-                        })
-                    );
+                        url: 'https://geonode.wfp.org/geoserver/wms',
+                        params: {
+                            'LAYERS': 'geonode:wld_bnd_admin0_l_unmap_2019',
+                            'TILED': true
+                        }
+                    })
+                );
                 break;
             case BACKGROUND_MAPS.osm:
                 d3.select("#title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
-                bk_layer.setSource( new OSM() );
+                bk_layer.setSource(new OSM());
                 break;
             case BACKGROUND_MAPS.stamen:
                 d3.select("#title").style("color", "#212529");
@@ -100,7 +100,11 @@ class  BackgroundLayerManager extends React.Component{
                     })
                 );
                 break;
-
+            default:
+                d3.select("#title").style("color", "#212529");
+                d3.select("#map").style("background-color", "white");
+                bk_layer.setSource();
+                break;
         }
 
         this.setState({
@@ -117,22 +121,22 @@ class  BackgroundLayerManager extends React.Component{
                     </DropdownToggle>
                     <DropdownMenu >
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
-                            <img src={img_map_un} className="rounded" width="100px"></img>
+                            <img src={img_map_un} className="rounded" width="100px" alt="White"/>
                         </DropdownItem>
                         {/*<DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >*/}
                         {/*    <img src={img_map_un} className="rounded" width="100px"></img>*/}
                         {/*</DropdownItem>*/}
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
-                            <img src={img_map_osm} className="rounded" width="100px"></img>
+                            <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
                         </DropdownItem>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.stamen} >
-                            <img src={img_map_stamen} className="rounded" width="100px"></img>
+                            <img src={img_map_stamen} className="rounded" width="100px" alt="Stamen"/>
                         </DropdownItem>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.nature} >
-                            <img src={img_map_bingaer} className="rounded" width="100px"></img>
+                            <img src={img_map_bingaer} className="rounded" width="100px" alt="Nature"/>
                         </DropdownItem>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.dark} >
-                            <img src={img_map_dark} className="rounded" width="100px"></img>
+                            <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>

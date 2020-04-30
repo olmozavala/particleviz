@@ -4,8 +4,8 @@ import './css/Animations.css';
 import * as d3 from "d3"
 import ImageLayer from "ol/layer/Image";
 import ImageCanvasSource from "ol/source/ImageCanvas";
-import {fromLonLat, toLonLat} from "ol/proj";
-import {getCenter, getWidth} from "ol/extent";
+import {toLonLat} from "ol/proj";
+import {getCenter} from "ol/extent";
 import _ from "underscore";
 import 'animate.css'
 import 'open-iconic/font/css/open-iconic-bootstrap.css';
@@ -24,7 +24,7 @@ import {
 import JSZip from "jszip";
 import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
 import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
-import {ButtonGroup, OverlayTrigger, Tooltip, Form} from "react-bootstrap";
+import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 var zip = new JSZip();
 
 const STATUS = {
@@ -43,15 +43,6 @@ const TRAIL_SIZE = {
     5: .4
 };
 
-const TRAIL_SIZE_TXT = {
-    1: 'Largest',
-    2: 'Larger',
-    3: 'Default',
-    4: 'Smaller',
-    5: 'Smallest'
-};
-
-
 const PARTICLE_SIZES= {
     1: .6,
     2: 1.4,
@@ -60,13 +51,13 @@ const PARTICLE_SIZES= {
     5: 4,
 };
 
-const PARTICLE_SIZE_TXT = {
-    1: 'Biggest ',
-    2: 'Bigger  ',
-    3: 'Default ',
-    4: 'Smaller ',
-    5: 'Smallest'
-};
+// const PARTICLE_SIZE_TXT = {
+//     1: 'Biggest ',
+//     2: 'Bigger  ',
+//     3: 'Default ',
+//     4: 'Smaller ',
+//     5: 'Smallest'
+// };
 
 // Modes in how to increase/decrase a variable
 const MODES={
@@ -80,7 +71,6 @@ const MAX_ANIMATION_SPEED = 25;
 class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props);
-        // console.log(`Constructor ParticlesLayer, Properties: `, this.props);
 
         // Setting up d3 objects
         this.d3Projection = d3.geoEquirectangular().scale(1).translate([0, 0]);//Corresponds to EPSG:4326
@@ -122,7 +112,7 @@ class  ParticlesLayer extends React.Component {
         this.readBinaryBlob = this.readBinaryBlob.bind(this);
         this.decreaseTransparency = this.decreaseTransparency.bind(this);
         this.playPause = this.playPause.bind(this);
-        this.changeDay = this.changeDay.bind(this);
+        this.changeDayRange = this.changeDayRange.bind(this);
         this.readData = this.readData.bind(this);
         this.readingRawData = this.readingRawData.bind(this);
         this.clearInterval = this.clearInterval.bind(this);
@@ -169,15 +159,8 @@ class  ParticlesLayer extends React.Component {
     }
 
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
-        // console.log('====================================================');
         // TODO Depending on the extent is which generators we should display
         // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection);
-        var blues = d3.scaleOrdinal(d3.schemeBlues[9]);
-        // for(let i=0; i < 10; i++){
-        //     console.log(blues(i));
-        // }
-        console.log("Resolution:", this.props.map.getView().getResolution());
-        console.log("Center:", this.props.map.getView().getCenter());
 
         this.canvasWidth = size[0];
         this.canvasHeight = size[1];
@@ -262,9 +245,7 @@ class  ParticlesLayer extends React.Component {
                 this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000);
             }
             if (this.state.status === STATUS.paused) {
-                let canvas = this.d3canvas.node();
-                let ctx = canvas.getContext('2d');
-                this.drawLitter(ctx);
+                this.drawNextDay();
             }
         }
     }
@@ -294,24 +275,24 @@ class  ParticlesLayer extends React.Component {
      * Draws a single day of litter using D3
      */
     drawNextDay() {
-        if (this.state.status === STATUS.playing) {
-            let canvas = this.d3canvas.node();
-            let ctx = canvas.getContext('2d');
-            if (this.state.time_step === 0) {
-                // Clear the canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            } else {
-                // Make previous frame transparent
-                var prev = ctx.globalCompositeOperation;
-                ctx.globalCompositeOperation = "destination-out";
-                ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalCompositeOperation = prev;
-                ctx.fill();
-            }
+        let canvas = this.d3canvas.node();
+        let ctx = canvas.getContext('2d');
+        if (this.state.time_step === 0) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        } else {
+            // Make previous frame transparent
+            var prev = ctx.globalCompositeOperation;
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = prev;
+            ctx.fill();
+        }
+        // Draw next frame
+        this.drawLitter(ctx);
 
-            // Draw next frame
-            this.drawLitter(ctx);
+        if (this.state.status === STATUS.playing) {
             let next_time_step = (this.state.time_step + 1) % this.total_timesteps;
             this.setState({
                 time_step: next_time_step
@@ -357,6 +338,7 @@ class  ParticlesLayer extends React.Component {
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
             ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
+            // ctx.strokeStyle = "rgb(0,0,0)"
             this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
             if(this.show_west_map) {
                 this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
@@ -386,12 +368,11 @@ class  ParticlesLayer extends React.Component {
         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
             let cur_country = this.data[this.country_keys[cur_country_id]];
             let tot_part = cur_country["lat_lon"][0].length;
-            // console.log("\t tot particles: ", tot_part);
 
             // Iterating over particles at this time step
             let features_array = [];
                 // Iterate over all the particles
-                if(type.localeCompare('lines') == 0) {
+                if(type.localeCompare('lines') === 0) {
                     for (let part_id = 0; part_id < tot_part; part_id++) {
                         let coordinates = [];
                         // Add the two positions of the current particle
@@ -467,7 +448,7 @@ class  ParticlesLayer extends React.Component {
      */
     updateValue(old_value, mode, amount = 1) {
         let new_value = old_value;
-        if (mode == MODES.increase) {
+        if (mode === MODES.increase) {
             if (old_value >= 1) {
                 new_value += amount;
             } else {
@@ -488,7 +469,6 @@ class  ParticlesLayer extends React.Component {
         this.setState({
             speed_hz: new_speed
         });
-        console.log(new_speed);
         e.preventDefault();
     }
 
@@ -551,7 +531,7 @@ class  ParticlesLayer extends React.Component {
         }
     }
 
-    changeDay(e) {
+    changeDayRange(e) {
         e.preventDefault();
         this.draw_until_day = true;
         this.setState({time_step: parseInt(e.target.value)});
@@ -578,6 +558,7 @@ class  ParticlesLayer extends React.Component {
      * This function is used to change icon and color sizes
      * @param value
      * @param inv
+     * @param color
      * @returns {string}
      */
     getIconColorSize(value, inv=false, color=false){
@@ -586,7 +567,7 @@ class  ParticlesLayer extends React.Component {
         }
 
         if(color) {
-            if(value == 5) {
+            if(value === 5) {
                 return "darkred"
             }else{
                 return "black";
@@ -596,19 +577,16 @@ class  ParticlesLayer extends React.Component {
             switch (value) {
                 case 5:
                     return "lg";
-                    break;
                 case 4:
                     return "lg";
-                    break;
                 case 3:
-                    return "";
-                    break;
+                    return "1x";
                 case 2:
                     return "sm";
-                    break;
                 case 1:
                     return "xs";
-                    break;
+                default:
+                    return "1x";
             }
 
         }
@@ -632,12 +610,12 @@ class  ParticlesLayer extends React.Component {
 
                                         </OverlayTrigger>
                     <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
-                            disabled={this.state.transparency_index == (Object.keys(TRAIL_SIZE).length)}>
+                            disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
                                     <FontAwesomeIcon icon={faMinus} size="xs"/>
                     </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                            disabled={this.state.transparency_index == 1}>
+                            disabled={this.state.transparency_index === 1}>
                                     <FontAwesomeIcon icon={faPlus} size="xs"/>
                     </button>
                 </span>
@@ -647,7 +625,7 @@ class  ParticlesLayer extends React.Component {
 
     displayParticleSize(){
         let particleSize= <span></span>;
-        // if(this.state.status == STATUS.playing){
+        // if(this.state.status === STATUS.playing){
         if(this.state.status !== STATUS.loading){
             particleSize =
                 <span className="navbar-brand col">
@@ -664,12 +642,12 @@ class  ParticlesLayer extends React.Component {
 
                     </OverlayTrigger>
                     <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
-                            disabled={this.state.particle_size_index == 1}>
+                            disabled={this.state.particle_size_index === 1}>
                                 <FontAwesomeIcon icon={faMinus} size="xs"/>
                         </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.increaseSize}
-                            disabled={this.state.particle_size_index == (Object.keys(PARTICLE_SIZES).length)}>
+                            disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
                             <FontAwesomeIcon icon={faPlus} size="xs"/>
                     </button>
                 </span>;
@@ -691,9 +669,9 @@ class  ParticlesLayer extends React.Component {
         this.displayCurrentDay();
         return (
             <span>
-                {((this.state.status == STATUS.loading) || (this.state.status == STATUS.decompressing)) ?
+                {((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) ?
                     <div className="row">
-                        {this.state.status == STATUS.loading ?
+                        {this.state.status === STATUS.loading ?
                             <div>
                                 <div className="spinner-border" role="status">
                                     <span className="sr-only">Loading...</span>
@@ -714,7 +692,7 @@ class  ParticlesLayer extends React.Component {
                         {/*---- Current day ------------*/}
                         <span className="navbar-brand col d-none d-lg-inline">
                             <input type="range" style={{width: "50"}}
-                                   onChange={this.changeDay}
+                                   onChange={this.changeDayRange}
                                    value={this.state.time_step}
                                    min="0" max={this.total_timesteps}/>
                         </span>

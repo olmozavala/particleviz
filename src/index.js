@@ -6,15 +6,12 @@ import * as serviceWorker from './serviceWorker';
 
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
-import {Stamen} from "ol/source";
 import View from "ol/View";
-import OSM from "ol/source/OSM";
 import "bootstrap/dist/css/bootstrap.min.css"
 import TileWMS from "ol/source/TileWMS";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import TopoJSON from "ol/format/TopoJSON";
-import {Fill, Stroke, Style, Text} from "ol/style";
+import {Style} from "ol/style";
 import GeoJSON from "ol/format/GeoJSON";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
@@ -40,7 +37,7 @@ let states_layer = new VectorLayer({
     }
 });
 
-const tot_res = 7;
+const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
     resolutions[i] = .3/(2**i);
@@ -58,6 +55,7 @@ let map = new Map({
         extent: [-180, -90, 180, 90],
         resolutions: resolutions,
         zoom: 1,
+        moveTolerance: 100,
         // maxZoom: 8,
         // minZoom: 2
         // ---------- OR ----------------
