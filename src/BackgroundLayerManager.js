@@ -10,6 +10,7 @@ import img_map_stamen from "./imgs/stamen.jpg";
 import img_map_bingaer from "./imgs/bing_aer.jpg";
 import img_map_osm from "./imgs/osm.jpg";
 import img_map_un from "./imgs/un.jpg";
+import img_map_blank from "./imgs/blank.jpg";
 //https://geonode.wfp.org/layers/geonode%3Awld_bnd_admin0_l_unmap_2019
 import DropdownToggle from "react-bootstrap/DropdownToggle";
 import DropdownItem from "react-bootstrap/DropdownItem";
@@ -55,7 +56,7 @@ class  BackgroundLayerManager extends React.Component{
                 break;
             case BACKGROUND_MAPS.un:
                 d3.select("#title").style("color", "#212529");
-                d3.select("#map").style("background-color", "white");
+                d3.select("#map").style("background-color", "#AAD3DF");
                 bk_layer.setSource(
                     new TileWMS({
                         url: 'https://geonode.wfp.org/geoserver/wms',
@@ -121,11 +122,11 @@ class  BackgroundLayerManager extends React.Component{
                     </DropdownToggle>
                     <DropdownMenu >
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
-                            <img src={img_map_un} className="rounded" width="100px" alt="White"/>
+                            <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
                         </DropdownItem>
-                        {/*<DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >*/}
-                        {/*    <img src={img_map_un} className="rounded" width="100px"></img>*/}
-                        {/*</DropdownItem>*/}
+                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >
+                            <img src={img_map_un} className="rounded" width="100px"  alt="UN"/>
+                        </DropdownItem>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
                             <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
                         </DropdownItem>

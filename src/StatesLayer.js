@@ -64,7 +64,6 @@ class  StatesLayer extends React.Component{
         }
     }
 
-
     makeTable(name){
         let country_data  =this.reached_data[name.toLowerCase()];
         const element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
@@ -77,7 +76,7 @@ class  StatesLayer extends React.Component{
      * @param name
      * @returns {Style}
      */
-    getStyleCountryOfInterest(color, name){
+    getCountryStyle(color, name){
         return new Style({
             fill: new Fill({
                 color: color
@@ -112,11 +111,11 @@ class  StatesLayer extends React.Component{
             fill: new Fill({
                 color: 'rgba(255,255,255,.1)',
             }),
-            // stroke: new Stroke({
-            //     // color: '#319FD3',
-            //     color: '#6D6D6D',
-            //     width: 0
-            // }),
+            stroke: new Stroke({
+                // color: '#319FD3',
+                color: '#6D6D6D',
+                width: 0
+            }),
             text: new Text({
                 font: '12px Calibri,sans-serif',
                 fill: new Fill({
@@ -134,7 +133,7 @@ class  StatesLayer extends React.Component{
     setCountriesStyle(feature){
         if( this.props.colors_by_country[feature.get('name').toLowerCase()]){
             let color = this.props.colors_by_country[feature.get('name').toLowerCase()];//Adding transaprency to the color
-            return this.getStyleCountryOfInterest(color, feature.get(['name']));
+            return this.getCountryStyle(color, feature.get(['name']));
         }else{
             return this.getDefaultStyle(feature.get(['name']));
         }
@@ -158,7 +157,7 @@ class  StatesLayer extends React.Component{
             if(_.isUndefined(color)){
                 oldHovered.setStyle(this.getDefaultStyle(name));
             }else{
-                oldHovered.setStyle(this.getStyleCountryOfInterest(color, name));
+                oldHovered.setStyle(this.getCountryStyle(color, name));
             }
         }
     }
@@ -184,14 +183,14 @@ class  StatesLayer extends React.Component{
             // In which case should we restore the old color
             if(this.state.selected !== null) {
                 let old_name = this.state.selected.get("name");
-                this.state.selected.setStyle(this.getStyleCountryOfInterest(this.state.oldSelectedColor, old_name));
+                this.state.selected.setStyle(this.getCountryStyle(this.state.oldSelectedColor, old_name));
             }
 
             // WE ALWAYS NEED TO SEND THE UPDATE SIGNAL WHEN WE CLICK IN A COUNTRY
             this.props.updateSelectedCountry(name);
 
             if (this.state.selected !== country) {
-                country.setStyle(this.getStyleCountryOfInterest(selected_color, name));
+                country.setStyle(this.getCountryStyle(selected_color, name));
                 // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
                 // var coordinate = e.coordinate;
                 // //     ------ Popup OpenLayers
@@ -234,7 +233,7 @@ class  StatesLayer extends React.Component{
                     let color = this.props.colors_by_country[name];//Adding transaprency to the color
                     if(!_.isUndefined(color)){
                         let new_color = color.slice(0,-2) + "AA";
-                        country.setStyle(this.getStyleCountryOfInterest(new_color, name));
+                        country.setStyle(this.getCountryStyle(new_color, name));
                         this.setState({hovered: country});
                     }
                 }
