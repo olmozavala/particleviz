@@ -8,18 +8,14 @@ import {toLonLat} from "ol/proj";
 import {getCenter} from "ol/extent";
 import _ from "underscore";
 import 'animate.css'
-import 'open-iconic/font/css/open-iconic-bootstrap.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faArrowsAltH,
-    faBackward, faCircle,
-    faForward,
-    faMinus,
-    faPause,
-    faPlus,
-    faStepBackward
-} from '@fortawesome/free-solid-svg-icons'
+    ArrowRight, CircleFill, Plus, Dash,
+    PlayFill, PauseFill,
+    SkipBackwardFill, SkipForwardFill,
+    SkipEndFill, SkipStartFill,
+} from 'react-bootstrap-icons';
 
+import {Form, ProgressBar} from "react-bootstrap";
 
 import JSZip from "jszip";
 import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
@@ -27,6 +23,7 @@ import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
 import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 var zip = new JSZip();
 
+const default_size = 15;
 const STATUS = {
     loading: 0,
     decompressing: 1,
@@ -47,8 +44,8 @@ const PARTICLE_SIZES= {
     1: .6,
     2: 1.4,
     3: 2,
-    4: 3,
-    5: 4,
+    4: 4,
+    5: 6,
 };
 
 // const PARTICLE_SIZE_TXT = {
@@ -66,7 +63,7 @@ const MODES={
 }
 
 const DRAW_LAST_DAYS = 60;
-const MAX_ANIMATION_SPEED = 25;
+const MAX_ANIMATION_SPEED = 45;
 
 class  ParticlesLayer extends React.Component {
     constructor(props) {
@@ -90,7 +87,8 @@ class  ParticlesLayer extends React.Component {
             status: STATUS.loading,
             particle_size_index: 3,
             selected_model: this.props.selected_model,
-            canvas_layer: -1
+            canvas_layer: -1,
+            loading_perc: 0,
         };
         this.canvasWidth = 0;
         this.canvasHeight = 0;
@@ -102,6 +100,7 @@ class  ParticlesLayer extends React.Component {
         this.drawLines = this.drawLines.bind(this);
         this.canvasFunction = this.canvasFunction.bind(this);
         this.getIconColorSize= this.getIconColorSize.bind(this);
+        this.getIconColorSizeBoostrap= this.getIconColorSizeBoostrap.bind(this);
         this.drawNextDay = this.drawNextDay.bind(this);
         this.increaseSpeed = this.increaseSpeed.bind(this);
         this.decreaseSpeed = this.decreaseSpeed.bind(this);
@@ -109,12 +108,12 @@ class  ParticlesLayer extends React.Component {
         this.decreaseSize = this.decreaseSize.bind(this);
         this.updateAnimation = this.updateAnimation.bind(this);
         this.increaseTransparency = this.increaseTransparency.bind(this);
-        this.readBinaryBlob = this.readBinaryBlob.bind(this);
+        this.readOneZip = this.readOneZip.bind(this);
         this.decreaseTransparency = this.decreaseTransparency.bind(this);
         this.playPause = this.playPause.bind(this);
         this.changeDayRange = this.changeDayRange.bind(this);
-        this.readData = this.readData.bind(this);
-        this.readingRawData = this.readingRawData.bind(this);
+        this.readThreeReadJSON = this.readThreeReadJSON.bind(this);
+        this.readTwoUnzippedFile = this.readTwoUnzippedFile.bind(this);
         this.clearInterval = this.clearInterval.bind(this);
         this.nextDay = this.nextDay.bind(this);
         this.prevDay = this.prevDay.bind(this);
@@ -123,26 +122,28 @@ class  ParticlesLayer extends React.Component {
         this.displayParticleSize= this.displayParticleSize.bind(this);
     }
 
-    readingRawData(data) {
-        this.readData(JSON.parse(data));
+    readTwoUnzippedFile(data) {
+        this.readThreeReadJSON(JSON.parse(data));
     }
 
     /**
      * Main function that reads the json data
      * @param data
      */
-    readData(data) {
-        console.log("Reading data!!!!!!! ", data);
+    readThreeReadJSON(data) {
+        console.log("Reading json data!!!!!!! ", data);
         this.data = data;
 
         this.country_keys = Object.keys(this.data);
         this.country_names = this.country_keys.map((x) => x.toLowerCase());
         this.ocean_names = this.country_keys.map((x) => this.data[x]['oceans']);
+        this.continent_names = this.country_keys.map((x) => this.data[x]['continent']);
         this.total_timesteps = this.data[this.country_keys[0]]["lat_lon"][0][0].length;
 
         console.log("\t Total timesteps: ", this.total_timesteps);
         console.log("\t Countries names: ", this.country_names);
         console.log("\t Ocean names: ", this.ocean_names);
+        console.log("\t Continent names: ", this.continent_names);
 
         if (this.state.canvas_layer === -1) {
             let canv_lay = new ImageLayer({
@@ -155,7 +156,7 @@ class  ParticlesLayer extends React.Component {
             })
             this.props.map.addLayer(canv_lay);
         }
-        this.props.updateCountriesData(this.country_names, this.ocean_names);
+        this.props.updateCountriesData(this.country_names, this.ocean_names, this.continent_names);
     }
 
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
@@ -238,8 +239,9 @@ class  ParticlesLayer extends React.Component {
             });
             this.selected_mode = this.props.selected_model;
             let url = `${this.props.url}/${this.props.selected_model.file}.zip`;
+            console.log("Changed model: ", url);
             d3.blob(url)
-                .then(this.readBinaryBlob);
+                .then(this.readOneZip);
         } else {
             if (this.state.status === STATUS.playing) {
                 this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000);
@@ -254,7 +256,7 @@ class  ParticlesLayer extends React.Component {
      * Reads a zip file and dispatches the correct function after unziping
      * @param blob
      */
-    readBinaryBlob(blob) {
+    readOneZip(blob) {
         console.log('File has been received!');
         zip.loadAsync(blob)
             .then(function (zip) {
@@ -264,7 +266,7 @@ class  ParticlesLayer extends React.Component {
                     return zipobj.async("string");
                 }
             })
-            .then(this.readingRawData);
+            .then(this.readTwoUnzippedFile);
 
         this.setState({
             status: STATUS.decompressing
@@ -315,13 +317,18 @@ class  ParticlesLayer extends React.Component {
      */
     drawParticles(ctx) {
         let countries = this.getFeatures('points');
-        ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
             ctx.fillStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
             this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
             this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
             this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features});
+            if(this.show_west_map) {
+                this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
+            }
+            if(this.show_east_map) {
+                this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features});
+            }
             ctx.fill();
             ctx.closePath();
         }
@@ -333,12 +340,15 @@ class  ParticlesLayer extends React.Component {
      * @param ctx Context of the canvas object to use
      */
     drawLines(ctx) {
+        // console.time('features');
         let countries = this.getFeatures('lines');
+        // console.timeLog('features', "features");
+        // console.time('draw');
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
-            ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
-            // ctx.strokeStyle = "rgb(0,0,0)"
+            // ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
+            ctx.strokeStyle = "rgb(0,0,0)"
             this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
             if(this.show_west_map) {
                 this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
@@ -349,6 +359,7 @@ class  ParticlesLayer extends React.Component {
             ctx.stroke();
             ctx.closePath();
         }
+        // console.timeLog('draw', "draw");
         this.props.map.render();
     }
 
@@ -364,55 +375,57 @@ class  ParticlesLayer extends React.Component {
         if (this.draw_until_day) {
             start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS*(6-this.state.transparency_index)/6);
         }
+
+        // let glob_tot_particles = 0;
         // Iterating over countries
         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
             let cur_country = this.data[this.country_keys[cur_country_id]];
             let tot_part = cur_country["lat_lon"][0].length;
+            // glob_tot_particles += tot_part;
 
-            // Iterating over particles at this time step
             let features_array = [];
-                // Iterate over all the particles
-                if(type.localeCompare('lines') === 0) {
-                    for (let part_id = 0; part_id < tot_part; part_id++) {
-                        let coordinates = [];
-                        // Add the two positions of the current particle
-                        // Pushes the coordinates of the first position
-                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
-                            parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
-                        // Pushes all the other particles times
-                        for (let time_step = start_time; time_step <= end_time; time_step++) {
-                            coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-                                parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
-                        }
-                        let single_part_feature = {
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "LineString",
-                                "coordinates": coordinates
-                            }
-                        };
-                        features_array.push(single_part_feature);
+            // Iterate over all the particles
+            if(type.localeCompare('lines') === 0) {
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    let coordinates = [];
+                    // Add the two positions of the current particle
+                    // Pushes the coordinates of the first position
+                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
+                        parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
+                    // Pushes all the other particles times
+                    for (let time_step = start_time; time_step <= end_time; time_step++) {
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
                     }
-                }else{
-                    // THis case is when we want to draw particles rather than lines
-                    for (let part_id = 0; part_id < tot_part; part_id++) {
-                        let coordinates = [];
-                        // Add the position of the current particle
-                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step]),
-                            parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step])]);
-                        // If drawing more than one location, then add more particles
-                        for (let time_step = start_time; time_step < end_time; time_step++) {
-                            coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-                                parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
+                    let single_part_feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": coordinates
                         }
-                        let single_part_feature = {
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "MultiPoint",
-                                "coordinates": coordinates
-                            }
-                        };
-                        features_array.push(single_part_feature);
+                    };
+                    features_array.push(single_part_feature);
+                }
+            }else{
+                // THis case is when we want to draw particles rather than lines
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    let coordinates = [];
+                    // Add the position of the current particle
+                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step]),
+                        parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step])]);
+                    // If drawing more than one location, then add more particles
+                    for (let time_step = start_time; time_step < end_time; time_step++) {
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
+                    }
+                    let single_part_feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "MultiPoint",
+                            "coordinates": coordinates
+                        }
+                    };
+                    features_array.push(single_part_feature);
                 }
             }
 
@@ -424,6 +437,7 @@ class  ParticlesLayer extends React.Component {
             countries_feature_collection.push(features);
         }
 
+        // console.log("TOTAL NUMBER OF PARTICLES: ", glob_tot_particles)
 
         if (this.draw_until_day) {
             this.draw_until_day = false;
@@ -481,7 +495,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     increaseSize(e) {
-        let new_size = this.updateValue(this.state.particle_size_index, true);
+        let new_size = this.updateValue(this.state.particle_size_index, MODES.increase);
         this.setState({
             particle_size_index: new_size
         });
@@ -489,7 +503,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     decreaseSize(e) {
-        let new_size = this.updateValue(this.state.particle_size_index, false);
+        let new_size = this.updateValue(this.state.particle_size_index, MODES.decrease);
         this.setState({
             particle_size_index: new_size
         });
@@ -591,32 +605,54 @@ class  ParticlesLayer extends React.Component {
 
         }
     }
+    getIconColorSizeBoostrap(value, inv=false, color=false){
+        if(inv){
+            value = 6 - value;
+        }
 
+        if(color) {
+            if(value === 5) {
+                return "darkred"
+            }else{
+                return "black";
+            }
+
+        }else{
+            switch (value) {
+                case 5:
+                    return 24;
+                case 4:
+                    return 22;
+                case 3:
+                    return 20;
+                case 2:
+                    return 18;
+                case 1:
+                    return 16
+                default:
+                    return 20;
+            }
+
+        }
+    }
     displayTransparency(){
         let transparency = <span></span>;
         if(this.state.status !== STATUS.loading){
             transparency =
                 <span className="navbar-brand col">
-                    <OverlayTrigger
-                        overlay={
-                            <Tooltip id="button-tooltip">
-                                Trail size
-                            </Tooltip>
-                        }
-                        delay={{show:50, hide:50}}
-                        placement="left">
-                    <span> <FontAwesomeIcon icon={faArrowsAltH} color={this.getIconColorSize(this.state.transparency_index, true, true)}
-                                                                           size={this.getIconColorSize(this.state.transparency_index, true)}/> </span>
-
-                                        </OverlayTrigger>
+                    <span style={{display:"inline-block",  width:"25px"}}>
+                        <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)} />
+                    </span>
                     <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
+                            title="Increase litter trail"
                             disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
-                                    <FontAwesomeIcon icon={faMinus} size="xs"/>
+                            <Dash size={default_size}/>
                     </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                            title="Decrease litter trail"
                             disabled={this.state.transparency_index === 1}>
-                                    <FontAwesomeIcon icon={faPlus} size="xs"/>
+                            <Plus size={default_size}/>
                     </button>
                 </span>
         }
@@ -629,26 +665,19 @@ class  ParticlesLayer extends React.Component {
         if(this.state.status !== STATUS.loading){
             particleSize =
                 <span className="navbar-brand col">
-                    <OverlayTrigger
-                        overlay={
-                            <Tooltip id="button-tooltip">
-                                Particle size
-                            </Tooltip>
-                        }
-                        delay={{show:50, hide:50}}
-                        placement="left">
-                        <span> <FontAwesomeIcon icon={faCircle} color={this.getIconColorSize(this.state.particle_size_index, false, true)}
-                                                size={this.getIconColorSize(this.state.particle_size_index)}/> </span>
-
-                    </OverlayTrigger>
+                    <span style={{display:"inline-block",  width:"25px"}}>
+                        <CircleFill size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
+                    </span>
                     <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
+                            title="Decrease litter size"
                             disabled={this.state.particle_size_index === 1}>
-                                <FontAwesomeIcon icon={faMinus} size="xs"/>
+                            <Dash size={default_size}/>
                         </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.increaseSize}
+                            title="Increase litter size"
                             disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
-                            <FontAwesomeIcon icon={faPlus} size="xs"/>
+                        <Plus size={default_size}/>
                     </button>
                 </span>;
         }
@@ -672,14 +701,19 @@ class  ParticlesLayer extends React.Component {
                 {((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) ?
                     <div className="row">
                         {this.state.status === STATUS.loading ?
-                            <div>
+                            <div className="col-6">
                                 <div className="spinner-border" role="status">
                                     <span className="sr-only">Loading...</span>
                                 </div>
                             </div>
                             :
-                            <div className="spinner-border text-secondary" role="status">
-                                <span className="sr-only">Processing data...</span>
+                            <div className="col-10  d-inline-block">
+                                <div className="spinner-border text-secondary" role="status">
+                                    <span className="sr-only">Processing data...</span>
+                                </div>
+                                <div className="col-9 d-inline-block">
+                                    <ProgressBar animated variant="info" now={this.state.loading_perc} label="%"/>
+                                </div>
                             </div>
                         }
                     </div>
@@ -691,10 +725,10 @@ class  ParticlesLayer extends React.Component {
                         {this.displayParticleSize()}
                         {/*---- Current day ------------*/}
                         <span className="navbar-brand col d-none d-lg-inline">
-                            <input type="range" style={{width: "50"}}
+                            <Form.Control type="range"
                                    onChange={this.changeDayRange}
                                    value={this.state.time_step}
-                                   min="0" max={this.total_timesteps}/>
+                                   min="0" max={this.total_timesteps} custom/>
                         </span>
                         {/*---- Play/Pause---------*/}
                         <span className="navbar-brand col">
@@ -703,28 +737,31 @@ class  ParticlesLayer extends React.Component {
                                         title="Decrease animation speed"
                                         disabled={(this.state.status !== STATUS.playing) ||
                                         (this.state.speed_hz <= .6)}>
-                                <FontAwesomeIcon icon={faBackward} size="xs"/>
+                                {/*<FontAwesomeIcon icon={faBackward} size="xs"/>*/}
+                                <SkipBackwardFill size={default_size}/>
                                 </button>
                                 <button className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
                                         title="Previous time step"
                                         disabled={this.state.status !== STATUS.paused}>
-                                <FontAwesomeIcon icon={faStepBackward} size="xs"/>
+                                {/*<FontAwesomeIcon icon={faStepBackward} size="xs"/>*/}
+                                <SkipStartFill size={default_size}/>
                                 </button>
                                 <button className="btn btn-info btn-sm"
+                                        title="Play/pause animation"
                                         onClick={this.playPause}>{this.state.status === STATUS.playing ?
-                                    <FontAwesomeIcon icon={faPause} size="xs"/> :
-                                    <FontAwesomeIcon icon={faPlay} size="xs"/>}
+                                    <PauseFill size={default_size}/>:
+                                    <PlayFill size={default_size}/>}
                                 </button>
                                 <button className="btn btn-info btn-sm" onClick={this.nextDay}
                                         title="Next time step"
                                         disabled={this.state.status !== STATUS.paused}>
-                                <FontAwesomeIcon icon={faStepForward} size="xs"/>
+                                        <SkipEndFill size={default_size}/>
                                 </button>
                                 <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
                                         title="Incrase animation speed"
                                         disabled={(this.state.status !== STATUS.playing) ||
                                         (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
-                                <FontAwesomeIcon icon={faForward} size="xs"/>
+                                <SkipForwardFill size={default_size}/>
                                 </button>
                             </ButtonGroup>
                         </span>

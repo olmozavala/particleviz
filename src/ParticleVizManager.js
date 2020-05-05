@@ -4,8 +4,9 @@ import StatesLayer from "./StatesLayer";
 import ParticlesLayer from "./ParticlesLayer";
 import BackgroundLayerManager from "./BackgroundLayerManager";
 import Dropdown from "react-bootstrap/Dropdown";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobeAfrica, faMap, } from '@fortawesome/free-solid-svg-icons';
+import {
+    DropletHalf
+} from 'react-bootstrap-icons';
 
 const data_folder_url = "http://localhost/data";
 // const data_folder_url = "http://ozavala.coaps.fsu.edu/data";
@@ -16,7 +17,7 @@ const not_selected_alpha = '88';
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
     ["#0968E5", "#095BD2", "#094EBE", "#0941AB", "#093397", "#092684", "#091970"],
-    ["#C11E38", "#A71B37", "#8C1837", "#721536", "#571135", "#3D0E35", "#220B34"],
+    ["#C11E38", "#3d0e15", "#A71B37", "#8C1837", "#721536", "#571135", "#340b0e"],
     ["#F4D941", "#F3CB3F", "#F1BC3D", "#F0AE3B", "#EF9F39", "#ED9137", "#EC8235"],
     ["#57EBDE", "#66EEC0", "#74F0A2", "#83F384", "#91F666", "#A0F848", "#AEFB2A"],
     ["#0B2C24", "#0F392B", "#134632", "#185339", "#1C603F", "#206D46", "#247A4D"],
@@ -67,15 +68,31 @@ const OCEANS = {
         color: 7}
 }
 
+const CONTINENTS = {
+    africa: {name:'africa', color:2},
+    asia: {name:'asia', color:1},
+    south_america: {name:'south america', color:0},
+    europe: {name:'europe', color:5},
+    oceania: {name:'oceania', color:4},
+    north_america: {name:'north america', color:3},
+    seven_seas: {name:'seven seas (open ocean)', color:6},
+    Antarctica: {name:'antarctica', color:7},
+}
+
 let selected_color = `rgba(255,0,0,${selected_alpha})`;
 
 const data_files = [
-    {file: "1/TESTUN_output",title: "TEST", speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "1/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output",title: "August 2010", speed: "", start_date: new Date(2010, 8, 1)},
-    {file: "1/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output",title: "September 2010", speed: "", start_date: new Date(2010, 9, 1)},
-    {file: "1/Single_Release_FiveYears_EachMonth_2010_10_2020-04-19_21_18_output",title: "October 2010", speed: "", start_date: new Date(2010, 10, 1)},
-    {file: "1/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 11, 1)},
-    {file: "1/Single_Release_FiveYears_EachMonth_2010_12_2020-04-19_21_18_output",title: "December 2010", speed: "", start_date: new Date(2010, 12, 1)},
+    {file: "2/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "2/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
+    // {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "3/TESTUN_output",title: "TEST", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/TestOneYear_Unbeaching2020-04-29_11_06_output",title: "(testunbeaching)Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output",title: "August 2010 (1/4)", speed: "", start_date: new Date(2010, 7, 1)},
+    // {file: "3/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output",title: "September 2010", speed: "", start_date: new Date(2010, 8, 1)},
+    // {file: "3/Single_Release_FiveYears_EachMonth_2010_10_2020-04-19_21_18_output",title: "October 2010", speed: "", start_date: new Date(2010, 9, 1)},
+    // {file: "3/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 10, 1)},
+    // {file: "3/Single_Release_FiveYears_EachMonth_2010_12_2020-04-19_21_18_output",title: "December 2010", speed: "", start_date: new Date(2010, 11, 1)},
 
 ];
 
@@ -87,6 +104,7 @@ class  ParticleVizManager extends React.Component{
             selected_country: '',
             country_names: [],
             ocean_names: [],
+            continents: [],
             selected_model: data_files[0]
         };
 
@@ -103,11 +121,12 @@ class  ParticleVizManager extends React.Component{
         this.props.map.render();
     }
 
-    updateCountriesAll(country_names, ocean_names) {
-        let colors_by_country = this.updateCountryColorsPartViz_Manager(country_names, ocean_names, this.state.selected_country);
+    updateCountriesAll(country_names, ocean_names, continents) {
+        let colors_by_country = this.updateCountryColorsPartViz_Manager(country_names, ocean_names, continents, this.state.selected_country);
         this.setState({
             country_names: country_names,
             ocean_names: ocean_names,
+            continents: continents,
             colors_by_country: colors_by_country
         })
     }
@@ -119,7 +138,8 @@ class  ParticleVizManager extends React.Component{
         if(current_country.localeCompare(name) === 0){
             name = '';
         }
-        let colors_by_country = this.updateCountryColorsPartViz_Manager(this.state.country_names, this.state.ocean_names, name);
+        let colors_by_country = this.updateCountryColorsPartViz_Manager(
+            this.state.country_names, this.state.ocean_names, this.state.continents, name);
 
         this.setState({
             selected_country: name,
@@ -138,6 +158,18 @@ class  ParticleVizManager extends React.Component{
         // return colors[sel_ocean.color][Math.floor(Math.random() * 7)];
         return colors[sel_ocean.color];
     }
+    colorByContinent(continent){
+        let sel_continent = '';
+        let i = 0;
+        for(const c_continent in CONTINENTS){
+            if(CONTINENTS[c_continent].name.localeCompare(continent.toLowerCase()) === 0){
+                sel_continent = CONTINENTS[c_continent];
+                break;
+            }
+            i+=1;
+        }
+        return colors[sel_continent.color];
+    }
 
     /**
      * Function that updates the assigned color for each country.
@@ -145,7 +177,7 @@ class  ParticleVizManager extends React.Component{
      * @param selected_country
      * @returns {{}}
      */
-    updateCountryColorsPartViz_Manager(country_names, ocean_names, selected_country) {
+    updateCountryColorsPartViz_Manager(country_names, ocean_names, continent_names, selected_country) {
         let colors_by_country = {};
         let update_alpha = false;
 
@@ -167,6 +199,7 @@ class  ParticleVizManager extends React.Component{
             } else {
                 // let new_color = colors[i % colors.length];
                 let new_color = this.colorByOcean(ocean_names[i])[i % 7];
+                // let new_color = this.colorByContinent(continent_names[i])[i % 7];
                 if(update_alpha) {
                     let rgb = new_color;
                     // rgb = rgb.replace(/[^\d,]/g, '').split(',');
@@ -198,8 +231,8 @@ class  ParticleVizManager extends React.Component{
         return (
             <div className="container-fluid">
                 <div className="row justify-content-center">
-                    <div className="col-1 navbar-brand ml-2 d-none d-lg-inline">
-                        <FontAwesomeIcon icon={faGlobeAfrica} size="lg"/>
+                    <div className="col-1 navbar-brand ml-2 d-none d-xl-inline">
+                        <DropletHalf size={30}/>
                     </div>
                     <div className="col-12 col-md-8 col-lg-8 col-xl-6">
                         <ParticlesLayer map={this.props.map}
@@ -209,9 +242,9 @@ class  ParticleVizManager extends React.Component{
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
                     </div>
-                    <div className="col-5 col-md-2 col-lg-2 navbar-brand  ml-2">
-                        <Dropdown >
-                            <Dropdown.Toggle variant="info">
+                    <div className="col-5 col-md-3 col-lg-3 navbar-brand  ml-2">
+                        <Dropdown>
+                            <Dropdown.Toggle variant="info" size="sm">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={this.changeFile}>
@@ -221,7 +254,7 @@ class  ParticleVizManager extends React.Component{
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    <div className="col-5 col-md-2 col-lg-1">
+                    <div className="col-5 col-md-1 col-lg-1">
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map} />
                     </div>

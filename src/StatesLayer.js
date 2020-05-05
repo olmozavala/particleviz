@@ -53,7 +53,8 @@ class  StatesLayer extends React.Component{
 
         this.props.map.addLayer(this.vectorLayer);
 
-        this.clickState = this.clickState.bind(this);
+        this.clickEvent = this.clickEvent.bind(this);
+        this.hoverEvent = this.hoverEvent.bind(this);
         this.makeTable = this.makeTable.bind(this);
         this.clearHovered = this.clearHovered.bind(this);
 
@@ -166,7 +167,7 @@ class  StatesLayer extends React.Component{
      * table (if any).
      * @param e
      */
-    clickState(e){
+    clickEvent(e){
         this.clearHovered();
         var pixpos = e.pixel;
         var features = e.map.getFeaturesAtPixel(pixpos);
@@ -218,27 +219,29 @@ class  StatesLayer extends React.Component{
             }
     }
 
-    componentDidMount() {
-        this.props.map.on('click', this.clickState);
-        this.props.map.on('pointermove', function(e){
-            this.clearHovered();
-            var pixpos = e.pixel;
-            var features = e.map.getFeaturesAtPixel(pixpos);
-            // It found something
+    hoverEvent(e){
+        this.clearHovered();
+        var pixpos = e.pixel;
+        var features = e.map.getFeaturesAtPixel(pixpos);
+        // It found something
 
-            if(features !== null){
-                let country = features[0];
-                if(this.state.selected !== country) {
-                    let name = country.get("name").toLowerCase();
-                    let color = this.props.colors_by_country[name];//Adding transaprency to the color
-                    if(!_.isUndefined(color)){
-                        let new_color = color.slice(0,-2) + "AA";
-                        country.setStyle(this.getCountryStyle(new_color, name));
-                        this.setState({hovered: country});
-                    }
+        if(features !== null){
+            let country = features[0];
+            if(this.state.selected !== country) {
+                let name = country.get("name").toLowerCase();
+                let color = this.props.colors_by_country[name];//Adding transaprency to the color
+                if(!_.isUndefined(color)){
+                    let new_color = color.slice(0,-2) + "AA";
+                    country.setStyle(this.getCountryStyle(new_color, name));
+                    this.setState({hovered: country});
                 }
             }
-        }.bind(this));
+        }
+    }
+
+    componentDidMount() {
+        this.props.map.on('click', this.clickEvent);
+        this.props.map.on('pointermove', this.hoverEvent);
     }
 
     render() {

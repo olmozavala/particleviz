@@ -55,7 +55,7 @@ let map = new Map({
         extent: [-180, -90, 180, 90],
         resolutions: resolutions,
         zoom: 1,
-        moveTolerance: 100,
+        moveTolerance: 400,
         // maxZoom: 8,
         // minZoom: 2
         // ---------- OR ----------------
