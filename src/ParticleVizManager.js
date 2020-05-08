@@ -8,8 +8,8 @@ import {
     DropletHalf
 } from 'react-bootstrap-icons';
 
-const data_folder_url = "http://localhost/data";
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data";
+// const data_folder_url = "http://localhost/data";
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data";
 const def_alpha = "FF";
 const selected_alpha = 1;
 // const not_selected_alpha = .2;
@@ -82,16 +82,20 @@ const CONTINENTS = {
 let selected_color = `rgba(255,0,0,${selected_alpha})`;
 
 const data_files = [
-    {file: "2/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "2/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
-    // {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "3/TESTUN_output",title: "TEST", speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/OneYear_Only_Currents2020-05-05_16_36_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
+    {file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
+    // {file: "1/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "4/TESTUN_output",title: "TEST", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "1/TestOneYear_Unbeaching2020-04-29_11_06_output",title: "(testunbeaching)Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output",title: "August 2010 (1/4)", speed: "", start_date: new Date(2010, 7, 1)},
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output",title: "September 2010", speed: "", start_date: new Date(2010, 8, 1)},
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_10_2020-04-19_21_18_output",title: "October 2010", speed: "", start_date: new Date(2010, 9, 1)},
-    // {file: "3/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 10, 1)},
+    // {file: "1/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 10, 1)},
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_12_2020-04-19_21_18_output",title: "December 2010", speed: "", start_date: new Date(2010, 11, 1)},
 
 ];
