@@ -25,6 +25,17 @@ let background_layer = new TileLayer({
     })
 });
 
+let histogram_layer = new TileLayer({
+    source: new TileWMS({
+        url:'http://localhost:8080/ncWMS2/wms',
+        params: {
+            'LAYERS':'all/histo',
+            'ABOVEMAXCOLOR':'extend',
+            'TILED':true
+        }
+    })
+});
+
 let states_layer = new VectorLayer({
     source: new VectorSource({
         // url: "http://ozavala.coaps.fsu.edu/data/countries.json",
@@ -46,7 +57,7 @@ console.log("Resolutions: ", resolutions);
 
 let map = new Map({
     layers: [
-        background_layer, states_layer
+        background_layer, states_layer, histogram_layer
     ],
     target: 'map',
     view: new View({

@@ -18,9 +18,10 @@ import {
 import {Form, ProgressBar} from "react-bootstrap";
 
 import JSZip from "jszip";
-import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
-import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
-import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
+// import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay";
+// import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward";
+// import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {ButtonGroup} from "react-bootstrap";
 var zip = new JSZip();
 
 const default_size = 15;
@@ -371,7 +372,7 @@ class  ParticlesLayer extends React.Component {
     getFeatures(type='lines'){
         let countries_feature_collection = [];
         let start_time = this.state.time_step;
-        let end_time = this.state.time_step+1;
+        let end_time = start_time+1;
         if (this.draw_until_day) {
             start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS*(6-this.state.transparency_index)/6);
         }
@@ -386,25 +387,47 @@ class  ParticlesLayer extends React.Component {
             let features_array = [];
             // Iterate over all the particles
             if(type.localeCompare('lines') === 0) {
-                for (let part_id = 0; part_id < tot_part; part_id++) {
-                    let coordinates = [];
-                    // Add the two positions of the current particle
-                    // Pushes the coordinates of the first position
-                    coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
-                        parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
-                    // Pushes all the other particles times
-                    for (let time_step = start_time; time_step <= end_time; time_step++) {
-                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-                            parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
+                if(end_time === (start_time+1)){
+                    for (let part_id = 0; part_id < tot_part; part_id++) {
+                        let coordinates = [];
+                        // Add the two positions of the current particle
+                        // Pushes the coordinates of the first position
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
+                        // Pushes all the other particles times
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time+1]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][start_time+1])]);
+                        let single_part_feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": coordinates
+                            }
+                        };
+                        features_array.push(single_part_feature);
                     }
-                    let single_part_feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": coordinates
+
+                }else{// In this case we need to draw more than one time step
+                    for (let part_id = 0; part_id < tot_part; part_id++) {
+                        let coordinates = [];
+                        // Add the two positions of the current particle
+                        // Pushes the coordinates of the first position
+                        coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
+                            parseFloat(cur_country["lat_lon"][0][part_id][start_time])]);
+                        // Pushes all the other particles times
+                        for (let time_step = start_time; time_step <= end_time; time_step++) {
+                            coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
+                                parseFloat(cur_country["lat_lon"][0][part_id][time_step])]);
                         }
-                    };
-                    features_array.push(single_part_feature);
+                        let single_part_feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": coordinates
+                            }
+                        };
+                        features_array.push(single_part_feature);
+                    }
                 }
             }else{
                 // THis case is when we want to draw particles rather than lines
@@ -773,9 +796,9 @@ class  ParticlesLayer extends React.Component {
 }
 
 export default ParticlesLayer ;
-{/*---- Speed ---------*/}
-{/*<div className="row">*/}
-{/*    <div className="col-12">*/}
-{/*        Animation speed: {this.state.speed_hz} hz*/}
-{/*    </div>*/}
-{/*</div>*/}
+// {/*---- Speed ---------*/}
+// {/*<div className="row">*/}
+// {/*    <div className="col-12">*/}
+// {/*        Animation speed: {this.state.speed_hz} hz*/}
+// {/*    </div>*/}
+// {/*</div>*/}

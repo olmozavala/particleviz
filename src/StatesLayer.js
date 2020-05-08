@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './css/App.css';
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";

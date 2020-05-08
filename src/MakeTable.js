@@ -1,8 +1,5 @@
 import React from 'react';
 import _ from "underscore";
-import $ from 'jquery';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faForward, faWindowClose} from "@fortawesome/free-solid-svg-icons";
 import 'animate.css'
 
 class  MakeTable extends React.Component {
