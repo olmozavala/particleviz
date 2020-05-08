@@ -27,14 +27,15 @@ let background_layer = new TileLayer({
 
 let histogram_layer = new TileLayer({
     source: new TileWMS({
-        url:'http://localhost:8080/ncWMS2/wms',
+        url:'http://146.201.212.214:8080/ncWMS2/wms',
         params: {
             'LAYERS':'all/histo',
             'ABOVEMAXCOLOR':'extend',
             'TILED':true
         }
-    })
-});
+    }),
+    opacity:.8});
+histogram_layer.setVisible(false);
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
@@ -79,7 +80,7 @@ let map = new Map({
 
 console.log(map.getView().getResolution())
 
-ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer}/>,
+ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} histogram_layer={histogram_layer}/>,
     document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
