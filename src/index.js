@@ -38,8 +38,8 @@ let histogram_layer = new TileLayer({
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
-        // url: "http://ozavala.coaps.fsu.edu/data/countries.json",
-        url: "http://localhost/data/countries.json",
+        url: "http://ozavala.coaps.fsu.edu/data/countries.json",
+        // url: "http://localhost/data/countries.json",
         format: new GeoJSON()
     }),
     //The style is defined on 'StatesLayer.js'

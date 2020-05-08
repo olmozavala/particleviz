@@ -348,8 +348,8 @@ class  ParticlesLayer extends React.Component {
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
         for (let i = 0; i < countries.length; i++) {
             ctx.beginPath()
-            // ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
-            ctx.strokeStyle = "rgb(0,0,0)"
+            ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
+            // ctx.strokeStyle = "rgb(0,0,0)"
             this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
             if(this.show_west_map) {
                 this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
