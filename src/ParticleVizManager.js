@@ -9,6 +9,7 @@ import {
 } from 'react-bootstrap-icons'
 import InputGroup from "react-bootstrap/InputGroup"
 import TileWMS from "ol/source/TileWMS"
+import * as d3 from "d3";
 
 const data_folder_url = "http://localhost/data"
 const wms_url = "http://localhost:8080/ncWMS2/wms"
@@ -73,10 +74,16 @@ const CONTINENTS = {
 
 let selected_color = `rgba(255,0,0,${selected_alpha})`
 
-const data_files = [
+const months = [
+    'January', 'February', 'March', 'April', 'May',
+    'June', 'July', 'August', 'September',
+    'October', 'November', 'December'
+];
+
+let data_files = [
     //-------------------------------------------------------------------
-    {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",style:"default-scalar/div-PRGn",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "1/TESTUN_output",title: "TEST", style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",style:"default-scalar/div-PRGn",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/TESTUN_output",title: "TEST", style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", speed: "", start_date: new Date(2010, 0, 1)},
     //--------- COAPS ----------------------------------------------------------
     // {file: "1/OneYear_Only_Currents2020-05-05_16_36_output",style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", title: "Only Currents 2010", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2012, 0, 1)},
@@ -88,18 +95,6 @@ const data_files = [
     // {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
     //-------------------------------------------------------------------
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_05", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_05/histo", title: "Five Years May",      speed: "", start_date: new Date(2010, 4, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_01", style:"default-scalar/div-RdGy",  wms: "fy_wcd_10_01/histo", title: "Five Years January",  speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_02", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_02/histo", title: "Five Years February", speed: "", start_date: new Date(2010, 1, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_03", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_03/histo", title: "Five Years March",    speed: "", start_date: new Date(2010, 2, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_04", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_04/histo", title: "Five Years April",    speed: "", start_date: new Date(2010, 3, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_06", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_06/histo", title: "Five Years June",     speed: "", start_date: new Date(2010, 5, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_07", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_07/histo", title: "Five Years July",     speed: "", start_date: new Date(2010, 6, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_08", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_08/histo", title: "Five Years August",   speed: "", start_date: new Date(2010, 7, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_09", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_09/histo", title: "Five Years September",speed: "", start_date: new Date(2010, 8, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_10", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_10/histo", title: "Five Years October",  speed: "", start_date: new Date(2010, 9, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_11", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_11/histo", title: "Five Years November", speed: "", start_date: new Date(2010, 10, 1)},
-    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_12", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_12/histo", title: "Five Years December", speed: "", start_date: new Date(2010, 11, 1)},
     //-------------------------------------------------------------------
 
     // {file: "1/TestOneYear_Unbeaching2020-04-29_11_06_output",title: "(testunbeaching)Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
@@ -109,6 +104,21 @@ const data_files = [
     // {file: "1/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 10, 1)},
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_12_2020-04-19_21_18_output",title: "December 2010", speed: "", start_date: new Date(2010, 11, 1)},
 ]
+
+for(let i=1; i<=12; i++) {
+    let i_str = `${i < 10 ? '0' + i : i}`
+    data_files.push({
+        file: `4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_${i_str}`,
+        style: "default-scalar/div-PRGn",
+        // wms: `fy_wcd_10_${i_str}histo`,
+        wms: `fy_wcd_10_01/histo`,
+        title: `Five Years ${months[i-1]}`,
+        speed: "",
+        start_date: new Date(2010, i-1, 1),
+        // num_files: 17
+        num_files: 5
+    })
+}
 
 class  ParticleVizManager extends React.Component{
     constructor(props){
@@ -299,7 +309,7 @@ class  ParticleVizManager extends React.Component{
                     </div>
                     <div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">
                         <InputGroup.Prepend>
-                            <span>Density</span> &nbsp
+                            <span>Density</span> &nbsp;
                             <InputGroup.Checkbox aria-label="Checkbox for following text input"
                                 checked={this.state.histogram_selected}
                                 onChange={this.toogleHistogramLayer}/>
@@ -322,3 +332,4 @@ class  ParticleVizManager extends React.Component{
 }
 
 export default ParticleVizManager
+
