@@ -1,20 +1,22 @@
-import React from 'react';
-import './css/App.css';
-import StatesLayer from "./StatesLayer";
-import ParticlesLayer from "./ParticlesLayer";
-import BackgroundLayerManager from "./BackgroundLayerManager";
-import Dropdown from "react-bootstrap/Dropdown";
+import React from 'react'
+import './css/App.css'
+import StatesLayer from "./StatesLayer"
+import ParticlesLayer from "./ParticlesLayer"
+import BackgroundLayerManager from "./BackgroundLayerManager"
+import Dropdown from "react-bootstrap/Dropdown"
 import {
     DropletHalf
-} from 'react-bootstrap-icons';
-import InputGroup from "react-bootstrap/InputGroup";
+} from 'react-bootstrap-icons'
+import InputGroup from "react-bootstrap/InputGroup"
+import TileWMS from "ol/source/TileWMS"
 
-const data_folder_url = "http://localhost/data";
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data";
-const def_alpha = "FF";
-const selected_alpha = 1;
-// const not_selected_alpha = .2;
-const not_selected_alpha = '88';
+const data_folder_url = "http://localhost/data"
+const wms_url = "http://localhost:8080/ncWMS2/wms"
+// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+const def_alpha = "FF"
+const selected_alpha = 1
+// const not_selected_alpha = .2
+const not_selected_alpha = '88'
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
     ["#0968E5", "#095BD2", "#094EBE", "#0941AB", "#093397", "#092684", "#091970"],
@@ -28,9 +30,8 @@ let tempcolors = [
     ["#FF5858", "#FF6B6B", "#FF7D7D", "#FF9090", "#FFA3A3", "#FFB5B5", "#FFC8C8"],
     ["#B94C98", "#C24189", "#CB3579", "#D52A6A", "#DE1E5A", "#E7134B", "#F0073B"],
     ["#E4E7E4", "#C0C4CA", "#9BA1B0", "#777F96", "#535C7B", "#2E3961", "#0A1647"],
-];
-let colors = tempcolors.map((c_colors ) => c_colors.map((color) => color + def_alpha));
-
+]
+let colors = tempcolors.map((c_colors ) => c_colors.map((color) => color + def_alpha))
 
 const OCEANS = {
     black_sea: {
@@ -70,33 +71,35 @@ const CONTINENTS = {
     Antarctica: {name:'antarctica', color:7},
 }
 
-let selected_color = `rgba(255,0,0,${selected_alpha})`;
+let selected_color = `rgba(255,0,0,${selected_alpha})`
 
 const data_files = [
     //-------------------------------------------------------------------
-    // {file: "1/TESTUN_output",title: "TEST", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "1/OneYear_Only_Currents2020-05-05_16_36_output",title: "Only Currents 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",style:"default-scalar/div-PRGn",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/TESTUN_output",title: "TEST", style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", speed: "", start_date: new Date(2010, 0, 1)},
+    //--------- COAPS ----------------------------------------------------------
+    // {file: "1/OneYear_Only_Currents2020-05-05_16_36_output",style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", title: "Only Currents 2010", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2012, 0, 1)},
     // {file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
     // {file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    //--------- HOME PC ----------------------------------------------------------
+    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "1/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
+    // {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
+    // {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
     //-------------------------------------------------------------------
-    {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "1/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
-    {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    //-------------------------------------------------------------------
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_01",title: "Five Years January", speed: "", start_date: new Date(2010, 0, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_02",title: "Five Years February", speed: "", start_date: new Date(2010, 1, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_03",title: "Five Years March", speed: "", start_date: new Date(2010, 2, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_04",title: "Five Years April", speed: "", start_date: new Date(2010, 3, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_05",title: "Five Years May", speed: "", start_date: new Date(2010, 4, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_06",title: "Five Years June", speed: "", start_date: new Date(2010, 5, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_07",title: "Five Years July", speed: "", start_date: new Date(2010, 6, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_08",title: "Five Years August", speed: "", start_date: new Date(2010, 7, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_09",title: "Five Years September", speed: "", start_date: new Date(2010, 8, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_10",title: "Five Years October", speed: "", start_date: new Date(2010, 9, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_11",title: "Five Years November", speed: "", start_date: new Date(2010, 10, 1)},
-    {file: "4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_12",title: "Five Years December", speed: "", start_date: new Date(2010, 11, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_05", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_05/histo", title: "Five Years May",      speed: "", start_date: new Date(2010, 4, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_01", style:"default-scalar/div-RdGy",  wms: "fy_wcd_10_01/histo", title: "Five Years January",  speed: "", start_date: new Date(2010, 0, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_02", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_02/histo", title: "Five Years February", speed: "", start_date: new Date(2010, 1, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_03", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_03/histo", title: "Five Years March",    speed: "", start_date: new Date(2010, 2, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_04", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_04/histo", title: "Five Years April",    speed: "", start_date: new Date(2010, 3, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_06", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_06/histo", title: "Five Years June",     speed: "", start_date: new Date(2010, 5, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_07", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_07/histo", title: "Five Years July",     speed: "", start_date: new Date(2010, 6, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_08", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_08/histo", title: "Five Years August",   speed: "", start_date: new Date(2010, 7, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_09", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_09/histo", title: "Five Years September",speed: "", start_date: new Date(2010, 8, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_10", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_10/histo", title: "Five Years October",  speed: "", start_date: new Date(2010, 9, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_11", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_11/histo", title: "Five Years November", speed: "", start_date: new Date(2010, 10, 1)},
+    {file: "1/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_12", style:"default-scalar/div-PRGn",  wms: "fy_wcd_10_12/histo", title: "Five Years December", speed: "", start_date: new Date(2010, 11, 1)},
     //-------------------------------------------------------------------
 
     // {file: "1/TestOneYear_Unbeaching2020-04-29_11_06_output",title: "(testunbeaching)Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
@@ -105,11 +108,11 @@ const data_files = [
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_10_2020-04-19_21_18_output",title: "October 2010", speed: "", start_date: new Date(2010, 9, 1)},
     // {file: "1/Single_Release_FiveYears_EachMonth_2010_11_2020-04-19_21_18_output",title: "November 2010", speed: "", start_date: new Date(2010, 10, 1)},
     // {file: "3/Single_Release_FiveYears_EachMonth_2010_12_2020-04-19_21_18_output",title: "December 2010", speed: "", start_date: new Date(2010, 11, 1)},
-];
+]
 
 class  ParticleVizManager extends React.Component{
     constructor(props){
-        super(props);
+        super(props)
         this.state = {
             colors_by_country: [],
             selected_country: '',
@@ -118,24 +121,39 @@ class  ParticleVizManager extends React.Component{
             continents: [],
             selected_model: data_files[0],
             histogram_selected: false
-        };
+        }
 
-        this.updateCountriesAll = this.updateCountriesAll.bind(this);
-        this.updateSelectedCountry= this.updateSelectedCountry.bind(this);
-        this.changeFile = this.changeFile.bind(this);
-        this.updateHistogramLayer= this.updateHistogramLayer.bind(this);
+        this.updateCountriesAll = this.updateCountriesAll.bind(this)
+        this.updateSelectedCountry= this.updateSelectedCountry.bind(this)
+        this.changeFile = this.changeFile.bind(this)
+        this.toogleHistogramLayer= this.toogleHistogramLayer.bind(this)
     }
 
     componentDidMount() {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        this.props.map.getLayers().forEach(layer => layer.getSource().refresh());
-        this.props.map.render();
+        this.props.histogram_layer.setSource(
+            new TileWMS({
+                // url:'http://146.201.212.214:8080/ncWMS2/wms',
+                url: wms_url,
+                params: {
+                    'LAYERS':this.state.selected_model.wms,
+                    'TILED':true,
+                    'STYLES':this.state.selected_model.style,
+                    'COLORSCALERANGE':'1,503500',
+                    'NUMCOLORBANDS':250,
+                    'LOGSCALE':true
+
+                }
+            })
+        )
+        this.props.map.getLayers().forEach(layer => layer.getSource().refresh())
+        this.props.map.render()
     }
 
     updateCountriesAll(country_names, ocean_names, continents) {
-        let colors_by_country = this.updateCountryColorsPartViz_Manager(country_names, ocean_names, continents, this.state.selected_country);
+        let colors_by_country = this.updateCountryColorsPartViz_Manager(country_names, ocean_names, continents, this.state.selected_country)
         this.setState({
             country_names: country_names,
             ocean_names: ocean_names,
@@ -144,7 +162,8 @@ class  ParticleVizManager extends React.Component{
         })
     }
 
-    updateHistogramLayer(e){
+    toogleHistogramLayer(e){
+
         if(e.target.checked){
             this.props.histogram_layer.setVisible(true)
         }else{
@@ -158,40 +177,40 @@ class  ParticleVizManager extends React.Component{
 
     updateSelectedCountry(name){
 
-        let current_country = this.state.selected_country;
+        let current_country = this.state.selected_country
         // If the name is the same as before then we 'toogle it'
         if(current_country.localeCompare(name) === 0){
-            name = '';
+            name = ''
         }
         let colors_by_country = this.updateCountryColorsPartViz_Manager(
-            this.state.country_names, this.state.ocean_names, this.state.continents, name);
+            this.state.country_names, this.state.ocean_names, this.state.continents, name)
 
         this.setState({
             selected_country: name,
             colors_by_country: colors_by_country
-        });
+        })
     }
 
     colorByOcean(ocean){
-        let sel_ocean = '';
+        let sel_ocean = ''
         for(const c_ocean in OCEANS){
             if(OCEANS[c_ocean].name.localeCompare(ocean[0].toLowerCase()) === 0){
-                sel_ocean = OCEANS[c_ocean];
-                break;
+                sel_ocean = OCEANS[c_ocean]
+                break
             }
         }
-        // return colors[sel_ocean.color][Math.floor(Math.random() * 7)];
-        return colors[sel_ocean.color];
+        // return colors[sel_ocean.color][Math.floor(Math.random() * 7)]
+        return colors[sel_ocean.color]
     }
     colorByContinent(continent){
-        let sel_continent = '';
+        let sel_continent = ''
         for(const c_continent in CONTINENTS){
             if(CONTINENTS[c_continent].name.localeCompare(continent.toLowerCase()) === 0){
-                sel_continent = CONTINENTS[c_continent];
-                break;
+                sel_continent = CONTINENTS[c_continent]
+                break
             }
         }
-        return colors[sel_continent.color];
+        return colors[sel_continent.color]
     }
 
     /**
@@ -201,53 +220,53 @@ class  ParticleVizManager extends React.Component{
      * @returns {{}}
      */
     updateCountryColorsPartViz_Manager(country_names, ocean_names, continent_names, selected_country) {
-        let colors_by_country = {};
-        let update_alpha = false;
+        let colors_by_country = {}
+        let update_alpha = false
 
         // Finds for a selected country, If it finds it reduces the alpha of the other countries
         for(let i=0; i < country_names.length; i++){
-            let name = country_names[i];
+            let name = country_names[i]
             if(name.toLowerCase() === selected_country.toLowerCase()) {
-                update_alpha = true;
-                break;
+                update_alpha = true
+                break
             }
         }
 
         // Iterates over all the country names
         for (let i = 0; i < country_names.length; i++) {
-            let name = country_names[i];
+            let name = country_names[i]
             // Finds teh selected country and highlights it
             if (name.toLowerCase() === selected_country.toLowerCase()) {
-                colors_by_country[name] = selected_color;
+                colors_by_country[name] = selected_color
             } else {
-                // let new_color = colors[i % colors.length];
-                // let new_color = this.colorByOcean(ocean_names[i])[i % 7];
-                let new_color = this.colorByContinent(continent_names[i])[i % 7];
+                // let new_color = colors[i % colors.length]
+                // let new_color = this.colorByOcean(ocean_names[i])[i % 7]
+                let new_color = this.colorByContinent(continent_names[i])[i % 7]
                 if(update_alpha) {
-                    let rgb = new_color;
-                    // rgb = rgb.replace(/[^\d,]/g, '').split(',');
-                    // new_color = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${not_selected_alpha})`;
-                    new_color = rgb.slice(0,-2) + not_selected_alpha;
+                    let rgb = new_color
+                    // rgb = rgb.replace(/[^\d,]/g, '').split(',')
+                    // new_color = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${not_selected_alpha})`
+                    new_color = rgb.slice(0,-2) + not_selected_alpha
                 }
-                colors_by_country[name] = new_color;
+                colors_by_country[name] = new_color
             }
         }
-        return colors_by_country;
+        return colors_by_country
     }
 
     changeFile(e){
-        let new_selected_model = [];
+        let new_selected_model = []
         for(let i = 0; i < data_files.length; i++){
             let merged = `${data_files[i].title.toLowerCase()} ${data_files[i].speed.toLowerCase()}`
             if(merged === e.target.text.toLowerCase()){
-                new_selected_model = data_files[i];
-                break;
+                new_selected_model = data_files[i]
+                break
             }
         }
         this.setState({
             selected_model: new_selected_model
         })
-        e.preventDefault();
+        e.preventDefault()
     }
 
     render(){
@@ -280,10 +299,10 @@ class  ParticleVizManager extends React.Component{
                     </div>
                     <div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">
                         <InputGroup.Prepend>
-                            <span>Density</span> &nbsp;
+                            <span>Density</span> &nbsp
                             <InputGroup.Checkbox aria-label="Checkbox for following text input"
                                 checked={this.state.histogram_selected}
-                                onChange={this.updateHistogramLayer}/>
+                                onChange={this.toogleHistogramLayer}/>
                         </InputGroup.Prepend>
                     </div>
                     <div className="col-5 col-md-1 col-lg-1">
@@ -298,8 +317,8 @@ class  ParticleVizManager extends React.Component{
                              updateSelectedCountry = {this.updateSelectedCountry}/>
 
             </div>
-        );
+        )
     }
 }
 
-export default ParticleVizManager;
+export default ParticleVizManager

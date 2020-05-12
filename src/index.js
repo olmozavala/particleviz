@@ -27,11 +27,16 @@ let background_layer = new TileLayer({
 
 let histogram_layer = new TileLayer({
     source: new TileWMS({
-        url:'http://146.201.212.214:8080/ncWMS2/wms',
+        // url:'http://146.201.212.214:8080/ncWMS2/wms',
+        url:'http://localhost:8080/ncWMS2/wms',
         params: {
-            'LAYERS':'all/histo',
-            'ABOVEMAXCOLOR':'extend',
-            'TILED':true
+            'LAYERS':'un_ml/histo',
+            'TILED':true,
+            'STYLES':'default-scalar/div-PRGn',
+            'COLORSCALERANGE':'1,503500',
+            'NUMCOLORBANDS':250,
+            'LOGSCALE':true
+
         }
     }),
     opacity:.8});
@@ -39,8 +44,8 @@ histogram_layer.setVisible(false);
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
-        url: "http://ozavala.coaps.fsu.edu/data/countries.json",
-        // url: "http://localhost/data/countries.json",
+        // url: "http://ozavala.coaps.fsu.edu/data/countries.json",
+        url: "http://localhost/data/countries.json",
         format: new GeoJSON()
     }),
     //The style is defined on 'StatesLayer.js'
@@ -52,7 +57,8 @@ let states_layer = new VectorLayer({
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
-    resolutions[i] = .3/(2**i);
+    resolutions[i] = .16/(2**i);
+    // resolutions[i] = .36/(2**i);
 }
 console.log("Resolutions: ", resolutions);
 

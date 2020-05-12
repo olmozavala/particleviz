@@ -6,7 +6,7 @@ import ImageLayer from "ol/layer/Image";
 import ImageCanvasSource from "ol/source/ImageCanvas";
 import {toLonLat} from "ol/proj";
 import {getCenter} from "ol/extent";
-import _ from "underscore";
+import _ from "lodash"
 import 'animate.css'
 import {
     ArrowRight, CircleFill, Plus, Dash,
@@ -90,10 +90,16 @@ class  ParticlesLayer extends React.Component {
             selected_model: this.props.selected_model,
             canvas_layer: -1,
             loading_perc: 0,
+            data: null,
+            data_geo: null,
+            extent: null,
+            domain: null,
+            ol_canvas_size:null
         };
         this.canvasWidth = 0;
         this.canvasHeight = 0;
         this.draw_until_day = true; // Used to redraw all the positions until current time
+
 
         this.getFeatures = this.getFeatures.bind(this);
         this.drawLitter = this.drawLitter.bind(this);
@@ -121,9 +127,14 @@ class  ParticlesLayer extends React.Component {
         this.displayCurrentDay = this.displayCurrentDay.bind(this);
         this.displayTransparency= this.displayTransparency.bind(this);
         this.displayParticleSize= this.displayParticleSize.bind(this);
+        this.geoToCanvas= this.geoToCanvas.bind(this);
+        this.geoToCanvasWest= this.geoToCanvasWest.bind(this);
+        this.geoToCanvasEast= this.geoToCanvasEast.bind(this);
+        this.updateAllData= this.updateAllData.bind(this);
     }
 
     readTwoUnzippedFile(data) {
+        console.log("Uncrompressed file received....")
         this.readThreeReadJSON(JSON.parse(data));
     }
 
@@ -132,37 +143,106 @@ class  ParticlesLayer extends React.Component {
      * @param data
      */
     readThreeReadJSON(data) {
-        console.log("Reading json data!!!!!!! ", data);
-        this.data = data;
+        console.log("Reading final json data!!!!!!! ", data);
+        this.country_keys = Object.keys(data);
+        // fixing those particles that 'jump' the map
+        let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length;
+        for(let c_time=0; c_time < total_timesteps - 1; c_time++){
+            for(let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+                let cur_country = data[this.country_keys[cur_country_id]]
+                let tot_part = cur_country["lat_lon"][0].length
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    let lon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
+                    let nlon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time+1]
+                    if( ((lon > 170) && (nlon < -170)) || ((lon < -170) && (nlon > 170)) ){
+                        data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
+                        data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time+1] = 200
+                    }
+                }
+            }
+        }
 
-        this.country_keys = Object.keys(this.data);
         this.country_names = this.country_keys.map((x) => x.toLowerCase());
-        this.ocean_names = this.country_keys.map((x) => this.data[x]['oceans']);
-        this.continent_names = this.country_keys.map((x) => this.data[x]['continent']);
-        this.total_timesteps = this.data[this.country_keys[0]]["lat_lon"][0][0].length;
+        this.ocean_names = this.country_keys.map((x) => data[x]['oceans']);
+        this.continent_names = this.country_keys.map((x) => data[x]['continent']);
+        this.total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length;
 
         console.log("\t Total timesteps: ", this.total_timesteps);
-        console.log("\t Countries names: ", this.country_names);
-        console.log("\t Ocean names: ", this.ocean_names);
-        console.log("\t Continent names: ", this.continent_names);
+        // console.log("\t Countries names: ", this.country_names);
+        // console.log("\t Ocean names: ", this.ocean_names);
+        // console.log("\t Continent names: ", this.continent_names);
 
+        let canv_lay = null
         if (this.state.canvas_layer === -1) {
             let canv_lay = new ImageLayer({
                 source: new ImageCanvasSource({
                     canvasFunction: this.canvasFunction
                 })
             });
-            this.setState({
-                canvas_layer: canv_lay
-            })
             this.props.map.addLayer(canv_lay);
         }
+        this.setState({
+            canvas_layer: canv_lay,
+            data: data
+        })
         this.props.updateCountriesData(this.country_names, this.ocean_names, this.continent_names);
     }
 
+    /**
+     * Transforms geographic into window
+     * @param lon
+     * @param lat
+     * @returns {number[]}
+     */
+    geoToCanvas(lon, lat){
+        let nlon = ((lon - this.state.extent[0])/this.state.domain[0]) * this.state.ol_canvas_size[0]
+        let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
+        return [nlon, nlat]
+    }
+    /**
+     * Transforms geographic into window
+     * @param lon
+     * @param lat
+     * @returns {number[]}
+     */
+    geoToCanvasWest(lon, lat){
+        let nlon = ((lon - this.state.extent[0] - 360)/this.state.domain[0]) * this.state.ol_canvas_size[0]
+        let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
+        return [nlon, nlat]
+    }
+    /**
+     * Transforms geographic into window
+     * @param lon
+     * @param lat
+     * @returns {number[]}
+     */
+    geoToCanvasEast(lon, lat){
+        let nlon = ((lon - this.state.extent[0] + 360)/this.state.domain[0]) * this.state.ol_canvas_size[0]
+        let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
+        return [nlon, nlat]
+    }
+
+    updateAllData(extent, domain, size){
+        console.log("Updating positions....")
+        let geoData = _.cloneDeep(this.state.data)
+        for(let c_time=0; c_time< this.total_timesteps; c_time++){
+            for(let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+                let cur_country = geoData[this.country_keys[cur_country_id]]
+                let tot_part = cur_country["lat_lon"][0].length
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    let lon = geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
+                    let lat = geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time]
+                    geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = ((lon - extent[0])/domain[0]) * size[0]
+                    geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time] = size[1] - (((lat - extent[1])/domain[1]) * size[1])
+                }
+            }
+        }
+        console.log("Done!....")
+        return geoData
+    }
+
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
-        // TODO Depending on the extent is which generators we should display
-        // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection);
+        console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection);
 
         this.canvasWidth = size[0];
         this.canvasHeight = size[1];
@@ -182,15 +262,15 @@ class  ParticlesLayer extends React.Component {
         this.show_west_map = false;
         this.show_east_map = false;
         if(extent[0] < -180){
-            // console.log('Showing west map....');
+            console.log('Showing west map....');
             this.show_west_map = true;
         }
         if(extent[2] > 180){
-            // console.log('Showing east map....');
+            console.log('Showing east map....');
             this.show_east_map = true;
         }
 
-        if (!_.isUndefined(this.data)) {
+        if (!_.isUndefined(this.state.data)) {
             let r = 57.295779513082266; // TODO This needs to be fixed is hardcoded
             let scale = r / (resolution / pixelRatio);
             let center = toLonLat(getCenter(extent), projection);
@@ -208,11 +288,21 @@ class  ParticlesLayer extends React.Component {
             this.d3GeoGenerator = this.d3GeoGenerator.projection(this.d3Projection).context(ctx);
             this.d3GeoGeneratorWest = this.d3GeoGeneratorWest.projection(this.d3ProjectionWest).context(ctx);
             this.d3GeoGeneratorEast = this.d3GeoGeneratorEast.projection(this.d3ProjectionEast).context(ctx);
-
+            let domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
+            let new_status = this.state.status
+            // let data_geo = this.updateAllData(locextent, domain, locsize)
+            // console.log(`Domain: ${domain}  Extent: ${locextent}  Size: ${locsize}`)
             if (this.state.status === STATUS.decompressing) {
-                this.setState({status: STATUS.paused});
+                new_status = STATUS.paused
             }
-            this.updateAnimation();
+
+            this.setState({
+                extent: extent,
+                domain: domain,
+                ol_canvas_size: size,
+                status: new_status,
+                // data_geo: data_geo
+            })
         }
 
         return this.d3canvas.node();
@@ -232,17 +322,16 @@ class  ParticlesLayer extends React.Component {
         // Verify the update was caused by the parent component and we have updated
         // the file to read.
         if (this.selected_mode !== this.props.selected_model) {
-            delete this.data;
             this.setState({
                 time_step: 0,
                 selected_model: this.props.selected_model,
-                status: STATUS.loading
+                status: STATUS.loading,
+                data: null
             });
             this.selected_mode = this.props.selected_model;
             let url = `${this.props.url}/${this.props.selected_model.file}.zip`;
             console.log("Changed model: ", url);
-            d3.blob(url)
-                .then(this.readOneZip);
+            d3.blob(url).then(this.readOneZip);
         } else {
             if (this.state.status === STATUS.playing) {
                 this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000);
@@ -336,32 +425,125 @@ class  ParticlesLayer extends React.Component {
         this.props.map.render();
     }
 
+
     /**
      * Draws the lines for a single day. It iterates over different countries
      * @param ctx Context of the canvas object to use
      */
     drawLines(ctx) {
-        // console.time('features');
-        let countries = this.getFeatures('lines');
-        // console.timeLog('features', "features");
-        // console.time('draw');
+        // ------------------- NEW Manuall -------------------
+        let start_time = this.state.time_step;
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
-        for (let i = 0; i < countries.length; i++) {
+        console.log(`Domain: ${this.state.domain}  Extent: ${this.state.extent}  Size: ${this.state.ol_canvas_size}`)
+        for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
             ctx.beginPath()
-            ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
-            // ctx.strokeStyle = "rgb(0,0,0)"
-            this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
-            if(this.show_west_map) {
-                this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
+            ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+            let cur_country = this.state.data[this.country_keys[cur_country_id]]
+            let tot_part = cur_country["lat_lon"][0].length
+
+            for (let part_id = 0; part_id < tot_part; part_id++) {
+                let clon = cur_country["lat_lon"][1][part_id][start_time]
+                let nlon = cur_country["lat_lon"][1][part_id][start_time+1]
+                let oldpos = [0,0]
+                let newpos= [0,0]
+                if((clon >= this.state.extent[0]) && (clon <= this.state.extent[2]) && (clon !== 200) && (nlon !== 200)){
+                    oldpos = this.geoToCanvas(clon, cur_country["lat_lon"][0][part_id][start_time])
+                    newpos = this.geoToCanvas(nlon, cur_country["lat_lon"][0][part_id][start_time + 1])
+                    // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+                    // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+                    ctx.moveTo(oldpos[0], oldpos[1])
+                    ctx.lineTo(newpos[0], newpos[1])
+                }
+                if((this.state.extent[2] >= 180) && (clon !== 200) && (nlon !== 200)) {
+                    let clon = cur_country["lat_lon"][1][part_id][start_time] + 360
+                    let nlon = cur_country["lat_lon"][1][part_id][start_time+1] + 360
+                    if((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])){
+                        oldpos = this.geoToCanvas(clon, cur_country["lat_lon"][0][part_id][start_time])
+                        newpos = this.geoToCanvas(nlon, cur_country["lat_lon"][0][part_id][start_time + 1])
+                        // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+                        // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+                        ctx.moveTo(oldpos[0], oldpos[1])
+                        ctx.lineTo(newpos[0], newpos[1])
+                    }
+                }
+                if((this.state.extent[0] <= -180)  && (clon !== 200) && (nlon !== 200)) {
+                    let clon = cur_country["lat_lon"][1][part_id][start_time] - 360
+                    let nlon = cur_country["lat_lon"][1][part_id][start_time+1] - 360
+                    if((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])){
+                        oldpos = this.geoToCanvas(clon, cur_country["lat_lon"][0][part_id][start_time])
+                        newpos = this.geoToCanvas(nlon, cur_country["lat_lon"][0][part_id][start_time + 1])
+                        // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+                        // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+                        ctx.moveTo(oldpos[0], oldpos[1])
+                        ctx.lineTo(newpos[0], newpos[1])
+                    }
+                }
             }
-            if(this.show_east_map) {
-                this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features});
-            }
+            // ---------------------- SEMI NEW ----------------------
+            // let oldpos = [0,0]
+            // let newpos= [0,0]
+            // for (let part_id = 0; part_id < tot_part; part_id++) {
+            //     oldpos = this.geoToCanvas(cur_country["lat_lon"][1][part_id][start_time],
+            //         cur_country["lat_lon"][0][part_id][start_time])
+            //     newpos = this.geoToCanvas(cur_country["lat_lon"][1][part_id][start_time+1],
+            //         cur_country["lat_lon"][0][part_id][start_time+1])
+            //     // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+            //     // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+            //     ctx.moveTo(oldpos[0], oldpos[1])
+            //     ctx.lineTo(newpos[0], newpos[1])
+            // }
+            // if(this.show_west_map) {
+            //     for (let part_id = 0; part_id < tot_part; part_id++) {
+            //         oldpos = this.geoToCanvasWest(cur_country["lat_lon"][1][part_id][start_time],
+            //             cur_country["lat_lon"][0][part_id][start_time])
+            //         newpos = this.geoToCanvasWest(cur_country["lat_lon"][1][part_id][start_time+1],
+            //             cur_country["lat_lon"][0][part_id][start_time+1])
+            //         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+            //         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+            //         ctx.moveTo(oldpos[0], oldpos[1])
+            //         ctx.lineTo(newpos[0], newpos[1])
+            //     }
+            // }
+            // if(this.show_east_map) {
+            //     for (let part_id = 0; part_id < tot_part; part_id++) {
+            //         oldpos = this.geoToCanvasEast(cur_country["lat_lon"][1][part_id][start_time],
+            //             cur_country["lat_lon"][0][part_id][start_time])
+            //         newpos = this.geoToCanvasEast(cur_country["lat_lon"][1][part_id][start_time+1],
+            //             cur_country["lat_lon"][0][part_id][start_time+1])
+            //         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+            //         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+            //         ctx.moveTo(oldpos[0], oldpos[1])
+            //         ctx.lineTo(newpos[0], newpos[1])
+            //     }
+            // }
+
             ctx.stroke();
             ctx.closePath();
         }
-        // console.timeLog('draw', "draw");
         this.props.map.render();
+
+        // +++++++++++++++++++++++++ OLD ++++++++++++++++
+        // console.time('features');
+        // let countries = this.getFeatures('lines');
+        // // console.timeLog('features', "features");
+        // // console.time('draw');
+        // ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
+        // for (let i = 0; i < countries.length; i++) {
+        //     ctx.beginPath()
+        //     ctx.strokeStyle = this.props.colors_by_country[countries[i].country.toLowerCase()];
+        //     // ctx.strokeStyle = "rgb(0,0,0)"
+        //     this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features});
+        //     if(this.show_west_map) {
+        //         this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features});
+        //     }
+        //     if(this.show_east_map) {
+        //         this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features});
+        //     }
+        //     ctx.stroke();
+        //     ctx.closePath();
+        // }
+        // console.timeLog('draw', "draw");
+        // this.props.map.render();
     }
 
     /**
@@ -376,11 +558,10 @@ class  ParticlesLayer extends React.Component {
         if (this.draw_until_day) {
             start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS*(6-this.state.transparency_index)/6);
         }
-
         // let glob_tot_particles = 0;
         // Iterating over countries
         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-            let cur_country = this.data[this.country_keys[cur_country_id]];
+            let cur_country = this.state.data[this.country_keys[cur_country_id]];
             let tot_part = cur_country["lat_lon"][0].length;
             // glob_tot_particles += tot_part;
 
@@ -628,6 +809,7 @@ class  ParticlesLayer extends React.Component {
 
         }
     }
+
     getIconColorSizeBoostrap(value, inv=false, color=false){
         if(inv){
             value = 6 - value;
@@ -658,6 +840,7 @@ class  ParticlesLayer extends React.Component {
 
         }
     }
+
     displayTransparency(){
         let transparency = <span></span>;
         if(this.state.status !== STATUS.loading){
