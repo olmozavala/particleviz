@@ -98,6 +98,7 @@ class  ParticlesLayer extends React.Component {
             country_names: null,
             ocean_names: null,
             continent_names: null,
+            index_by_country: {},
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -138,26 +139,38 @@ class  ParticlesLayer extends React.Component {
     readTwoUnzippedFile(txtdata, filenum) {
         console.log(`Uncrompressed file received, file number: ${filenum} ....`)
         let data = JSON.parse(txtdata)
+        let th = 10
 
         console.log("Reading final json data!!!!!!! ", data)
         this.country_keys = Object.keys(data)
         // fixing those particles that 'jump' the map
         let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length
-        for(let c_time=0; c_time < total_timesteps - 1; c_time++){
-            for(let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-                let cur_country = data[this.country_keys[cur_country_id]]
-                let tot_part = cur_country["lat_lon"][0].length
-                for (let part_id = 0; part_id < tot_part; part_id++) {
+        let loc_index_by_country = {}
+        for(let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+            let this_country_idx = []
+            let cur_country = data[this.country_keys[cur_country_id]]
+            let tot_part = cur_country["lat_lon"][0].length
+            for (let part_id = 0; part_id < tot_part; part_id++) {
+                let this_particle_idx = {}
+                for(let c_time=0; c_time < total_timesteps - 1; c_time++){
                     let lon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
                     let nlon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time+1]
 
-                    if( ((lon > 179) && (nlon < -179)) || ((lon < -179) && (nlon > 179)) ){
-                        data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
-                        data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time+1] = 200
+                    if( (lon != 200) && (nlon != 200) ){
+                        if( ((lon > th) && (nlon < -th)) || ((lon < -th) && (nlon > th))){
+                            console.log(`This is added ${lon} and ${nlon} part ${part_id} time ${c_time}`)
+                            data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
+                            // this_particle_idx.push(c_time)
+                        }
                     }
                 }
+                loc_index_by_country[cur_country_id] = this_country_idx
             }
         }
+
+        let global_index_by_country = this.state.index_by_country
+        global_index_by_country[filenum] = loc_index_by_country
+        console.log("Global index by country: ", global_index_by_country)
 
         let country_names = this.country_keys.map((x) => x.toLowerCase())
         let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
@@ -196,7 +209,8 @@ class  ParticlesLayer extends React.Component {
             country_names: country_names,
             ocean_names: ocean_names,
             total_timesteps: this.state.total_timesteps + total_timesteps,
-            status: cur_state
+            status: cur_state,
+            index_by_country: global_index_by_country
         })
         this.props.updateCountriesData(country_names, ocean_names, continent_names)
         console.log("Done reading!")    }
@@ -458,7 +472,7 @@ class  ParticlesLayer extends React.Component {
         let available_files = Object.keys(this.state.data)
         let file_number = (Math.floor(this.state.time_step/ 100)).toString()
         let start_time = this.state.time_step % 100;
-        console.log(`Drawing lines time step: ${start_time} file number: ${file_number}   (global ${this.state.time_step})`)
+        // console.log(`Drawing lines time step: ${start_time} file number: ${file_number}   (global ${this.state.time_step})`)
 
         if( available_files.includes(file_number) ) {
             for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
@@ -469,33 +483,41 @@ class  ParticlesLayer extends React.Component {
                 let tot_part = country_start["lat_lon"][0].length
                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
                 for (let part_id = 0; part_id < tot_part; part_id++) {
-                    let clon = country_start["lat_lon"][1][part_id][start_time]
-                    let clat = country_start["lat_lon"][0][part_id][start_time]
-                    let nlon = country_start["lat_lon"][1][part_id][start_time + 1]
-                    let nlat = country_start["lat_lon"][0][part_id][start_time + 1]
+                    if(this.state.index_by_country[file_number]){
+                        let clon = country_start["lat_lon"][1][part_id][start_time]
+                        let clat = country_start["lat_lon"][0][part_id][start_time]
+                        let nlon = country_start["lat_lon"][1][part_id][start_time + 1]
+                        let nlat = country_start["lat_lon"][0][part_id][start_time + 1]
 
-                    let oldpos = [0, 0]
-                    let newpos = [0, 0]
-                    if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2]) && (clon !== 200) && (nlon !== 200)) {
-                        oldpos = this.geoToCanvas(clon, clat)
-                        newpos = this.geoToCanvas(nlon, nlat)
-                        ctx.moveTo(oldpos[0], oldpos[1])
-                        ctx.lineTo(newpos[0], newpos[1])
-                    }
-                    if ((this.state.extent[2] >= 180) && (clon !== 200) && (nlon !== 200)) {
-                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                            oldpos = this.geoToCanvas(clon + 360, clat)
-                            newpos = this.geoToCanvas(nlon + 360, nlat)
-                            ctx.moveTo(oldpos[0], oldpos[1])
-                            ctx.lineTo(newpos[0], newpos[1])
-                        }
-                    }
-                    if ((this.state.extent[0] <= -180) && (clon !== 200) && (nlon !== 200)) {
-                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                            oldpos = this.geoToCanvas(clon - 360, clat)
-                            newpos = this.geoToCanvas(nlon - 360, nlat)
-                            ctx.moveTo(oldpos[0], oldpos[1])
-                            ctx.lineTo(newpos[0], newpos[1])
+                        let oldpos = [0, 0]
+                        let newpos = [0, 0]
+                        if((clon != 200) && (nlon != 200)){
+                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(clon, clat)
+                                newpos = this.geoToCanvas(nlon, nlat)
+                                ctx.moveTo(oldpos[0], oldpos[1])
+                                ctx.lineTo(newpos[0], newpos[1])
+                            }
+                            if ((this.state.extent[2] >= 180)) {
+                                let tlon = clon + 360
+                                let tnlon = nlon + 360
+                                if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    newpos = this.geoToCanvas(tnlon, nlat)
+                                    ctx.moveTo(oldpos[0], oldpos[1])
+                                    ctx.lineTo(newpos[0], newpos[1])
+                                }
+                            }
+                            if ((this.state.extent[0] <= -180)) {
+                                let tlon = clon - 360
+                                let tnlon = nlon - 360
+                                if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    newpos = this.geoToCanvas(tnlon, nlat)
+                                    ctx.moveTo(oldpos[0], oldpos[1])
+                                    ctx.lineTo(newpos[0], newpos[1])
+                                }
+                            }
                         }
                     }
                 }

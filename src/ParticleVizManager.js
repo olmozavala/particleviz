@@ -116,7 +116,7 @@ for(let i=1; i<=12; i++) {
         speed: "",
         start_date: new Date(2010, i-1, 1),
         // num_files: 17
-        num_files: 5
+        num_files: 10
     })
 }
 
