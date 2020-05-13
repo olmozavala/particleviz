@@ -137,11 +137,11 @@ class  ParticlesLayer extends React.Component {
     }
 
     readTwoUnzippedFile(txtdata, filenum) {
-        console.log(`Uncrompressed file received, file number: ${filenum} ....`)
+        // console.log(`Uncompressed file received, file number: ${filenum} ....`)
         let data = JSON.parse(txtdata)
         let th = 10
 
-        console.log("Reading final json data!!!!!!! ", data)
+        // console.log("Reading final json data!!!!!!! ", data)
         this.country_keys = Object.keys(data)
         // fixing those particles that 'jump' the map
         let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length
@@ -170,13 +170,13 @@ class  ParticlesLayer extends React.Component {
 
         let global_index_by_country = this.state.index_by_country
         global_index_by_country[filenum] = loc_index_by_country
-        console.log("Global index by country: ", global_index_by_country)
+        // console.log("Global index by country: ", global_index_by_country)
 
         let country_names = this.country_keys.map((x) => x.toLowerCase())
         let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
         let continent_names = this.country_keys.map((x) => data[x]['continent'])
 
-        console.log("\t Total timesteps: ", total_timesteps)
+        // console.log("\t Total timesteps: ", total_timesteps)
         // console.log("\t Countries names: ", this.country_names)
         // console.log("\t Ocean names: ", this.ocean_names)
         // console.log("\t Continent names: ", this.continent_names)
@@ -193,8 +193,8 @@ class  ParticlesLayer extends React.Component {
         let cur_state = this.state.status
         // Update the progress bar
         if(this.state.loaded_files >= (this.state.selected_model.num_files - 3)){
-            console.log("Done reading and uncompressing all the files!!!!")
-            console.log(this.state.total_timesteps + total_timesteps)
+            // console.log("Done reading and uncompressing all the files!!!!")
+            // console.log(this.state.total_timesteps + total_timesteps)
             cur_state = STATUS.paused
         }
 
@@ -213,7 +213,8 @@ class  ParticlesLayer extends React.Component {
             index_by_country: global_index_by_country
         })
         this.props.updateCountriesData(country_names, ocean_names, continent_names)
-        console.log("Done reading!")    }
+        // console.log("Done reading!")
+    }
 
 
     /**
@@ -384,12 +385,12 @@ class  ParticlesLayer extends React.Component {
      * @param blob
      */
     readOneZip(blob, filenum) {
-        console.log(`File has been received! file number ${filenum}`, blob)
+        // console.log(`File has been received! file number ${filenum}`, blob)
         let zip = new JSZip()
         zip.loadAsync(blob)
             .then(function (zip) {
                 // you now have every files contained in the loaded zip
-                console.log(`Received zip for file number ${filenum}:`, zip)
+                // console.log(`Received zip for file number ${filenum}:`, zip)
                 for (let file in zip.files) {
                     let zipobj = zip.files[file]
                     return zipobj.async("string")

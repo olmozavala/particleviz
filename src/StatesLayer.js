@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import './css/App.css';
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
@@ -45,9 +46,11 @@ class  StatesLayer extends React.Component{
 
         // Reading Reached data
         let url_data = `${this.props.url}/ReachedTablesData.json`;
+        // console.log(url_data)
         d3.json(url_data)
             .then(function (data) {
                 this.reached_data = data;
+                console.log('Table data', data)
             }.bind(this));
 
         this.props.map.addLayer(this.vectorLayer);
@@ -192,18 +195,16 @@ class  StatesLayer extends React.Component{
             if (this.state.selected !== country) {
                 country.setStyle(this.getCountryStyle(selected_color, name));
                 // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
-                // var coordinate = e.coordinate;
-                // //     ------ Popup OpenLayers
-                // this.popup.setPosition(coordinate);
-                // $(element).popover({
-                //     placement: 'left',
-                //     animation: true,
-                //     html: true,
-                // });
-                // ReactDOM.render(this.makeTable(name), element);
-                // $(element).show({duration:100});
-                // }else{
-                //     $("#stats_table").addClass('fadeOutRight');
+                var coordinate = e.coordinate;
+                //     ------ Popup OpenLayers
+                this.popup.setPosition(coordinate);
+                $(element).popover({
+                    placement: 'left',
+                    animation: true,
+                    html: true,
+                });
+                ReactDOM.render(this.makeTable(name), element);
+                $(element).show({duration:100});
                 this.setState({
                     selected: country,
                     oldSelectedColor: oldcolor
@@ -213,6 +214,7 @@ class  StatesLayer extends React.Component{
                     selected: null,
                     oldSelectedColor: null
                 });
+                $("#stats_table").addClass('fadeOutRight');
             }
 
             }

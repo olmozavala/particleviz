@@ -22,39 +22,68 @@ class  MakeTable extends React.Component {
         // $('#popup').popover('hide');
     }
 
-    showStatistics(asia, africa){
+    showStatistics(){
         if(!_.isUndefined(this.props.country_data)) {
+            let from_data = this.props.country_data
             return (
                 <span>
-                    <div className="row text-center bg-white pt-2">
-                        <div className="col-6">
-                            <h6><strong>Asia</strong></h6>
-                        </div>
-                        <div className="col-6">
-                            <h6><strong>Africa</strong></h6>
-                        </div>
-                        <div className="col-12">
-                            <hr className="p-0 m-0"/>
-                        </div>
-                    </div>
                     <div className="row">
                         <div className="col-6">
-                            <ul className="list-group list-group-flush">
-                                {Object.keys(asia).map((name) =>
-                                    <li className="m-0 p-1  text-capitalize list-group-item" key={name}>
-                                        <small>{name} {(100 * asia[name][0] / asia[name][1]).toFixed(2)}%</small>
-                                    </li>)}
-                            </ul>
+                            <div className="row">
+                                <div className="col-12">
+                                    From {from_data['from'].name} to other countries, {from_data['from'].tot_tons} tons
+                                </div>
+                            </div>
+                            <div className="row ">
+                                <div className="col-12">
+                                    <ul className="list-group list-group-flush">
+                                        {Object.keys(from_data['from']['from']).map((id) =>
+                                            <li className="m-0 p-1  list-group-item" key={from_data['from']['from'][id].name}>
+                                                <small>{from_data['from']['from'][id].tons} tons, {from_data['from']['from'][id].perc}%
+                                                    to {from_data['from']['from'][id].name}</small>
+                                            </li>)}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div className="col-6">
-                            <ul className="list-group list-group-flush">
-                                {Object.keys(africa).map((name) =>
-                                    <li className="m-0 p-1 text-capitalize list-group-item" key={name}>
-                                        <small> {name} {(100 * africa[name][0] / africa[name][1]).toFixed(2)}%</small>
-                                    </li>)}
-                            </ul>
+                            <div className="row text-capitalize">
+                                <div className="col-12">
+                                    Towards {from_data['to'].name} from other countries, {from_data['to'].tot_tons} tons
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-12">
+                                    <ul className="list-group list-group-flush">
+                                        {Object.keys(from_data['to']['to']).map((id) =>
+                                            <li className="m-0 p-1   list-group-item" key={from_data['to']['to'][id].name}>
+                                                <small>{from_data['to']['to'][id].tons} tons, {from_data['to']['to'][id].perc}%
+                                                    from {from_data['to']['to'][id].name}</small>
+                                            </li>)}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
+                    {/*<div className="row">*/}
+                    {/*    <div className="col-6">*/}
+                    {/*        <ul className="list-group list-group-flush">*/}
+                    {/*            {Object.keys(asia).map((name) =>*/}
+                    {/*                <li className="m-0 p-1  text-capitalize list-group-item" key={name}>*/}
+                    {/*                    <small>{name} {(100 * asia[name][0] / asia[name][1]).toFixed(2)}%</small>*/}
+                    {/*                </li>)}*/}
+                    {/*        </ul>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="col-6">*/}
+                    {/*        <ul className="list-group list-group-flush">*/}
+                    {/*            {Object.keys(africa).map((name) =>*/}
+                    {/*                <li className="m-0 p-1 text-capitalize list-group-item" key={name}>*/}
+                    {/*                    <small> {name} {(100 * africa[name][0] / africa[name][1]).toFixed(2)}%</small>*/}
+                    {/*                </li>)}*/}
+                    {/*        </ul>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </span>);
         }else{
             return <span></span>;
@@ -73,12 +102,6 @@ class  MakeTable extends React.Component {
     }
 
     render(){
-        let africa = "";
-        let asia = "";
-        if(!_.isUndefined(this.props.country_data)){
-            africa = this.props.country_data.Africa;
-            asia = this.props.country_data.Asia;
-        }
         return (
             <div className="container bg-white rounded-lg">
                 <div className="row rounded-lg bg-dark">
@@ -91,7 +114,7 @@ class  MakeTable extends React.Component {
                     {/*    </button>*/}
                     {/*</div>*/}
                 </div>
-                {this.showStatistics(asia, africa)}
+                {this.showStatistics()}
                 {/*{this.showFootnote()}*/}
             </div>
         );

@@ -13,17 +13,19 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Style} from "ol/style";
 import GeoJSON from "ol/format/GeoJSON";
+import OSM from "ol/source/OSM";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
-let background_layer = new TileLayer({
-    source: new TileWMS({
-        url:'https://geonode.wfp.org/geoserver/wms',
-        params: {
-            'LAYERS':'geonode:wld_bnd_admin0_l_unmap_2019',
-            'TILED':true
-        }
-    })
-});
+let background_layer = new TileLayer({ source: new OSM() });
+// let background_layer = new TileLayer({
+//     source: new TileWMS({
+//         url:'https://geonode.wfp.org/geoserver/wms',
+//         params: {
+//             'LAYERS':'geonode:wld_bnd_admin0_l_unmap_2019',
+//             'TILED':true
+//         }
+//     })
+// });
 
 let histogram_layer = new TileLayer({
     source: new TileWMS({
@@ -60,7 +62,7 @@ for(let i=0; i < tot_res; i++){
     resolutions[i] = .16/(2**i);
     // resolutions[i] = .36/(2**i);
 }
-console.log("Resolutions: ", resolutions);
+// console.log("Resolutions: ", resolutions);
 
 let map = new Map({
     layers: [
@@ -70,7 +72,7 @@ let map = new Map({
     view: new View({
         projection: 'EPSG:4326', //Equirectangular
         center: [0, 0],
-        extent: [-180, -90, 180, 90],
+        extent: [-180, -190, 180, 190],
         resolutions: resolutions,
         zoom: 1,
         moveTolerance: 400,
@@ -84,7 +86,7 @@ let map = new Map({
     })
 });
 
-console.log(map.getView().getResolution())
+// console.log(map.getView().getResolution())
 
 ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} histogram_layer={histogram_layer}/>,
     document.getElementById('root'));

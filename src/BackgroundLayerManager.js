@@ -40,13 +40,14 @@ class  BackgroundLayerManager extends React.Component{
     }
 
     componentDidMount() {
+        this.updateBackgroundLayer(BACKGROUND_MAPS.empty)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
     updateBackgroundLayer(e){
-        console.log("Updating background layer...");
+        // console.log("Updating background layer...");
         let bk_layer = this.state.bk_layer;
         switch(parseInt(e)) {
             case BACKGROUND_MAPS.empty:
@@ -124,9 +125,9 @@ class  BackgroundLayerManager extends React.Component{
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
                             <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
                         </DropdownItem>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >
-                            <img src={img_map_un} className="rounded" width="100px"  alt="UN"/>
-                        </DropdownItem>
+                        {/*<DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >*/}
+                        {/*    <img src={img_map_un} className="rounded" width="100px"  alt="UN"/>*/}
+                        {/*</DropdownItem>*/}
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
                             <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
                         </DropdownItem>
@@ -145,7 +146,5 @@ class  BackgroundLayerManager extends React.Component{
             );
     }
 }
-
-
 
 export default BackgroundLayerManager;
