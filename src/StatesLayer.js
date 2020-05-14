@@ -34,8 +34,9 @@ class  StatesLayer extends React.Component{
 
         //------------------ Adding popup for the stats table ---------------------
         // Creating overlay
+        let popup = document.getElementById('popup')
         this.popup = new Overlay({
-            element: document.getElementById('popup')
+            element: popup
         });
         $('#popup').popover();
         this.props.map.addOverlay(this.popup);
@@ -176,6 +177,7 @@ class  StatesLayer extends React.Component{
 
         // Hide the previous table/plot
         var element = this.popup.getElement();
+
         $(element).hide();
 
         // It found something
@@ -183,41 +185,49 @@ class  StatesLayer extends React.Component{
             let country = features[0];
             let name = country.get("name");
             let oldcolor = this.props.colors_by_country[name.toLowerCase()];
-            // In which case should we restore the old color
-            if(this.state.selected !== null) {
-                let old_name = this.state.selected.get("name");
-                this.state.selected.setStyle(this.getCountryStyle(this.state.oldSelectedColor, old_name));
-            }
+            if(!(_.isUndefined(oldcolor))){ // In this case the country is not found.
+                // In which case should we restore the old color
+                if(this.state.selected !== null) {
+                    let old_name = this.state.selected.get("name");
+                    this.state.selected.setStyle(this.getCountryStyle(this.state.oldSelectedColor, old_name));
+                }
 
-            // WE ALWAYS NEED TO SEND THE UPDATE SIGNAL WHEN WE CLICK IN A COUNTRY
-            this.props.updateSelectedCountry(name);
+                // WE ALWAYS NEED TO SEND THE UPDATE SIGNAL WHEN WE CLICK IN A COUNTRY
+                this.props.updateSelectedCountry(name);
 
-            if (this.state.selected !== country) {
-                country.setStyle(this.getCountryStyle(selected_color, name));
-                // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
-                var coordinate = e.coordinate;
-                //     ------ Popup OpenLayers
-                this.popup.setPosition(coordinate);
-                $(element).popover({
-                    placement: 'left',
-                    animation: true,
-                    html: true,
-                });
-                ReactDOM.render(this.makeTable(name), element);
-                $(element).show({duration:100});
-                this.setState({
-                    selected: country,
-                    oldSelectedColor: oldcolor
-                });
-            }else{// Tooggle color 'unselect'
-                this.setState({
-                    selected: null,
-                    oldSelectedColor: null
-                });
-                $("#stats_table").addClass('fadeOutRight');
+                if (this.state.selected !== country) {
+                    country.setStyle(this.getCountryStyle(selected_color, name));
+                    // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
+                    var coordinate = e.coordinate;
+                    //     ------ Popup OpenLayers
+                    this.popup.setPosition(coordinate);
+                    $(element).popover({
+                        placement: 'left',
+                        animation: true,
+                        html: true,
+                    });
+                    let ol_popup_container = document.getElementsByClassName("ol-selectable")
+                    // Setting the popup with the table to 'passs through' the mouse events. To be able to scroll the map
+                    if(!_.isUndefined(ol_popup_container)){
+                        ol_popup_container[0].style.pointerEvents = "none"
+                        ol_popup_container[0].style.width= "34em"
+                    }
+                    ReactDOM.render(this.makeTable(name), element);
+                    $(element).show({duration:100});
+                    this.setState({
+                        selected: country,
+                        oldSelectedColor: oldcolor
+                    });
+                }
+                else{// Tooggle color 'unselect'
+                    this.setState({
+                        selected: null,
+                        oldSelectedColor: null
+                    });
+                    $("#stats_table").addClass('fadeOutRight');
+                }
             }
-
-            }
+        }
     }
 
     hoverEvent(e){
@@ -243,6 +253,7 @@ class  StatesLayer extends React.Component{
     componentDidMount() {
         this.props.map.on('click', this.clickEvent);
         this.props.map.on('pointermove', this.hoverEvent);
+        document.getElementsByClassName("ol-zoom")[0].style.zIndex = 101
     }
 
     render() {

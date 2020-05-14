@@ -27,10 +27,12 @@ let background_layer = new TileLayer({ source: new OSM() });
 //     })
 // });
 
-let histogram_layer = new TileLayer({
+// let ip_address = 'http://146.201.212.214'
+let ip_address = 'http://localhost'
+
+    let histogram_layer = new TileLayer({
     source: new TileWMS({
-        // url:'http://146.201.212.214:8080/ncWMS2/wms',
-        url:'http://localhost:8080/ncWMS2/wms',
+        url:`${ip_address}:8080/ncWMS2/wms`,
         params: {
             'LAYERS':'un_ml/histo',
             'TILED':true,
@@ -46,8 +48,7 @@ histogram_layer.setVisible(false);
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
-        // url: "http://ozavala.coaps.fsu.edu/data/countries.json",
-        url: "http://localhost/data/countries.json",
+        url:`${ip_address}/data/countries.json`,
         format: new GeoJSON()
     }),
     //The style is defined on 'StatesLayer.js'
@@ -59,8 +60,7 @@ let states_layer = new VectorLayer({
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
-    resolutions[i] = .16/(2**i);
-    // resolutions[i] = .36/(2**i);
+    resolutions[i] = .36/(2**i);
 }
 // console.log("Resolutions: ", resolutions);
 
@@ -88,7 +88,7 @@ let map = new Map({
 
 // console.log(map.getView().getResolution())
 
-ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} histogram_layer={histogram_layer}/>,
+ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} histogram_layer={histogram_layer} url={ip_address}/>,
     document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

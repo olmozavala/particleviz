@@ -11,9 +11,10 @@ import InputGroup from "react-bootstrap/InputGroup"
 import TileWMS from "ol/source/TileWMS"
 import * as d3 from "d3";
 
-const data_folder_url = "http://localhost/data"
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const wms_url = "http://localhost:8080/ncWMS2/wms"
+const wms_url = "http://http://146.201.212.214:8080/ncWMS2/wms"
 const def_alpha = "FF"
 const selected_alpha = 1
 // const not_selected_alpha = .2
@@ -101,7 +102,7 @@ data_files.push({
     file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
     style: "default-scalar/div-PRGn",
     wms: `fy_wcd_10_01/histo`,
-    title: `Five Years ${months[7]}`,
+    title: `One year since ${months[7]} 2010`,
     speed: "",
     start_date: new Date(2010, 7, 1),
     num_files: 4
@@ -147,7 +148,6 @@ class  ParticleVizManager extends React.Component{
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.props.histogram_layer.setSource(
             new TileWMS({
-                // url:'http://146.201.212.214:8080/ncWMS2/wms',
                 url: wms_url,
                 params: {
                     'LAYERS':this.state.selected_model.wms,
@@ -309,14 +309,14 @@ class  ParticleVizManager extends React.Component{
                         </Dropdown>
 
                     </div>
-                    <div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">
-                        <InputGroup.Prepend>
-                            <span>Density</span> &nbsp;
-                            <InputGroup.Checkbox aria-label="Checkbox for following text input"
-                                checked={this.state.histogram_selected}
-                                onChange={this.toogleHistogramLayer}/>
-                        </InputGroup.Prepend>
-                    </div>
+                    {/*<div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">*/}
+                    {/*    <InputGroup.Prepend>*/}
+                    {/*        <span>Density</span> &nbsp;*/}
+                    {/*        <InputGroup.Checkbox aria-label="Checkbox for following text input"*/}
+                    {/*            checked={this.state.histogram_selected}*/}
+                    {/*            onChange={this.toogleHistogramLayer}/>*/}
+                    {/*    </InputGroup.Prepend>*/}
+                    {/*</div>*/}
                     <div className="col-5 col-md-1 col-lg-1">
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map} />

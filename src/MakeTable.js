@@ -26,12 +26,12 @@ class  MakeTable extends React.Component {
         if(!_.isUndefined(this.props.country_data)) {
             let from_data = this.props.country_data
             return (
-                <span>
+                <span >
                     <div className="row">
                         <div className="col-6">
-                            <div className="row">
-                                <div className="col-12">
-                                    From {from_data['from'].name} to other countries, {from_data['from'].tot_tons} tons
+                            <div className="row ">
+                                <div className="col-12 bg-secondary text-white">
+                                    From {this.props.country_name} ({from_data['from'].tot_tons} tons)
                                 </div>
                             </div>
                             <div className="row ">
@@ -47,9 +47,9 @@ class  MakeTable extends React.Component {
                             </div>
                         </div>
                         <div className="col-6">
-                            <div className="row text-capitalize">
-                                <div className="col-12">
-                                    Towards {from_data['to'].name} from other countries, {from_data['to'].tot_tons} tons
+                            <div className="row ">
+                                <div className="col-12 bg-secondary text-white">
+                                    Toward {this.props.country_name} ({from_data['to'].tot_tons} tons)
                                 </div>
                             </div>
                             <div className="row">
@@ -102,11 +102,19 @@ class  MakeTable extends React.Component {
     }
 
     render(){
+        let from_data = this.props.country_data
         return (
             <div className="container bg-white rounded-lg">
                 <div className="row rounded-lg bg-dark">
                     <div className="col-11 text-center text-white  pt-2">
-                        <h6 className="d-inline"> {this.props.country_name}</h6>
+                        <h5 className="d-inline"> {this.props.country_name} exports {from_data['from'].tot_tons} tons per year </h5>
+                    </div>
+                    <div className="col-11 text-center text-white  pt-2">
+                        <h6 className="d-inline">
+                            {from_data['from'].ocean_tons} ({from_data['from'].ocean_perc}%) end up on the ocean
+                            <br/>
+                            {from_data['from'].beach_tons} ({from_data['from'].beach_perc}%) end up on the beach
+                        </h6>
                     </div>
                     {/*<div className="col-auto">*/}
                     {/*    <button type="button" className="btn btn-dark" onClick={this.hideTable}>*/}
