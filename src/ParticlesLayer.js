@@ -131,8 +131,6 @@ class  ParticlesLayer extends React.Component {
         this.displayTransparency= this.displayTransparency.bind(this)
         this.displayParticleSize= this.displayParticleSize.bind(this)
         this.geoToCanvas= this.geoToCanvas.bind(this)
-        this.geoToCanvasWest= this.geoToCanvasWest.bind(this)
-        this.geoToCanvasEast= this.geoToCanvasEast.bind(this)
         this.updateAllData= this.updateAllData.bind(this)
     }
 
@@ -216,7 +214,6 @@ class  ParticlesLayer extends React.Component {
         // console.log("Done reading!")
     }
 
-
     /**
      * Transforms geographic into window
      * @param lon
@@ -225,28 +222,6 @@ class  ParticlesLayer extends React.Component {
      */
     geoToCanvas(lon, lat){
         let nlon = ((lon - this.state.extent[0])/this.state.domain[0]) * this.state.ol_canvas_size[0]
-        let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
-        return [nlon, nlat]
-    }
-    /**
-     * Transforms geographic into window
-     * @param lon
-     * @param lat
-     * @returns {number[]}
-     */
-    geoToCanvasWest(lon, lat){
-        let nlon = ((lon - this.state.extent[0] - 360)/this.state.domain[0]) * this.state.ol_canvas_size[0]
-        let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
-        return [nlon, nlat]
-    }
-    /**
-     * Transforms geographic into window
-     * @param lon
-     * @param lat
-     * @returns {number[]}
-     */
-    geoToCanvasEast(lon, lat){
-        let nlon = ((lon - this.state.extent[0] + 360)/this.state.domain[0]) * this.state.ol_canvas_size[0]
         let nlat =  this.state.ol_canvas_size[1] - (((lat - this.state.extent[1])/this.state.domain[1]) * this.state.ol_canvas_size[1])
         return [nlon, nlat]
     }
@@ -616,44 +591,6 @@ class  ParticlesLayer extends React.Component {
                     c_time += 1
                     next_time += 1
                 }
-                // ---------------------- SEMI NEW ----------------------
-                // let oldpos = [0,0]
-                // let newpos= [0,0]
-                // for (let part_id = 0; part_id < tot_part; part_id++) {
-                //     oldpos = this.geoToCanvas(country_start["lat_lon"][1][part_id][start_time],
-                //         country_start["lat_lon"][0][part_id][start_time])
-                //     newpos = this.geoToCanvas(cur_country["lat_lon"][1][part_id][start_time+1],
-                //         cur_country["lat_lon"][0][part_id][start_time+1])
-                //     // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                //     // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                //     ctx.moveTo(oldpos[0], oldpos[1])
-                //     ctx.lineTo(newpos[0], newpos[1])
-                // }
-                // if(this.show_west_map) {
-                //     for (let part_id = 0; part_id < tot_part; part_id++) {
-                //         oldpos = this.geoToCanvasWest(cur_country["lat_lon"][1][part_id][start_time],
-                //             cur_country["lat_lon"][0][part_id][start_time])
-                //         newpos = this.geoToCanvasWest(cur_country["lat_lon"][1][part_id][start_time+1],
-                //             cur_country["lat_lon"][0][part_id][start_time+1])
-                //         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                //         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                //         ctx.moveTo(oldpos[0], oldpos[1])
-                //         ctx.lineTo(newpos[0], newpos[1])
-                //     }
-                // }
-                // if(this.show_east_map) {
-                //     for (let part_id = 0; part_id < tot_part; part_id++) {
-                //         oldpos = this.geoToCanvasEast(cur_country["lat_lon"][1][part_id][start_time],
-                //             cur_country["lat_lon"][0][part_id][start_time])
-                //         newpos = this.geoToCanvasEast(cur_country["lat_lon"][1][part_id][start_time+1],
-                //             cur_country["lat_lon"][0][part_id][start_time+1])
-                //         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                //         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                //         ctx.moveTo(oldpos[0], oldpos[1])
-                //         ctx.lineTo(newpos[0], newpos[1])
-                //     }
-                // }
-
                 ctx.stroke()
                 ctx.closePath()
             }
@@ -988,13 +925,13 @@ class  ParticlesLayer extends React.Component {
                         <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)} />
                     </span>
                     <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
-                            title="Increase litter trail"
+                            title="Decrease litter trail"
                             disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
                             <Dash size={default_size}/>
                     </button>
                     {" "}
                     <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                            title="Decrease litter trail"
+                            title="Increase litter trail"
                             disabled={this.state.transparency_index === 1}>
                             <Plus size={default_size}/>
                     </button>

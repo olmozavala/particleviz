@@ -70,7 +70,10 @@ class  StatesLayer extends React.Component{
 
     makeTable(name){
         let country_data  =this.reached_data[name.toLowerCase()];
-        const element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
+        let element = <div></div>
+        if(!_.isUndefined(country_data) && !_.isUndefined(country_data['to']) && !_.isUndefined(country_data['from'])){
+            element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
+        }
         return  element;
     }
 

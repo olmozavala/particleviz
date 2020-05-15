@@ -107,6 +107,15 @@ data_files.push({
     start_date: new Date(2010, 7, 1),
     num_files: 4
 })
+data_files.push({
+    file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
+    style: "default-scalar/div-PRGn",
+    wms: `fy_wcd_10_01/histo`,
+    title: `One year since ${months[8]} 2010`,
+    speed: "",
+    start_date: new Date(2010, 8, 1),
+    num_files: 4
+})
 
 // for(let i=1; i<=12; i++) {
 //     let i_str = `${i < 10 ? '0' + i : i}`
@@ -296,7 +305,7 @@ class  ParticleVizManager extends React.Component{
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
                     </div>
-                    <div className="col-5 col-md-3 col-lg-2 navbar-brand  ml-2">
+                    <div className="col-5 col-md-3 col-lg-3 navbar-brand  ml-2">
                         <Dropdown>
                             <Dropdown.Toggle variant="info" size="sm">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
@@ -317,7 +326,7 @@ class  ParticleVizManager extends React.Component{
                     {/*            onChange={this.toogleHistogramLayer}/>*/}
                     {/*    </InputGroup.Prepend>*/}
                     {/*</div>*/}
-                    <div className="col-5 col-md-1 col-lg-1">
+                    <div className="col-5 col-md-2 col-lg-1">
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map} />
                     </div>

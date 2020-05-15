@@ -1,25 +1,25 @@
 import React from 'react';
 import _ from "underscore";
 import 'animate.css'
+import $ from "jquery";
+import {SkipForwardFill} from "react-bootstrap-icons";
+import {ButtonGroup} from "react-bootstrap";
 
 class  MakeTable extends React.Component {
     constructor(props){
-        super(props);
-        // this.stats_table = $('#stats_table');
-        this.hideTable = this.hideTable.bind(this);
-        this.showStatistics= this.showStatistics.bind(this);
-        this.showFootnote= this.showFootnote.bind(this);
+        super(props)
+        this.showStatistics= this.showStatistics.bind(this)
+        this.showFootnote= this.showFootnote.bind(this)
+        this.hideTable = this.hideTable.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         console.log("Updating TABLE");
-        // this.stats_table.removeClass('fadeOutRight');
-        // this.stats_table.addClass('fadeInRight');
     }
 
     hideTable(){
-        // this.stats_table.addClass('fadeOutRight');
-        // $('#popup').popover('hide');
+        console.log("Hiding table....")
+        $("#stats_table").addClass('fadeOutRight');
     }
 
     showStatistics(){
@@ -66,24 +66,6 @@ class  MakeTable extends React.Component {
                         </div>
 
                     </div>
-                    {/*<div className="row">*/}
-                    {/*    <div className="col-6">*/}
-                    {/*        <ul className="list-group list-group-flush">*/}
-                    {/*            {Object.keys(asia).map((name) =>*/}
-                    {/*                <li className="m-0 p-1  text-capitalize list-group-item" key={name}>*/}
-                    {/*                    <small>{name} {(100 * asia[name][0] / asia[name][1]).toFixed(2)}%</small>*/}
-                    {/*                </li>)}*/}
-                    {/*        </ul>*/}
-                    {/*    </div>*/}
-                    {/*    <div className="col-6">*/}
-                    {/*        <ul className="list-group list-group-flush">*/}
-                    {/*            {Object.keys(africa).map((name) =>*/}
-                    {/*                <li className="m-0 p-1 text-capitalize list-group-item" key={name}>*/}
-                    {/*                    <small> {name} {(100 * africa[name][0] / africa[name][1]).toFixed(2)}%</small>*/}
-                    {/*                </li>)}*/}
-                    {/*        </ul>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                 </span>);
         }else{
             return <span></span>;
@@ -116,11 +98,10 @@ class  MakeTable extends React.Component {
                             {from_data['from'].beach_tons} ({from_data['from'].beach_perc}%) end up on the beach
                         </h6>
                     </div>
-                    {/*<div className="col-auto">*/}
-                    {/*    <button type="button" className="btn btn-dark" onClick={this.hideTable}>*/}
-                    {/*        <FontAwesomeIcon icon={faWindowClose} color="white"/>*/}
-                    {/*    </button>*/}
-                    {/*</div>*/}
+                    {/*<button className="btn btn-info btn-sm" onClick={this.hideTable}*/}
+                    {/*        title="Incrase animation speed">*/}
+                    {/*    <SkipForwardFill/>*/}
+                    {/*</button>*/}
                 </div>
                 {this.showStatistics()}
                 {/*{this.showFootnote()}*/}

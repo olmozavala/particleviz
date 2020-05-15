@@ -28,9 +28,9 @@ let background_layer = new TileLayer({ source: new OSM() });
 // });
 
 // let ip_address = 'http://146.201.212.214'
-let ip_address = 'http://localhost'
+let ip_address = 'http://ozavala.coaps.fsu.edu/'
 
-    let histogram_layer = new TileLayer({
+let histogram_layer = new TileLayer({
     source: new TileWMS({
         url:`${ip_address}:8080/ncWMS2/wms`,
         params: {
