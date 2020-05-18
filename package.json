@@ -10,6 +10,7 @@
     "@jeffbski/parquetjs": "^0.10.2",
     "animate.css": "^3.7.2",
     "bootstrap": "^4.4.1",
+    "canvasjs": "^1.8.3",
     "jquery": "^3.4.1",
     "jszip": "^3.2.2",
     "lodash": "^4.17.15",

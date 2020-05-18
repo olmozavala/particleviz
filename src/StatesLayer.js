@@ -6,6 +6,7 @@ import VectorSource from "ol/source/Vector";
 import {GeoJSON} from "ol/format";
 import {Fill, Stroke, Style, Text} from "ol/style";
 import MakeTable from "./MakeTable";
+import MakePlot from "./MakePlot";
 import Overlay from "ol/Overlay";
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -72,7 +73,8 @@ class  StatesLayer extends React.Component{
         let country_data  =this.reached_data[name.toLowerCase()];
         let element = <div></div>
         if(!_.isUndefined(country_data) && !_.isUndefined(country_data['to']) && !_.isUndefined(country_data['from'])){
-            element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
+            // element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
+            element = <MakePlot country_name={name} country_data={country_data}></MakePlot>;
         }
         return  element;
     }
@@ -212,7 +214,7 @@ class  StatesLayer extends React.Component{
                     let ol_popup_container = document.getElementsByClassName("ol-selectable")
                     // Setting the popup with the table to 'passs through' the mouse events. To be able to scroll the map
                     if(!_.isUndefined(ol_popup_container)){
-                        ol_popup_container[0].style.pointerEvents = "none"
+                        // ol_popup_container[0].style.pointerEvents = "none"
                         ol_popup_container[0].style.width= "34em"
                     }
                     ReactDOM.render(this.makeTable(name), element);
