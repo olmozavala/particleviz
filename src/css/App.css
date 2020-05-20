@@ -27,3 +27,11 @@
   border-top-right-radius: calc(0.3rem - 1px);
 }
 
+.stats_plot{
+  position: absolute;
+  background-color: aliceblue;
+  bottom: 0;
+  z-index: 102;
+  width: 100%;
+  opacity: .8;
+}

@@ -10,11 +10,12 @@ import {
 import InputGroup from "react-bootstrap/InputGroup"
 import TileWMS from "ol/source/TileWMS"
 import * as d3 from "d3";
+import TileLayer from "ol/layer/Tile";
 
-// const data_folder_url = "http://localhost/data"
-const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
-// const wms_url = "http://localhost:8080/ncWMS2/wms"
-const wms_url = "http://http://146.201.212.214:8080/ncWMS2/wms"
+const data_folder_url = "http://localhost/data"
+// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+const wms_url = "http://localhost:8080/ncWMS2/wms"
+// const wms_url = "http://http://146.201.212.214:8080/ncWMS2/wms"
 const def_alpha = "FF"
 const selected_alpha = 1
 // const not_selected_alpha = .2
@@ -82,39 +83,30 @@ const months = [
 ];
 
 let data_files = [
-    //-------------------------------------------------------------------
-    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",style:"default-scalar/div-PRGn",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "1/TESTUN_output",title: "TEST", style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", speed: "", start_date: new Date(2010, 0, 1)},
-    //--------- COAPS ----------------------------------------------------------
-    // {file: "1/OneYear_Only_Currents2020-05-05_16_36_output",style:"default-scalar/div-PRGn", wms: "fy_wcd_10_01/histo", title: "Only Currents 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2012, 0, 1)},
-    // {file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    //--------- HOME PC ----------------------------------------------------------
-    // {file: "1/OneYear_Currents_Winds_Diffusion2020-05-04_13_46_output",title: "Currents+Winds+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "1/OneYear_Only_Currents2020-05-04_13_46_output",title: "Only Currents 2010", speed: "", start_date: new Date(2012, 0, 1)},
-    // {file: "2/OneYear_Currents_And_Wind2020-05-04_13_46_output",title: "Currents+Winds 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    // {file: "2/OneYear_Currents_And_Diffusion2020-05-04_13_46_output",title: "Currents+Diffusion 2010", speed: "", start_date: new Date(2010, 0, 1)},
-    //-------------------------------------------------------------------
-    //-------------------------------------------------------------------
+    {file: "1/TESTUN_output",
+    title: "TEST",
+     style:"default-scalar/div-PRGn",
+     wms: "fy_wcd_10_01/histo",
+     speed: "",
+     start_date: new Date(2010, 0, 1),
+    num_files: 1
+    }
 ]
 data_files.push({
     file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
-    style: "default-scalar/div-PRGn",
-    wms: `fy_wcd_10_01/histo`,
+    wms: `histo_08/histo`,
     title: `One year since ${months[7]} 2010`,
     speed: "",
     start_date: new Date(2010, 7, 1),
-    num_files: 4
+    num_files: 17
 })
 data_files.push({
-    file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
-    style: "default-scalar/div-PRGn",
-    wms: `fy_wcd_10_01/histo`,
+    file: `4/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output`,
+    wms: `histo_09/histo`,
     title: `One year since ${months[8]} 2010`,
     speed: "",
     start_date: new Date(2010, 8, 1),
-    num_files: 4
+    num_files: 17
 })
 
 // for(let i=1; i<=12; i++) {
@@ -135,6 +127,23 @@ data_files.push({
 class  ParticleVizManager extends React.Component{
     constructor(props){
         super(props)
+
+        let histogram_layer = new TileLayer({
+            source: new TileWMS({
+                url:`${wms_url}:8080/ncWMS2/wms`,
+                params: {
+                    'LAYERS':data_files[0].wms,
+                    'TILED':true,
+                    'STYLES':'default-scalar/x-Sst',
+                    // 'COLORSCALERANGE':'1,503500',
+                    'NUMCOLORBANDS':250,
+                    'LOGSCALE':true
+
+                }
+            }),
+            opacity:.8});
+        histogram_layer.setVisible(false);
+
         this.state = {
             colors_by_country: [],
             selected_country: '',
@@ -142,8 +151,10 @@ class  ParticleVizManager extends React.Component{
             ocean_names: [],
             continents: [],
             selected_model: data_files[0],
+            histogram_layer: histogram_layer,
             histogram_selected: false
         }
+        this.props.map.addLayer(histogram_layer)
 
         this.updateCountriesAll = this.updateCountriesAll.bind(this)
         this.updateSelectedCountry= this.updateSelectedCountry.bind(this)
@@ -155,17 +166,16 @@ class  ParticleVizManager extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        this.props.histogram_layer.setSource(
+        this.state.histogram_layer.setSource(
             new TileWMS({
                 url: wms_url,
                 params: {
                     'LAYERS':this.state.selected_model.wms,
                     'TILED':true,
-                    'STYLES':this.state.selected_model.style,
-                    'COLORSCALERANGE':'1,503500',
-                    'NUMCOLORBANDS':250,
+                    'STYLES':'default-scalar/x-Sst',
+                    // 'COLORSCALERANGE':'1,503500',
+                    // 'NUMCOLORBANDS':250,
                     'LOGSCALE':true
-
                 }
             })
         )
@@ -186,9 +196,9 @@ class  ParticleVizManager extends React.Component{
     toogleHistogramLayer(e){
 
         if(e.target.checked){
-            this.props.histogram_layer.setVisible(true)
+            this.state.histogram_layer.setVisible(true)
         }else{
-            this.props.histogram_layer.setVisible(false)
+            this.state.histogram_layer.setVisible(false)
         }
 
         this.setState({
@@ -318,14 +328,14 @@ class  ParticleVizManager extends React.Component{
                         </Dropdown>
 
                     </div>
-                    {/*<div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">*/}
-                    {/*    <InputGroup.Prepend>*/}
-                    {/*        <span>Density</span> &nbsp;*/}
-                    {/*        <InputGroup.Checkbox aria-label="Checkbox for following text input"*/}
-                    {/*            checked={this.state.histogram_selected}*/}
-                    {/*            onChange={this.toogleHistogramLayer}/>*/}
-                    {/*    </InputGroup.Prepend>*/}
-                    {/*</div>*/}
+                    <div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">
+                        <InputGroup.Prepend>
+                            <span>Density</span> &nbsp;
+                            <InputGroup.Checkbox aria-label="Checkbox for following text input"
+                                checked={this.state.histogram_selected}
+                                onChange={this.toogleHistogramLayer}/>
+                        </InputGroup.Prepend>
+                    </div>
                     <div className="col-5 col-md-2 col-lg-1">
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map} />

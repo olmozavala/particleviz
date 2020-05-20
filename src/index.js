@@ -30,21 +30,6 @@ let background_layer = new TileLayer({ source: new OSM() });
 // let ip_address = 'http://146.201.212.214'
 let ip_address = 'http://ozavala.coaps.fsu.edu/'
 
-let histogram_layer = new TileLayer({
-    source: new TileWMS({
-        url:`${ip_address}:8080/ncWMS2/wms`,
-        params: {
-            'LAYERS':'un_ml/histo',
-            'TILED':true,
-            'STYLES':'default-scalar/div-PRGn',
-            'COLORSCALERANGE':'1,503500',
-            'NUMCOLORBANDS':250,
-            'LOGSCALE':true
-
-        }
-    }),
-    opacity:.8});
-histogram_layer.setVisible(false);
 
 let states_layer = new VectorLayer({
     source: new VectorSource({
@@ -66,7 +51,7 @@ for(let i=0; i < tot_res; i++){
 
 let map = new Map({
     layers: [
-        background_layer, states_layer, histogram_layer
+        background_layer, states_layer
     ],
     target: 'map',
     view: new View({
@@ -88,7 +73,7 @@ let map = new Map({
 
 // console.log(map.getView().getResolution())
 
-ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} histogram_layer={histogram_layer} url={ip_address}/>,
+ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} url={ip_address}/>,
     document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

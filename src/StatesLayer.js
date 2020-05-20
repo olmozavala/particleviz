@@ -35,12 +35,12 @@ class  StatesLayer extends React.Component{
 
         //------------------ Adding popup for the stats table ---------------------
         // Creating overlay
-        let popup = document.getElementById('popup')
-        this.popup = new Overlay({
-            element: popup
-        });
-        $('#popup').popover();
-        this.props.map.addOverlay(this.popup);
+        // let popup = document.getElementById('popup')
+        // this.popup = new Overlay({
+        //     element: popup
+        // });
+        // $('#popup').popover();
+        // this.props.map.addOverlay(this.popup);
 
         //------------  Bootstrap popover versoin
         // this.popup = $('#stats_table'); //Get the jquery ref
@@ -181,9 +181,11 @@ class  StatesLayer extends React.Component{
         var features = e.map.getFeaturesAtPixel(pixpos);
 
         // Hide the previous table/plot
-        var element = this.popup.getElement();
+        // var element = this.popup.getElement();
+        // $(element).hide();
 
-        $(element).hide();
+        let popup = document.getElementById('popup')
+        $(popup).hide();
 
         // It found something
         if(features !== null){
@@ -203,22 +205,21 @@ class  StatesLayer extends React.Component{
                 if (this.state.selected !== country) {
                     country.setStyle(this.getCountryStyle(selected_color, name));
                     // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
-                    var coordinate = e.coordinate;
-                    //     ------ Popup OpenLayers
-                    this.popup.setPosition(coordinate);
-                    $(element).popover({
-                        placement: 'left',
-                        animation: true,
-                        html: true,
-                    });
-                    let ol_popup_container = document.getElementsByClassName("ol-selectable")
+                    // var coordinate = e.coordinate;
+                    // this.popup.setPosition(coordinate);
+                    // $(element).popover({
+                    //     placement: 'left',
+                    //     animation: true,
+                    //     html: true,
+                    // });
+                    // let ol_popup_container = document.getElementsByClassName("ol-selectable")
                     // Setting the popup with the table to 'passs through' the mouse events. To be able to scroll the map
-                    if(!_.isUndefined(ol_popup_container)){
-                        // ol_popup_container[0].style.pointerEvents = "none"
-                        ol_popup_container[0].style.width= "34em"
-                    }
-                    ReactDOM.render(this.makeTable(name), element);
-                    $(element).show({duration:100});
+                    // if(!_.isUndefined(ol_popup_container)){
+                    //     ol_popup_container[0].style.pointerEvents = "none"
+                        // ol_popup_container[0].style.width= "34em"
+                    // }
+                    $(popup).show();
+                    ReactDOM.render(this.makeTable(name), popup);
                     this.setState({
                         selected: country,
                         oldSelectedColor: oldcolor
