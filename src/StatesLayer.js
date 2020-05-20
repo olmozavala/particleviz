@@ -187,53 +187,41 @@ class  StatesLayer extends React.Component{
         let popup = document.getElementById('popup')
         $(popup).hide();
 
-        // It found something
+        // Restores the old color if one was saved
+        if(this.state.oldSelectedColor!== null) {
+            let old_name = this.state.selected.get("name");
+            this.state.selected.setStyle(this.getCountryStyle(this.state.oldSelectedColor, old_name));
+        }
+
+        let name = ''
+        // It we click inside a country
         if(features !== null){
             let country = features[0];
-            let name = country.get("name");
+            name = country.get("name");
             let oldcolor = this.props.colors_by_country[name.toLowerCase()];
-            if(!(_.isUndefined(oldcolor))){ // In this case the country is not found.
-                // In which case should we restore the old color
-                if(this.state.selected !== null) {
-                    let old_name = this.state.selected.get("name");
-                    this.state.selected.setStyle(this.getCountryStyle(this.state.oldSelectedColor, old_name));
-                }
 
-                // WE ALWAYS NEED TO SEND THE UPDATE SIGNAL WHEN WE CLICK IN A COUNTRY
-                this.props.updateSelectedCountry(name);
-
-                if (this.state.selected !== country) {
-                    country.setStyle(this.getCountryStyle(selected_color, name));
-                    // Es un desmadre, esta linea TIENE que ir antes del update o se puede cambiar los colores
-                    // var coordinate = e.coordinate;
-                    // this.popup.setPosition(coordinate);
-                    // $(element).popover({
-                    //     placement: 'left',
-                    //     animation: true,
-                    //     html: true,
-                    // });
-                    // let ol_popup_container = document.getElementsByClassName("ol-selectable")
-                    // Setting the popup with the table to 'passs through' the mouse events. To be able to scroll the map
-                    // if(!_.isUndefined(ol_popup_container)){
-                    //     ol_popup_container[0].style.pointerEvents = "none"
-                        // ol_popup_container[0].style.width= "34em"
-                    // }
-                    $(popup).show();
-                    ReactDOM.render(this.makeTable(name), popup);
-                    this.setState({
-                        selected: country,
-                        oldSelectedColor: oldcolor
-                    });
-                }
-                else{// Tooggle color 'unselect'
-                    this.setState({
-                        selected: null,
-                        oldSelectedColor: null
-                    });
-                    $("#stats_table").addClass('fadeOutRight');
-                }
+            // If we are selecting a different country
+            if (this.state.selected !== country) {
+                country.setStyle(this.getCountryStyle(selected_color, name)); // Set this country 'highlighted'
+                // Show the corresponding statistics
+                $(popup).show();
+                ReactDOM.render(this.makeTable(name), popup);
+                // Save current selection
+                this.setState({
+                    selected: country,
+                    oldSelectedColor: oldcolor
+                });
+            }
+            else{// If we  clicked on the same country we clear everything
+                this.setState({
+                    selected: null,
+                    oldSelectedColor: null
+                });
+                $("#stats_table").addClass('fadeOutRight');
             }
         }
+        // WE ALWAYS NEED TO SEND THE UPDATE SIGNAL WHEN WE CLICK IN A COUNTRY
+        this.props.updateSelectedCountry(name);
     }
 
     hoverEvent(e){
@@ -244,6 +232,11 @@ class  StatesLayer extends React.Component{
 
         if(features !== null){
             let country = features[0];
+            if(_.isNull(this.state.selected)){
+                console.log(`Selected: null  hovered: ${country.get("name").toLowerCase()}`)
+            }else{
+                console.log(`Selected: ${this.state.selected.get("name").toLowerCase()}  hovered: ${country.get("name").toLowerCase()}`)
+            }
             if(this.state.selected !== country) {
                 let name = country.get("name").toLowerCase();
                 let color = this.props.colors_by_country[name];//Adding transaprency to the color
