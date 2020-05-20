@@ -35,3 +35,20 @@
   width: 100%;
   opacity: .8;
 }
+
+.control {
+  /*position: absolute;*/
+  background-color: white;
+  top: 0;
+  z-index: 103;
+  width: 100%;
+  height: 50px;
+  opacity: .95;
+}
+
+.wl-title{
+  /*top: 30px;*/
+  z-index: 102;
+  position: absolute;
+  width: 100%;
+}

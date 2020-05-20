@@ -116,8 +116,8 @@ class  BackgroundLayerManager extends React.Component{
 
     render(){
         return (
-            <span className="navbar-brand ml-2">
-                <Dropdown>
+            <span>
+                <Dropdown className="m-1">
                     <DropdownToggle variant="light">
                         <FontAwesomeIcon icon={faMap} size="lg"/>
                     </DropdownToggle>

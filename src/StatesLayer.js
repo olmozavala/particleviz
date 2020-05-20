@@ -23,32 +23,14 @@ class  StatesLayer extends React.Component{
         super(props);
         this.vectorLayer = new VectorLayer({
             source: new VectorSource({
-                // url: `${this.props.url}/countries-110m.json`,
                 url: `${this.props.url}/countries.json`,
-                // url: `${this.props.url}/countries-50m.json`,
-                // url: `${this.props.url}/countries-10m.json`,
                 format: new GeoJSON( {layers:['countries'] }),
                 overlaps: false
             }),
             style: this.setCountriesStyle.bind(this)
         });
-
-        //------------------ Adding popup for the stats table ---------------------
-        // Creating overlay
-        // let popup = document.getElementById('popup')
-        // this.popup = new Overlay({
-        //     element: popup
-        // });
-        // $('#popup').popover();
-        // this.props.map.addOverlay(this.popup);
-
-        //------------  Bootstrap popover versoin
-        // this.popup = $('#stats_table'); //Get the jquery ref
-        // this.popup.popover();  // Initialize as Boostrap popup
-
         // Reading Reached data
         let url_data = `${this.props.url}/ReachedTablesData.json`;
-        // console.log(url_data)
         d3.json(url_data)
             .then(function (data) {
                 this.reached_data = data;
@@ -232,11 +214,11 @@ class  StatesLayer extends React.Component{
 
         if(features !== null){
             let country = features[0];
-            if(_.isNull(this.state.selected)){
-                console.log(`Selected: null  hovered: ${country.get("name").toLowerCase()}`)
-            }else{
-                console.log(`Selected: ${this.state.selected.get("name").toLowerCase()}  hovered: ${country.get("name").toLowerCase()}`)
-            }
+            // if(_.isNull(this.state.selected)){
+            //     console.log(`Selected: null  hovered: ${country.get("name").toLowerCase()}`)
+            // }else{
+            //     console.log(`Selected: ${this.state.selected.get("name").toLowerCase()}  hovered: ${country.get("name").toLowerCase()}`)
+            // }
             if(this.state.selected !== country) {
                 let name = country.get("name").toLowerCase();
                 let color = this.props.colors_by_country[name];//Adding transaprency to the color
@@ -253,6 +235,7 @@ class  StatesLayer extends React.Component{
         this.props.map.on('click', this.clickEvent);
         this.props.map.on('pointermove', this.hoverEvent);
         document.getElementsByClassName("ol-zoom")[0].style.zIndex = 101
+        document.getElementsByClassName("ol-zoom")[0].style.top = "50px"
     }
 
     render() {

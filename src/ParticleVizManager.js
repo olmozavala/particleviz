@@ -302,22 +302,27 @@ class  ParticleVizManager extends React.Component{
 
     render(){
         return (
-            <div className="container-fluid">
-                <div className="row justify-content-center">
-                    <div className="col-1 navbar-brand ml-2 d-none d-xl-inline">
-                        <DropletHalf size={30}/>
-                    </div>
-                    <div className="col-12 col-md-8 col-lg-7 col-xl-6">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <a className="navbar-brand" href="#">Ocean Litter</a>
+                <button className="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="navbar-nav" id="loading">
+                    <div className="spinner-border" role="status"> </div>
+                    <a id="load-perc" className="navbar-brand m-2" ></a>
+                </div>
+                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div className="navbar-nav">
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesAll}
                                         selected_color={selected_color}
                                         url={data_folder_url}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
-                    </div>
-                    <div className="col-5 col-md-3 col-lg-3 navbar-brand  ml-2">
-                        <Dropdown>
-                            <Dropdown.Toggle variant="info" size="sm">
+                        <Dropdown className="m-2">
+                            <Dropdown.Toggle variant="info">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={this.changeFile}>
@@ -326,28 +331,19 @@ class  ParticleVizManager extends React.Component{
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
+                        <form className="form-inline m-2">
+                            <button className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                        </form>
+                        <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
+                    </div>
 
-                    </div>
-                    <div className="col-1 col-md-1 col-lg-1 navbar-brand  ml-2">
-                        <InputGroup.Prepend>
-                            <span>Density</span> &nbsp;
-                            <InputGroup.Checkbox aria-label="Checkbox for following text input"
-                                checked={this.state.histogram_selected}
-                                onChange={this.toogleHistogramLayer}/>
-                        </InputGroup.Prepend>
-                    </div>
-                    <div className="col-5 col-md-2 col-lg-1">
-                        <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                map={this.props.map} />
-                    </div>
                 </div>
                 <StatesLayer map={this.props.map}
                              colors_by_country={this.state.colors_by_country}
                              url={data_folder_url}
                              selected_color={selected_color}
                              updateSelectedCountry = {this.updateSelectedCountry}/>
-
-            </div>
+            </nav>
         )
     }
 }
