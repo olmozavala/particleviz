@@ -49,12 +49,8 @@ for(let i=0; i < tot_res; i++){
 }
 // console.log("Resolutions: ", resolutions);
 
-let map = new Map({
-    layers: [
-        background_layer, states_layer
-    ],
-    target: 'map',
-    view: new View({
+
+let map_view = new View({
         projection: 'EPSG:4326', //Equirectangular
         center: [0, 0],
         extent: [-180, -190, 180, 190],
@@ -69,7 +65,14 @@ let map = new Map({
         // maxZoom: 8,
         // minZoom: 2
     })
-});
+let map = new Map({
+    layers: [
+        background_layer, states_layer
+    ],
+    target: 'map',
+    view: map_view
+})
+
 
 // console.log(map.getView().getResolution())
 

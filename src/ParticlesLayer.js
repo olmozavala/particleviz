@@ -4,8 +4,8 @@ import './css/Animations.css'
 import * as d3 from "d3"
 import ImageLayer from "ol/layer/Image"
 import ImageCanvasSource from "ol/source/ImageCanvas"
-import {toLonLat} from "ol/proj"
-import {getCenter} from "ol/extent"
+// import {toLonLat} from "ol/proj"
+// import {getCenter} from "ol/extent"
 import _ from "lodash"
 import $ from 'jquery';
 import 'animate.css'
@@ -92,7 +92,7 @@ class  ParticlesLayer extends React.Component {
             extent: null,
             domain: null,
             ol_canvas_size: null,
-            total_timesteps: 0,
+            total_timesteps: {},
             country_names: null,
             ocean_names: null,
             continent_names: null,
@@ -133,7 +133,7 @@ class  ParticlesLayer extends React.Component {
         this.prevDay = this.prevDay.bind(this)
         this.displayCurrentDay = this.displayCurrentDay.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
-        this.updateAllData = this.updateAllData.bind(this)
+        // this.updateAllData = this.updateAllData.bind(this)
 
     }
 
@@ -179,18 +179,30 @@ class  ParticlesLayer extends React.Component {
             cur_state = STATUS.paused
         }
 
-        let current_data = {}
-        current_data[filenum] = data
+        let model_id = this.state.selected_model.id
 
-        console.log("\t Total timesteps: ", this.state.total_timesteps)
+        let current_data = this.state.data
+        // Verify we have already read at least one file for this model
+        let model_timesteps = this.state.total_timesteps
+        // console.log("Model time steps:", this.state.total_timesteps)
+        if(_.isUndefined(current_data[model_id])){
+            current_data[model_id] = {}
+            model_timesteps[model_id] = {}
+            model_timesteps[model_id] = total_timesteps
+        }else{
+            model_timesteps[model_id] += total_timesteps
+        }
+        current_data[model_id][filenum] = data
+
+        // console.log("\t Total timesteps: ", this.state.total_timesteps)
         if(filenum == 0) {
             let country_names = this.country_keys.map((x) => x.toLowerCase())
             let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
             let continent_names = this.country_keys.map((x) => data[x]['continent'])
 
-            console.log("\t Countries names: ", country_names)
-            console.log("\t Ocean names: ", ocean_names)
-            console.log("\t Continent names: ", continent_names)
+            // console.log("\t Countries names: ", country_names)
+            // console.log("\t Ocean names: ", ocean_names)
+            // console.log("\t Continent names: ", continent_names)
 
             let canv_lay = null
             if (this.state.canvas_layer === -1) {
@@ -202,22 +214,25 @@ class  ParticlesLayer extends React.Component {
                 this.props.map.addLayer(canv_lay)
             }
             this.props.updateCountriesData(country_names, ocean_names, continent_names)
+
+            console.log("Model time steps:", model_timesteps)
             this.setState({
                 canvas_layer: canv_lay,
-                data: {...this.state.data, ...current_data},
+                data: {...current_data},
                 loaded_files: this.state.loaded_files + 1,
                 continent_names: continent_names,
                 country_names: country_names,
                 ocean_names: ocean_names,
-                total_timesteps: this.state.total_timesteps + total_timesteps,
+                total_timesteps: {...model_timesteps},
                 status: cur_state,
                 index_by_country: global_index_by_country
             })
         }else{
+            console.log("Model time steps:", model_timesteps)
             this.setState({
-                data: {...this.state.data, ...current_data},
+                data: {...current_data},
                 loaded_files: this.state.loaded_files + 1,
-                total_timesteps: this.state.total_timesteps + total_timesteps,
+                total_timesteps: {...model_timesteps},
                 status: cur_state,
                 index_by_country: global_index_by_country
             })
@@ -237,24 +252,24 @@ class  ParticlesLayer extends React.Component {
         return [nlon, nlat]
     }
 
-    updateAllData(extent, domain, size) {
-        console.log("Updating positions....")
-        let geoData = _.cloneDeep(this.state.data)
-        for (let c_time = 0; c_time < this.state.total_timesteps; c_time++) {
-            for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-                let cur_country = geoData[this.country_keys[cur_country_id]]
-                let tot_part = cur_country["lat_lon"][0].length
-                for (let part_id = 0; part_id < tot_part; part_id++) {
-                    let lon = geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
-                    let lat = geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time]
-                    geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = ((lon - extent[0]) / domain[0]) * size[0]
-                    geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time] = size[1] - (((lat - extent[1]) / domain[1]) * size[1])
-                }
-            }
-        }
-        console.log("Done!....")
-        return geoData
-    }
+    // updateAllData(extent, domain, size) {
+    //     console.log("Updating positions....")
+    //     let geoData = _.cloneDeep(this.state.data)
+    //     for (let c_time = 0; c_time < this.state.total_timesteps; c_time++) {
+    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+    //             let cur_country = geoData[this.country_keys[cur_country_id]]
+    //             let tot_part = cur_country["lat_lon"][0].length
+    //             for (let part_id = 0; part_id < tot_part; part_id++) {
+    //                 let lon = geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
+    //                 let lat = geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time]
+    //                 geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = ((lon - extent[0]) / domain[0]) * size[0]
+    //                 geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time] = size[1] - (((lat - extent[1]) / domain[1]) * size[1])
+    //             }
+    //         }
+    //     }
+    //     console.log("Done!....")
+    //     return geoData
+    // }
 
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
         console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
@@ -286,23 +301,23 @@ class  ParticlesLayer extends React.Component {
         }
 
         if (!_.isUndefined(this.state.data)) {
-            let r = 57.295779513082266; // TODO This needs to be fixed is hardcoded
-            let scale = r / (resolution / pixelRatio)
-            let center = toLonLat(getCenter(extent), projection)
-            this.d3Projection.scale(scale).center(center)
-                .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-            let center_west = center.slice()
-            center_west[0] += 360
-            this.d3ProjectionWest.scale(scale).center(center_west)
-                .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-            let center_east = center.slice()
-            center_east[0] -= 360
-            this.d3ProjectionEast.scale(scale).center(center_east)
-                .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-
-            this.d3GeoGenerator = this.d3GeoGenerator.projection(this.d3Projection).context(ctx)
-            this.d3GeoGeneratorWest = this.d3GeoGeneratorWest.projection(this.d3ProjectionWest).context(ctx)
-            this.d3GeoGeneratorEast = this.d3GeoGeneratorEast.projection(this.d3ProjectionEast).context(ctx)
+            // let r = 57.295779513082266; // TODO This needs to be fixed is hardcoded
+            // let scale = r / (resolution / pixelRatio)
+            // let center = toLonLat(getCenter(extent), projection)
+            // this.d3Projection.scale(scale).center(center)
+            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
+            // let center_west = center.slice()
+            // center_west[0] += 360
+            // this.d3ProjectionWest.scale(scale).center(center_west)
+            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
+            // let center_east = center.slice()
+            // center_east[0] -= 360
+            // this.d3ProjectionEast.scale(scale).center(center_east)
+            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
+            //
+            // this.d3GeoGenerator = this.d3GeoGenerator.projection(this.d3Projection).context(ctx)
+            // this.d3GeoGeneratorWest = this.d3GeoGeneratorWest.projection(this.d3ProjectionWest).context(ctx)
+            // this.d3GeoGeneratorEast = this.d3GeoGeneratorEast.projection(this.d3ProjectionEast).context(ctx)
             let domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
             let new_status = this.state.status
             // let data_geo = this.updateAllData(locextent, domain, locsize)
@@ -337,18 +352,25 @@ class  ParticlesLayer extends React.Component {
         // Verify the update was caused by the parent component and we have updated
         // the file to read.
         if (this.state.selected_model !== this.props.selected_model) {
-            this.setState({
-                time_step: 0,
-                total_timesteps: 0,
-                loaded_files: 0,
-                selected_model: this.props.selected_model,
-                status: STATUS.loading,
-                data: null
-            })
-            for (let i = 0; i < this.props.selected_model.num_files; i++) {
-                let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
-                console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
-                d3.blob(url).then((blob) => this.readOneZip(blob, i))
+            if(_.isUndefined(this.state.data[this.props.selected_model.id])){
+                this.setState({
+                    time_step: 0,
+                    loaded_files: 0,
+                    selected_model: this.props.selected_model,
+                    status: STATUS.loading,
+                })
+                for (let i = 0; i < this.props.selected_model.num_files; i++) {
+                    let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
+                    console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
+                    d3.blob(url).then((blob) => this.readOneZip(blob, i))
+                }
+            }else{
+                // console.log("Filas has been loaded previously")
+                this.setState({
+                    time_step: 0,
+                    selected_model: this.props.selected_model,
+                    cur_state: STATUS.paused
+                })
             }
         } else {
             if (this.state.status === STATUS.playing) {
@@ -365,7 +387,7 @@ class  ParticlesLayer extends React.Component {
      * @param blob
      */
     readOneZip(blob, filenum) {
-        console.log(`File has been received! file number ${filenum}`, blob)
+        // console.log(`File has been received! file number ${filenum}`, blob)
         let zip = new JSZip()
         zip.loadAsync(blob)
             .then(function (zip) {
@@ -406,7 +428,7 @@ class  ParticlesLayer extends React.Component {
             this.drawLitter(ctx)
 
             if (this.state.status === STATUS.playing) {
-                let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps
+                let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps[this.state.selected_model.id]
                 // console.log(`Setting the time: ${next_time_step}`)
                 this.setState({
                     time_step: next_time_step
@@ -450,7 +472,8 @@ class  ParticlesLayer extends React.Component {
 
     drawLines(ctx) {
         ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
-        let available_files = Object.keys(this.state.data)
+        let model_id = this.state.selected_model.id
+        let available_files = Object.keys(this.state.data[model_id])
         let file_number = (Math.floor(this.state.time_step / 100)).toString()
         let start_time = this.state.time_step % 100;
         // console.log(`Drawing lines time step: ${start_time} file number: ${file_number}   (global ${this.state.time_step})`)
@@ -460,7 +483,7 @@ class  ParticlesLayer extends React.Component {
                 ctx.beginPath()
                 // Retreive all the information from the first available file
                 ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
-                let country_start = this.state.data[file_number][this.country_keys[cur_country_id]]
+                let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
                 let tot_part = country_start["lat_lon"][0].length
                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
                 for (let part_id = 0; part_id < tot_part; part_id++) {
@@ -513,96 +536,96 @@ class  ParticlesLayer extends React.Component {
      * Draws the lines for a single day. It iterates over different countries
      * @param ctx Context of the canvas object to use
      */
-    drawLinesOld(ctx) {
-        // ------------------- NEW Manuall -------------------
-        // console.log(`Domain: ${this.state.domain}  Extent: ${this.state.extent}  Size: ${this.state.ol_canvas_size}`)
-        let global_start_time = this.state.time_step;
-        let global_end_time = this.state.time_step + 1;
-        if (this.draw_until_day) {
-            global_start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS * (6 - this.state.transparency_index) / 6);
-        }
-        let file_number = (Math.floor(global_start_time / 100)).toString()
-        let global_c_time = global_start_time % 100
-        let global_next_time = global_c_time + 1
-
-        ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
-        // console.log(`Drawing lines time step: ${global_c_time} file number: ${file_number}   (global ${this.state.time_step})`)
-        let available_files = Object.keys(this.state.data)
-        if (available_files.includes(file_number)) {
-            for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-                ctx.beginPath()
-                // Retreive all the information from the first available file
-                ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
-                let country_start = this.state.data[file_number][this.country_keys[cur_country_id]]
-                let country_end = country_start
-                let tot_part = country_start["lat_lon"][0].length
-                let local_file_number = file_number
-                let local_global_start_time = global_start_time
-                let c_time = global_c_time
-                let next_time = global_next_time
-                while (local_global_start_time < global_end_time) {
-                    // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
-                    console.log(`RUNS: ${c_time - global_c_time}`)
-                    if (c_time == 99) {
-                        next_time = 0
-                        local_file_number = file_number + 1
-                        country_end = this.state.data[local_file_number][this.country_keys[cur_country_id]]
-                    }
-                    for (let part_id = 0; part_id < tot_part; part_id++) {
-                        let clon = country_start["lat_lon"][1][part_id][c_time]
-                        let clat = country_start["lat_lon"][0][part_id][c_time]
-
-                        let nlon = country_end["lat_lon"][1][part_id][next_time]
-                        let nlat = country_end["lat_lon"][0][part_id][next_time]
-                        let oldpos = [0, 0]
-                        let newpos = [0, 0]
-                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2]) && (clon !== 200) && (nlon !== 200)) {
-                            oldpos = this.geoToCanvas(clon, clat)
-                            newpos = this.geoToCanvas(nlon, nlat)
-                            // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                            // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                            ctx.moveTo(oldpos[0], oldpos[1])
-                            ctx.lineTo(newpos[0], newpos[1])
-                        }
-                        if ((this.state.extent[2] >= 180) && (clon !== 200) && (nlon !== 200)) {
-                            let clon = clon + 360
-                            let nlon = nlon + 360
-                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(clon, clat)
-                                newpos = this.geoToCanvas(nlon, nlat)
-                                // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                                // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                                ctx.moveTo(oldpos[0], oldpos[1])
-                                ctx.lineTo(newpos[0], newpos[1])
-                            }
-                        }
-                        if ((this.state.extent[0] <= -180) && (clon !== 200) && (nlon !== 200)) {
-                            let clon = clon - 360
-                            let nlon = nlon - 360
-                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(clon, clat)
-                                newpos = this.geoToCanvas(nlon, nlat)
-                                // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-                                // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-                                ctx.moveTo(oldpos[0], oldpos[1])
-                                ctx.lineTo(newpos[0], newpos[1])
-                            }
-                        }
-                    }
-                    if (c_time == 99) {
-                        country_start = this.state.data[local_file_number][this.country_keys[cur_country_id]]
-                        c_time = -1
-                    }
-                    local_global_start_time += 1
-                    c_time += 1
-                    next_time += 1
-                }
-                ctx.stroke()
-                ctx.closePath()
-            }
-            this.props.map.render()
-        }
-    }
+    // drawLinesOld(ctx) {
+    //     // ------------------- NEW Manuall -------------------
+    //     // console.log(`Domain: ${this.state.domain}  Extent: ${this.state.extent}  Size: ${this.state.ol_canvas_size}`)
+    //     let global_start_time = this.state.time_step;
+    //     let global_end_time = this.state.time_step + 1;
+    //     if (this.draw_until_day) {
+    //         global_start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS * (6 - this.state.transparency_index) / 6);
+    //     }
+    //     let file_number = (Math.floor(global_start_time / 100)).toString()
+    //     let global_c_time = global_start_time % 100
+    //     let global_next_time = global_c_time + 1
+    //
+    //     ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
+    //     // console.log(`Drawing lines time step: ${global_c_time} file number: ${file_number}   (global ${this.state.time_step})`)
+    //     let available_files = Object.keys(this.state.data[model_id])
+    //     if (available_files.includes(file_number)) {
+    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+    //             ctx.beginPath()
+    //             // Retreive all the information from the first available file
+    //             ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+    //             let country_start = this.state.data[file_number][this.country_keys[cur_country_id]]
+    //             let country_end = country_start
+    //             let tot_part = country_start["lat_lon"][0].length
+    //             let local_file_number = file_number
+    //             let local_global_start_time = global_start_time
+    //             let c_time = global_c_time
+    //             let next_time = global_next_time
+    //             while (local_global_start_time < global_end_time) {
+    //                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+    //                 console.log(`RUNS: ${c_time - global_c_time}`)
+    //                 if (c_time == 99) {
+    //                     next_time = 0
+    //                     local_file_number = file_number + 1
+    //                     country_end = this.state.data[local_file_number][this.country_keys[cur_country_id]]
+    //                 }
+    //                 for (let part_id = 0; part_id < tot_part; part_id++) {
+    //                     let clon = country_start["lat_lon"][1][part_id][c_time]
+    //                     let clat = country_start["lat_lon"][0][part_id][c_time]
+    //
+    //                     let nlon = country_end["lat_lon"][1][part_id][next_time]
+    //                     let nlat = country_end["lat_lon"][0][part_id][next_time]
+    //                     let oldpos = [0, 0]
+    //                     let newpos = [0, 0]
+    //                     if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2]) && (clon !== 200) && (nlon !== 200)) {
+    //                         oldpos = this.geoToCanvas(clon, clat)
+    //                         newpos = this.geoToCanvas(nlon, nlat)
+    //                         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+    //                         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+    //                         ctx.moveTo(oldpos[0], oldpos[1])
+    //                         ctx.lineTo(newpos[0], newpos[1])
+    //                     }
+    //                     if ((this.state.extent[2] >= 180) && (clon !== 200) && (nlon !== 200)) {
+    //                         let clon = clon + 360
+    //                         let nlon = nlon + 360
+    //                         if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+    //                             oldpos = this.geoToCanvas(clon, clat)
+    //                             newpos = this.geoToCanvas(nlon, nlat)
+    //                             // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+    //                             // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+    //                             ctx.moveTo(oldpos[0], oldpos[1])
+    //                             ctx.lineTo(newpos[0], newpos[1])
+    //                         }
+    //                     }
+    //                     if ((this.state.extent[0] <= -180) && (clon !== 200) && (nlon !== 200)) {
+    //                         let clon = clon - 360
+    //                         let nlon = nlon - 360
+    //                         if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+    //                             oldpos = this.geoToCanvas(clon, clat)
+    //                             newpos = this.geoToCanvas(nlon, nlat)
+    //                             // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
+    //                             // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
+    //                             ctx.moveTo(oldpos[0], oldpos[1])
+    //                             ctx.lineTo(newpos[0], newpos[1])
+    //                         }
+    //                     }
+    //                 }
+    //                 if (c_time == 99) {
+    //                     country_start = this.state.data[local_file_number][this.country_keys[cur_country_id]]
+    //                     c_time = -1
+    //                 }
+    //                 local_global_start_time += 1
+    //                 c_time += 1
+    //                 next_time += 1
+    //             }
+    //             ctx.stroke()
+    //             ctx.closePath()
+    //         }
+    //         this.props.map.render()
+    //     }
+    // }
 
     /**
      * Obtains the particles in the GeoJson format
@@ -818,7 +841,7 @@ class  ParticlesLayer extends React.Component {
 
     nextDay(e) {
         e.preventDefault()
-        this.setState({time_step: Math.min(this.state.time_step + 1, this.state.total_timesteps)})
+        this.setState({time_step: Math.min(this.state.time_step + 1, this.state.total_timesteps[this.state.selected_model.id])})
     }
 
     prevDay(e) {
@@ -969,7 +992,7 @@ class  ParticlesLayer extends React.Component {
                             <Form.Control type="range"
                                           onChange={this.changeDayRange}
                                           value={this.state.time_step}
-                                          min="0" max={this.state.total_timesteps} custom/>
+                                          min="0" max={this.state.total_timesteps[this.state.selected_model.id]} custom/>
                         </span>
                         {/*---- Play/Pause---------*/}
                         <span className="navbar-brand col-auto">

@@ -32,7 +32,7 @@ class  StatesLayer extends React.Component{
         d3.json(url_data)
             .then(function (data) {
                 this.reached_data = data;
-                console.log('Table data', data)
+                // console.log('Table data', data)
             }.bind(this));
 
         this.props.map.addLayer(this.vectorLayer);
@@ -52,7 +52,7 @@ class  StatesLayer extends React.Component{
     makeTable(name){
         let country_data  =this.reached_data[name.toLowerCase()];
         let element = <div></div>
-        if(!_.isUndefined(country_data) && !_.isUndefined(country_data['to']) && !_.isUndefined(country_data['from'])){
+        if(!_.isUndefined(country_data)){
             // element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
             element = <MakePlot country_name={name} country_data={country_data}></MakePlot>;
         }

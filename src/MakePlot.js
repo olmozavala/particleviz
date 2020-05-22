@@ -17,13 +17,14 @@ class  MakePlot extends React.Component {
 
     showStatistics(statsType='from'){
         if(!_.isUndefined(this.props.country_data)) {
-            let from_data = this.props.country_data
+            let stats_data = this.props.country_data
             let dataPoints = []
-            for(let id in Object.keys(from_data[statsType][statsType])){
-                let text = from_data[statsType][statsType][id].name
-                let value = from_data[statsType][statsType][id].tons
-                let perc = from_data[statsType][statsType][id].perc
-                if(value > 50){
+            for(let id in Object.keys(stats_data[statsType][statsType])){
+                let text = stats_data[statsType][statsType][id].name
+                let value = stats_data[statsType][statsType][id].tons
+                let perc = stats_data[statsType][statsType][id].perc
+                // console.log(perc)
+                if(perc > 1 || value > 50){
                     dataPoints.push({label: text, y: value, perc: perc})
                 }
             }
@@ -82,24 +83,24 @@ class  MakePlot extends React.Component {
     }
 
     render(){
-        let from_data = this.props.country_data
+        let stats_data = this.props.country_data
         return (
             <div className="container-fluid bg-white rounded-lg">
                 <div className="row justify-content-center">
                     <div className="col-12 mt-1 text-center">
-                        <h4 className="d-inline"> {this.props.country_name} exports {from_data['from'].tot_tons} tons per year </h4>
+                        <h4 className="d-inline"> {this.props.country_name} exports {stats_data['from'].tot_tons} tons per year </h4>
                         <h6>
-                            {from_data['from'].ocean_tons} ({from_data['from'].ocean_perc}%) end up in the ocean,
-                            {from_data['from'].beach_tons} ({from_data['from'].beach_perc}%) end up on the beach.
+                            {stats_data['from'].ocean_tons} ({stats_data['from'].ocean_perc}%) end up in the ocean,
+                            {stats_data['from'].beach_tons} ({stats_data['from'].beach_perc}%) end up on the beach.
                         </h6>
                     </div>
                 </div>
                 <div className="row justify-content-center">
                     <div className="col-xl-4 col-lg-5 col-md-6 col-sm-12"  id="chartContainerFrom">
-                        {this.showStatistics('from')}
+                        {_.isUndefined(stats_data['from']) ? <span></span>: this.showStatistics('from') }
                     </div>
                     <div className="col-xl-4 col-lg-5 col-md-6 col-sm-12" id="chartContainerTo">
-                        {this.showStatistics('to')}
+                        {_.isUndefined(stats_data['to']) ? <span></span>: this.showStatistics('to') }
                     </div>
                 </div>
             </div>

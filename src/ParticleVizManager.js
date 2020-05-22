@@ -7,6 +7,7 @@ import Dropdown from "react-bootstrap/Dropdown"
 
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile";
+import {easeIn} from "ol/easing";
 
 const data_folder_url = "http://localhost/data"
 // const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
@@ -79,16 +80,20 @@ const months = [
 ];
 
 let data_files = [
-    {file: "1/TESTUN_output",
-    title: "TEST",
-    style:"default-scalar/div-PRGn",
-    wms: `histo_08/histo`,
-    speed: "",
-    start_date: new Date(2010, 0, 1),
-    num_files: 1
+    {
+        id: 1,
+        file: "1/TESTUN_output",
+        title: "TEST",
+        style:"default-scalar/div-PRGn",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 1
     }
 ]
+
 data_files.push({
+    id: 2,
     file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
     wms: `histo_08/histo`,
     title: `One year since ${months[7]} 2010`,
@@ -96,7 +101,9 @@ data_files.push({
     start_date: new Date(2010, 7, 1),
     num_files: 17
 })
+
 data_files.push({
+    id: 3,
     file: `4/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output`,
     wms: `histo_09/histo`,
     title: `One year since ${months[8]} 2010`,
@@ -156,12 +163,21 @@ class  ParticleVizManager extends React.Component{
         this.updateSelectedCountry= this.updateSelectedCountry.bind(this)
         this.changeFile = this.changeFile.bind(this)
         this.toogleHistogramLayer= this.toogleHistogramLayer.bind(this)
+        this.updateMapLocation = this.updateMapLocation.bind(this)
     }
 
     componentDidMount() {
+        window.addEventListener("resize", this.updateMapLocation.bind(this))
+    }
+
+    updateMapLocation(){
+        let view = this.props.map.getView()
+        this.props.map.setSize( [window.innerWidth, window.innerHeight])
+        // this.props.map.render()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+
         this.state.histogram_layer.setSource(
             new TileWMS({
                 url: wms_url,
@@ -251,18 +267,18 @@ class  ParticleVizManager extends React.Component{
         let update_alpha = false
 
         // Finds for a selected country, If it finds it reduces the alpha of the other countries
-        for(let i=0; i < country_names.length; i++){
-            let name = country_names[i]
-            if(name.toLowerCase() === selected_country.toLowerCase()) {
-                update_alpha = true
-                break
-            }
-        }
+        // for(let i=0; i < country_names.length; i++){
+        //     let name = country_names[i]
+        //     if(name.toLowerCase() === selected_country.toLowerCase()) {
+        //         update_alpha = true
+        //         break
+        //     }
+        // }
 
         // Iterates over all the country names
         for (let i = 0; i < country_names.length; i++) {
             let name = country_names[i]
-            // Finds teh selected country and highlights it
+            // Finds the selected country and highlights it
             if (name.toLowerCase() === selected_country.toLowerCase()) {
                 colors_by_country[name] = selected_color
             } else {
@@ -328,7 +344,11 @@ class  ParticleVizManager extends React.Component{
                             </Dropdown.Menu>
                         </Dropdown>
                         <div className="m-2">
-                            <button className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                            {this.state.histogram_selected?
+                                <button className="btn btn-outline-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                                :
+                                <button className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                            }
                         </div>
                         <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
                     </div>
