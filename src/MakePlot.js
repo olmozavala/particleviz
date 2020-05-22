@@ -1,8 +1,6 @@
 import React from 'react';
 import _ from "underscore";
 import CanvasJSReact from './canvasjs.react';
-import ReactDOM from "react-dom";
-import $ from "jquery";
 var CanvasJSChart = CanvasJSReact.CanvasJSChart
 
 class  MakePlot extends React.Component {

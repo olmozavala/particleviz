@@ -19,11 +19,7 @@ import {
 import {Form, ProgressBar} from "react-bootstrap"
 
 import JSZip from "jszip"
-// import {faPlay} from "@fortawesome/free-solid-svg-icons/faPlay"
-// import {faStepForward} from "@fortawesome/free-solid-svg-icons/faStepForward"
-// import {ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap"
 import {ButtonGroup} from "react-bootstrap"
-import ReactDOM from "react-dom";
 
 const default_size = 15
 const STATUS = {
@@ -106,6 +102,12 @@ class  ParticlesLayer extends React.Component {
         this.canvasHeight = 0
         this.draw_until_day = true; // Used to redraw all the positions until current time
 
+        // THis is repeated should go ina function
+        for (let i = 0; i < this.props.selected_model.num_files; i++) {
+            let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
+            console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
+            d3.blob(url).then((blob) => this.readOneZip(blob, i))
+        }
 
         // this.getFeatures = this.getFeatures.bind(this)
         this.drawLitter = this.drawLitter.bind(this)
@@ -132,6 +134,7 @@ class  ParticlesLayer extends React.Component {
         this.displayCurrentDay = this.displayCurrentDay.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
         this.updateAllData = this.updateAllData.bind(this)
+
     }
 
     readTwoUnzippedFile(txtdata, filenum) {
@@ -149,16 +152,14 @@ class  ParticlesLayer extends React.Component {
             let cur_country = data[this.country_keys[cur_country_id]]
             let tot_part = cur_country["lat_lon"][0].length
             for (let part_id = 0; part_id < tot_part; part_id++) {
-                let this_particle_idx = {}
                 for (let c_time = 0; c_time < total_timesteps - 1; c_time++) {
                     let lon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
                     let nlon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time + 1]
 
-                    if ((lon != 200) && (nlon != 200)) {
+                    if ((lon !== 200) && (nlon !== 200)) {
                         if (((lon > th) && (nlon < -th)) || ((lon < -th) && (nlon > th))) {
-                            console.log(`This is added ${lon} and ${nlon} part ${part_id} time ${c_time}`)
+                            // console.log(`This is added ${lon} and ${nlon} part ${part_id} time ${c_time}`)
                             data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
-                            // this_particle_idx.push(c_time)
                         }
                     }
                 }
@@ -169,26 +170,8 @@ class  ParticlesLayer extends React.Component {
         let global_index_by_country = this.state.index_by_country
         global_index_by_country[filenum] = loc_index_by_country
         // console.log("Global index by country: ", global_index_by_country)
-
-        let country_names = this.country_keys.map((x) => x.toLowerCase())
-        let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
-        let continent_names = this.country_keys.map((x) => data[x]['continent'])
-
-        // console.log("\t Total timesteps: ", total_timesteps)
-        // console.log("\t Countries names: ", this.country_names)
-        // console.log("\t Ocean names: ", this.ocean_names)
-        // console.log("\t Continent names: ", this.continent_names)
-
-        let canv_lay = null
-        if (this.state.canvas_layer === -1) {
-            let canv_lay = new ImageLayer({
-                source: new ImageCanvasSource({
-                    canvasFunction: this.canvasFunction
-                })
-            })
-            this.props.map.addLayer(canv_lay)
-        }
         let cur_state = this.state.status
+
         // Update the progress bar
         if (this.state.loaded_files >= (this.state.selected_model.num_files - 3)) {
             // console.log("Done reading and uncompressing all the files!!!!")
@@ -199,18 +182,46 @@ class  ParticlesLayer extends React.Component {
         let current_data = {}
         current_data[filenum] = data
 
-        this.setState({
-            canvas_layer: canv_lay,
-            data: {...this.state.data, ...current_data},
-            loaded_files: this.state.loaded_files + 1,
-            continent_names: continent_names,
-            country_names: country_names,
-            ocean_names: ocean_names,
-            total_timesteps: this.state.total_timesteps + total_timesteps,
-            status: cur_state,
-            index_by_country: global_index_by_country
-        })
-        this.props.updateCountriesData(country_names, ocean_names, continent_names)
+        console.log("\t Total timesteps: ", this.state.total_timesteps)
+        if(filenum == 0) {
+            let country_names = this.country_keys.map((x) => x.toLowerCase())
+            let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
+            let continent_names = this.country_keys.map((x) => data[x]['continent'])
+
+            console.log("\t Countries names: ", country_names)
+            console.log("\t Ocean names: ", ocean_names)
+            console.log("\t Continent names: ", continent_names)
+
+            let canv_lay = null
+            if (this.state.canvas_layer === -1) {
+                let canv_lay = new ImageLayer({
+                    source: new ImageCanvasSource({
+                        canvasFunction: this.canvasFunction
+                    })
+                })
+                this.props.map.addLayer(canv_lay)
+            }
+            this.props.updateCountriesData(country_names, ocean_names, continent_names)
+            this.setState({
+                canvas_layer: canv_lay,
+                data: {...this.state.data, ...current_data},
+                loaded_files: this.state.loaded_files + 1,
+                continent_names: continent_names,
+                country_names: country_names,
+                ocean_names: ocean_names,
+                total_timesteps: this.state.total_timesteps + total_timesteps,
+                status: cur_state,
+                index_by_country: global_index_by_country
+            })
+        }else{
+            this.setState({
+                data: {...this.state.data, ...current_data},
+                loaded_files: this.state.loaded_files + 1,
+                total_timesteps: this.state.total_timesteps + total_timesteps,
+                status: cur_state,
+                index_by_country: global_index_by_country
+            })
+        }
         // console.log("Done reading!")
     }
 
@@ -266,11 +277,11 @@ class  ParticlesLayer extends React.Component {
         this.show_west_map = false
         this.show_east_map = false
         if (extent[0] < -180) {
-            console.log('Showing west map....')
+            // console.log('Showing west map....')
             this.show_west_map = true
         }
         if (extent[2] > 180) {
-            console.log('Showing east map....')
+            // console.log('Showing east map....')
             this.show_east_map = true
         }
 
@@ -325,24 +336,18 @@ class  ParticlesLayer extends React.Component {
         this.clearInterval()
         // Verify the update was caused by the parent component and we have updated
         // the file to read.
-        if (this.selected_mode !== this.props.selected_model) {
+        if (this.state.selected_model !== this.props.selected_model) {
             this.setState({
                 time_step: 0,
+                total_timesteps: 0,
                 loaded_files: 0,
                 selected_model: this.props.selected_model,
                 status: STATUS.loading,
                 data: null
             })
-            this.selected_mode = this.props.selected_model
-            // let url = `${this.props.url}/${this.props.selected_model.file}.zip`
-            // console.log("Changed model: ", url)
-            // for(let i = 0; i < 3; i++){
-            for (let i = 0; i < this.state.selected_model.num_files; i++) {
+            for (let i = 0; i < this.props.selected_model.num_files; i++) {
                 let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
-                // console.log("Changed model: ", url)
-                // d3.blob(url).then( function(blob) {
-                //         this.readOneZip(blob, i)
-                // }.bind(this))
+                console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
                 d3.blob(url).then((blob) => this.readOneZip(blob, i))
             }
         } else {
@@ -360,7 +365,7 @@ class  ParticlesLayer extends React.Component {
      * @param blob
      */
     readOneZip(blob, filenum) {
-        // console.log(`File has been received! file number ${filenum}`, blob)
+        console.log(`File has been received! file number ${filenum}`, blob)
         let zip = new JSZip()
         zip.loadAsync(blob)
             .then(function (zip) {
@@ -467,7 +472,7 @@ class  ParticlesLayer extends React.Component {
 
                         let oldpos = [0, 0]
                         let newpos = [0, 0]
-                        if ((clon != 200) && (nlon != 200)) {
+                        if ((clon !== 200) && (nlon !== 200)) {
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
                                 oldpos = this.geoToCanvas(clon, clat)
                                 newpos = this.geoToCanvas(nlon, nlat)
@@ -707,7 +712,6 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log("Updating")
         this.updateAnimation()
     }
 

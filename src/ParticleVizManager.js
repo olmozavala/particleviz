@@ -4,12 +4,8 @@ import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
 import BackgroundLayerManager from "./BackgroundLayerManager"
 import Dropdown from "react-bootstrap/Dropdown"
-import {
-    DropletHalf
-} from 'react-bootstrap-icons'
-import InputGroup from "react-bootstrap/InputGroup"
+
 import TileWMS from "ol/source/TileWMS"
-import * as d3 from "d3";
 import TileLayer from "ol/layer/Tile";
 
 const data_folder_url = "http://localhost/data"
@@ -85,10 +81,10 @@ const months = [
 let data_files = [
     {file: "1/TESTUN_output",
     title: "TEST",
-     style:"default-scalar/div-PRGn",
-     wms: "fy_wcd_10_01/histo",
-     speed: "",
-     start_date: new Date(2010, 0, 1),
+    style:"default-scalar/div-PRGn",
+    wms: `histo_08/histo`,
+    speed: "",
+    start_date: new Date(2010, 0, 1),
     num_files: 1
     }
 ]
@@ -106,7 +102,7 @@ data_files.push({
     title: `One year since ${months[8]} 2010`,
     speed: "",
     start_date: new Date(2010, 8, 1),
-    num_files: 17
+    num_files: 16
 })
 
 // for(let i=1; i<=12; i++) {
@@ -194,11 +190,11 @@ class  ParticleVizManager extends React.Component{
     }
 
     toogleHistogramLayer(e){
-
-        if(e.target.checked){
-            this.state.histogram_layer.setVisible(true)
-        }else{
+        if(this.state.histogram_selected){
             this.state.histogram_layer.setVisible(false)
+        }else{
+            console.log("Visible true")
+            this.state.histogram_layer.setVisible(true)
         }
 
         this.setState({
@@ -331,9 +327,9 @@ class  ParticleVizManager extends React.Component{
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
-                        <form className="form-inline m-2">
+                        <div className="m-2">
                             <button className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
-                        </form>
+                        </div>
                         <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
                     </div>
 
