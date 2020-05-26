@@ -157,11 +157,11 @@ class  StatesLayer extends React.Component{
      */
     clickEvent(e){
         this.clearHovered();
-        var pixpos = e.pixel;
-        var features = e.map.getFeaturesAtPixel(pixpos);
+        let pixpos = e.pixel;
+        let features = e.map.getFeaturesAtPixel(pixpos);
 
         // Hide the previous table/plot
-        // var element = this.popup.getElement();
+        // let element = this.popup.getElement();
         // $(element).hide();
 
         let popup = document.getElementById('popup')
@@ -206,11 +206,13 @@ class  StatesLayer extends React.Component{
 
     hoverEvent(e){
         this.clearHovered();
-        var pixpos = e.pixel;
-        var features = e.map.getFeaturesAtPixel(pixpos);
+        let pixpos = e.pixel;
+        let features = e.map.getFeaturesAtPixel(pixpos);
         // It found something
 
+        let map = document.getElementById("map")
         if(features !== null){
+            map.style.cursor = "pointer"
             let country = features[0];
             // if(_.isNull(this.state.selected)){
             //     console.log(`Selected: null  hovered: ${country.get("name").toLowerCase()}`)
@@ -226,6 +228,8 @@ class  StatesLayer extends React.Component{
                     this.setState({hovered: country});
                 }
             }
+        }else{
+            map.style.cursor = "default"
         }
     }
 

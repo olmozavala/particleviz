@@ -31,9 +31,9 @@ const STATUS = {
 
 // How much transparency should we add
 const TRAIL_SIZE = {
-    1: .006,
-    2: .016,
-    3: .032,
+    1: .020,
+    2: .040,
+    3: .080,
     4: .12,
     5: .4
 }
@@ -176,7 +176,7 @@ class  ParticlesLayer extends React.Component {
         if (this.state.loaded_files >= (this.state.selected_model.num_files - 3)) {
             // console.log("Done reading and uncompressing all the files!!!!")
             // console.log(this.state.total_timesteps + total_timesteps)
-            cur_state = STATUS.paused
+            cur_state = STATUS.playing
         }
 
         let model_id = this.state.selected_model.id

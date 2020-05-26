@@ -9,8 +9,8 @@ import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile";
 import {easeIn} from "ol/easing";
 
-// const data_folder_url = "http://localhost/data"
-const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+const data_folder_url = "http://localhost/data"
+// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -79,18 +79,18 @@ const months = [
     'October', 'November', 'December'
 ];
 
-// let data_files = [
-//     {
-//         id: 1,
-//         file: "1/TESTUN_output",
-//         title: "TEST",
-//         style:"default-scalar/div-PRGn",
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 1
-//     }
-// ]
+let data_files = [
+    {
+        id: 1,
+        file: "1/TESTUN_output",
+        title: "TEST",
+        style:"default-scalar/div-PRGn",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 1
+    }
+]
 //
 // data_files.push({
 //     id: 2,
@@ -113,7 +113,6 @@ const months = [
 // })
 
 let num_files = [0, 0, 18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
-let data_files = []
 for(let i=3; i<=12; i++) {
     let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
@@ -333,7 +332,7 @@ class  ParticleVizManager extends React.Component{
                                         url={data_folder_url}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
-                        <Dropdown className="m-2">
+                        <Dropdown className="m-2"  title="Release month">
                             <Dropdown.Toggle variant="info">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
                             </Dropdown.Toggle>
@@ -345,9 +344,9 @@ class  ParticleVizManager extends React.Component{
                         </Dropdown>
                         <div className="m-2">
                             {this.state.histogram_selected?
-                                <button className="btn btn-outline-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                                <button title="Litter accumulation" className="btn btn-outline-info" onClick={this.toogleHistogramLayer}>Histogram</button>
                                 :
-                                <button className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
+                                <button title="Litter accumulation" className="btn btn-info" onClick={this.toogleHistogramLayer}>Histogram</button>
                             }
                         </div>
                         <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
