@@ -23,7 +23,7 @@ class  MakePlot extends React.Component {
                 let text = stats_data[statsType][statsType][id].name
                 let value = stats_data[statsType][statsType][id].tons
                 let perc = stats_data[statsType][statsType][id].perc
-                // console.log(perc)
+                // console.log(perst0c)
                 if(perc > 1 || value > 50){
                     dataPoints.push({label: text, y: value, perc: perc})
                 }

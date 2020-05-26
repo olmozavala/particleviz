@@ -9,10 +9,10 @@ import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile";
 import {easeIn} from "ol/easing";
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const wms_url = "http://http://146.201.212.214:8080/ncWMS2/wms"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const wms_url = "http://localhost:8080/ncWMS2/wms"
+const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
 const selected_alpha = 1
 // const not_selected_alpha = .2
@@ -79,53 +79,53 @@ const months = [
     'October', 'November', 'December'
 ];
 
-let data_files = [
-    {
-        id: 1,
-        file: "1/TESTUN_output",
-        title: "TEST",
-        style:"default-scalar/div-PRGn",
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 1
-    }
-]
-
-data_files.push({
-    id: 2,
-    file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
-    wms: `histo_08/histo`,
-    title: `One year since ${months[7]} 2010`,
-    speed: "",
-    start_date: new Date(2010, 7, 1),
-    num_files: 17
-})
-
-data_files.push({
-    id: 3,
-    file: `4/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output`,
-    wms: `histo_09/histo`,
-    title: `One year since ${months[8]} 2010`,
-    speed: "",
-    start_date: new Date(2010, 8, 1),
-    num_files: 16
-})
-
-// for(let i=1; i<=12; i++) {
-//     let i_str = `${i < 10 ? '0' + i : i}`
-//     data_files.push({
-//         file: `4/Final_Five_Years_WindsCurrentsDiffusionUnbeaching_${i_str}`,
-//         style: "default-scalar/div-PRGn",
-//         // wms: `fy_wcd_10_${i_str}histo`,
-//         wms: `fy_wcd_10_01/histo`,
-//         title: `Five Years ${months[i-1]}`,
+// let data_files = [
+//     {
+//         id: 1,
+//         file: "1/TESTUN_output",
+//         title: "TEST",
+//         style:"default-scalar/div-PRGn",
+//         wms: `histo_08/histo`,
 //         speed: "",
-//         start_date: new Date(2010, i-1, 1),
-//         // num_files: 17
-//         num_files: 10
-//     })
-// }
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 1
+//     }
+// ]
+//
+// data_files.push({
+//     id: 2,
+//     file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
+//     wms: `histo_08/histo`,
+//     title: `One year since ${months[7]} 2010`,
+//     speed: "",
+//     start_date: new Date(2010, 7, 1),
+//     num_files: 17
+// })
+//
+// data_files.push({
+//     id: 3,
+//     file: `4/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output`,
+//     wms: `histo_09/histo`,
+//     title: `One year since ${months[8]} 2010`,
+//     speed: "",
+//     start_date: new Date(2010, 8, 1),
+//     num_files: 16
+// })
+
+let num_files = [0, 0, 18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
+let data_files = []
+for(let i=3; i<=12; i++) {
+    let i_str = `${i < 10 ? '0' + i : i}`
+    data_files.push({
+        id: i,
+        file: `4/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
+        wms: `histo_${i_str}/histo`,
+        title: `${months[i-1]} 2010`,
+        speed: "",
+        start_date: new Date(2010, i-1, 1),
+        num_files: num_files[i-1]
+    })
+}
 
 class  ParticleVizManager extends React.Component{
     constructor(props){
