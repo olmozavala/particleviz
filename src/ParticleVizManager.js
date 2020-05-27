@@ -4,6 +4,8 @@ import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
 import BackgroundLayerManager from "./BackgroundLayerManager"
 import Dropdown from "react-bootstrap/Dropdown"
+import * as d3 from "d3"
+import _ from "underscore";
 
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile";
@@ -61,14 +63,37 @@ const OCEANS = {
 }
 
 const CONTINENTS = {
-    africa: {name:'africa', color:2},
-    asia: {name:'asia', color:1},
-    south_america: {name:'south america', color:0},
-    europe: {name:'europe', color:5},
-    oceania: {name:'oceania', color:4},
-    north_america: {name:'north america', color:3},
-    seven_seas: {name:'seven seas (open ocean)', color:6},
-    Antarctica: {name:'antarctica', color:7},
+    africa: {name:'africa',
+        // colors:["#fde74c","#E24E1B"],
+        // colors:["#edc4b3","#774936"],
+        colors:["#ffea47","#ff4b1f"],
+        min_max: [1, 130000]},
+    asia: {name:'asia',
+        // colors:["#F4D941", "#db1b1b"]},
+        // colors:["#b76935", "#143642"],
+        colors:["#fefcfb", "#0466c8"],
+        min_max: [1, 2300000]},
+    south_america: {name:'south america',
+        colors:["#57EBDE", "#0B2C24"],
+        min_max: [1, 1000000]},
+    europe: {name:'europe',
+        // colors:["#ABBDFF","#663177"]},
+        colors:["#ffdd55","#522888"],
+        min_max: [1, 50000]},
+    oceania: {name:'oceania',
+        colors:["#f0f3bd","#05668d"],
+        min_max: [1, 10000000]},
+    north_america: {name:'north america',
+        // colors:["#45CDE9","#091970"],
+        // colors:["#fefcfb","#0a1128"],
+        colors:["#fff75e","#fdb833"],
+        min_max: [1, 600000]},
+    seven_seas: {name:'seven seas (open ocean)',
+        colors:["#F6FFF8", "#6B9080"],
+        min_max: [1, 10000000]},
+    antarctica: {name:'antarctica',
+        colors:["#E4E7E4", "#111111"],
+        min_max: [1, 10000000]},
 }
 
 let selected_color = `rgba(255,0,0,${selected_alpha})`
@@ -91,27 +116,6 @@ let data_files = [
         num_files: 1
     }
 ]
-//
-// data_files.push({
-//     id: 2,
-//     file: `4/Single_Release_FiveYears_EachMonth_2010_08_2020-04-19_21_18_output`,
-//     wms: `histo_08/histo`,
-//     title: `One year since ${months[7]} 2010`,
-//     speed: "",
-//     start_date: new Date(2010, 7, 1),
-//     num_files: 17
-// })
-//
-// data_files.push({
-//     id: 3,
-//     file: `4/Single_Release_FiveYears_EachMonth_2010_09_2020-04-19_21_18_output`,
-//     wms: `histo_09/histo`,
-//     title: `One year since ${months[8]} 2010`,
-//     speed: "",
-//     start_date: new Date(2010, 8, 1),
-//     num_files: 16
-// })
-
 let num_files = [0, 0, 18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
 for(let i=3; i<=12; i++) {
     let i_str = `${i < 10 ? '0' + i : i}`
@@ -146,23 +150,26 @@ class  ParticleVizManager extends React.Component{
             opacity:.8});
         histogram_layer.setVisible(false);
 
+        // let colors_by_country = new Array().fill("#FFFFFF")
         this.state = {
             colors_by_country: [],
             selected_country: '',
-            country_names: [],
-            ocean_names: [],
-            continents: [],
+            countries: {},
             selected_model: data_files[0],
             histogram_layer: histogram_layer,
             histogram_selected: false
         }
         this.props.map.addLayer(histogram_layer)
 
-        this.updateCountriesAll = this.updateCountriesAll.bind(this)
         this.updateSelectedCountry= this.updateSelectedCountry.bind(this)
         this.changeFile = this.changeFile.bind(this)
         this.toogleHistogramLayer= this.toogleHistogramLayer.bind(this)
         this.updateMapLocation = this.updateMapLocation.bind(this)
+        this.getColorByCountry= this.getColorByCountry.bind(this)
+        this.updateTonsByCountry = this.updateTonsByCountry.bind(this) // This one is called by States
+        this.updateCountriesData = this.updateCountriesData.bind(this) // This one is called by Particles
+        this.updateColors = this.updateColors.bind(this)
+        this.initCountries = this.initCountries.bind(this)
     }
 
     componentDidMount() {
@@ -194,21 +201,93 @@ class  ParticleVizManager extends React.Component{
         this.props.map.render()
     }
 
-    updateCountriesAll(country_names, ocean_names, continents) {
-        let colors_by_country = this.updateCountryColorsPartViz_Manager(country_names, ocean_names, continents, this.state.selected_country)
+    initCountries(country_names){
+        let countries = {}
+        if(!_.isEmpty(this.state.countries)){
+            // console.log("Return filled")
+            countries = {...this.state.countries}
+        }else{
+            // console.log("Create empty")
+            for(let i=0; i < country_names.length; i++){
+                countries[country_names[i]] = {
+                    tons: 0,
+                    color: "#FFFFFF",
+                    ocean: [],
+                    continent: ""
+                }
+            }
+        }
+        return countries
+    }
+
+    updateTonsByCountry(country_names, country_tons) {
+        // console.log("Updating tons per country....")
+        let countries = this.initCountries(country_names)
+        for(let i=0; i < country_names.length; i++){
+            if(!_.isUndefined(countries[country_names[i]])) {
+                countries[country_names[i]]['tons'] = country_tons[i]
+            }
+        }
         this.setState({
-            country_names: country_names,
-            ocean_names: ocean_names,
-            continents: continents,
+            countries: countries
+        })
+        this.updateColors()
+    }
+
+    updateCountriesData(country_names, oceans_by_country, continents) {
+        // console.log("Updating country data....")
+        let countries = this.initCountries(country_names)
+        for(let i=0; i < country_names.length; i++){
+            if(!_.isUndefined(countries[country_names[i]])){
+                countries[country_names[i]]['ocean'] = oceans_by_country[i]
+                countries[country_names[i]]['continent'] = continents[i]
+            }
+        }
+        this.setState({
+            countries: countries
+        })
+        this.updateColors()
+    }
+
+    updateColors(){
+        // console.log("Updating colors....")
+        let countries = {...this.state.countries}
+
+        let colors_by_country = {}
+        for(let key of Object.keys(countries)){
+            let continent_name = countries[key]['continent'].toLowerCase()
+            let [first_color, last_color, min_value, max_value] = this.colorByContinent(continent_name)
+            let myColor = d3.scaleLog().domain([min_value,max_value]).range([first_color, last_color])
+            let new_color = d3.color(myColor(countries[key]['tons']))
+            if(this.state.selected_country.toLowerCase().localeCompare(key) === 0){
+                // console.log(`${this.state.selected_country.toLowerCase()} ---- ${key}`)
+                new_color = selected_color
+            }
+            countries[key]['color'] = new_color
+            colors_by_country[key] = new_color
+        }
+        this.setState({
+            countries: countries,
             colors_by_country: colors_by_country
         })
+    }
+
+    getColorByCountry(name){
+        if(!_.isUndefined(this.state.countries[name])) {
+            // console.log(this.state.selected_country)
+            // console.log(`Returning this: ${this.state.countries[name]['color']} name: ${name}`)
+            return d3.color(this.state.countries[name]['color'])
+        } else{
+            return d3.color("#FFFFFF")
+        }
+
     }
 
     toogleHistogramLayer(e){
         if(this.state.histogram_selected){
             this.state.histogram_layer.setVisible(false)
         }else{
-            console.log("Visible true")
+            // console.log("Visible true")
             this.state.histogram_layer.setVisible(true)
         }
 
@@ -218,19 +297,15 @@ class  ParticleVizManager extends React.Component{
     }
 
     updateSelectedCountry(name){
-
         let current_country = this.state.selected_country
         // If the name is the same as before then we 'toogle it'
         if(current_country.localeCompare(name) === 0){
-            name = ''
+            this.state.countries[name]['color'] = selected_color
         }
-        let colors_by_country = this.updateCountryColorsPartViz_Manager(
-            this.state.country_names, this.state.ocean_names, this.state.continents, name)
-
         this.setState({
             selected_country: name,
-            colors_by_country: colors_by_country
         })
+        this.updateColors()
     }
 
     colorByOcean(ocean){
@@ -245,55 +320,16 @@ class  ParticleVizManager extends React.Component{
         return colors[sel_ocean.color]
     }
     colorByContinent(continent){
-        let sel_continent = ''
+        let colors = ["#FFFFFF", "#FFFFFF"]
+        let min_max = [0, 100000]
         for(const c_continent in CONTINENTS){
             if(CONTINENTS[c_continent].name.localeCompare(continent.toLowerCase()) === 0){
-                sel_continent = CONTINENTS[c_continent]
+                colors = CONTINENTS[c_continent]['colors']
+                min_max = CONTINENTS[c_continent]['min_max']
                 break
             }
         }
-        return colors[sel_continent.color]
-    }
-
-    /**
-     * Function that updates the assigned color for each country.
-     * @param country_names
-     * @param selected_country
-     * @returns {{}}
-     */
-    updateCountryColorsPartViz_Manager(country_names, ocean_names, continent_names, selected_country) {
-        let colors_by_country = {}
-        let update_alpha = false
-
-        // Finds for a selected country, If it finds it reduces the alpha of the other countries
-        // for(let i=0; i < country_names.length; i++){
-        //     let name = country_names[i]
-        //     if(name.toLowerCase() === selected_country.toLowerCase()) {
-        //         update_alpha = true
-        //         break
-        //     }
-        // }
-
-        // Iterates over all the country names
-        for (let i = 0; i < country_names.length; i++) {
-            let name = country_names[i]
-            // Finds the selected country and highlights it
-            if (name.toLowerCase() === selected_country.toLowerCase()) {
-                colors_by_country[name] = selected_color
-            } else {
-                // let new_color = colors[i % colors.length]
-                // let new_color = this.colorByOcean(ocean_names[i])[i % 7]
-                let new_color = this.colorByContinent(continent_names[i])[i % 7]
-                if(update_alpha) {
-                    let rgb = new_color
-                    // rgb = rgb.replace(/[^\d,]/g, '').split(',')
-                    // new_color = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${not_selected_alpha})`
-                    new_color = rgb.slice(0,-2) + not_selected_alpha
-                }
-                colors_by_country[name] = new_color
-            }
-        }
-        return colors_by_country
+        return [colors[0], colors[1], min_max[0], min_max[1]]
     }
 
     changeFile(e){
@@ -327,8 +363,7 @@ class  ParticleVizManager extends React.Component{
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
                         <ParticlesLayer map={this.props.map}
-                                        updateCountriesData={this.updateCountriesAll}
-                                        selected_color={selected_color}
+                                        updateCountriesData={this.updateCountriesData}
                                         url={data_folder_url}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
@@ -354,9 +389,9 @@ class  ParticleVizManager extends React.Component{
 
                 </div>
                 <StatesLayer map={this.props.map}
-                             colors_by_country={this.state.colors_by_country}
                              url={data_folder_url}
-                             selected_color={selected_color}
+                             colors_by_country={this.state.colors_by_country}
+                             updateTonsByCountry={this.updateTonsByCountry}
                              updateSelectedCountry = {this.updateSelectedCountry}/>
             </nav>
         )

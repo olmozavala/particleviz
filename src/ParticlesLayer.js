@@ -93,9 +93,6 @@ class  ParticlesLayer extends React.Component {
             domain: null,
             ol_canvas_size: null,
             total_timesteps: {},
-            country_names: null,
-            ocean_names: null,
-            continent_names: null,
             index_by_country: {},
         }
         this.canvasWidth = 0
@@ -143,8 +140,7 @@ class  ParticlesLayer extends React.Component {
         let th = 10
 
         // console.log("Reading final json data!!!!!!! ", data)
-        this.country_keys = Object.keys(data)
-        // fixing those particles that 'jump' the map
+        this.country_keys = Object.keys(data) // fixing those particles that 'jump' the map
         let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length
         let loc_index_by_country = {}
         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
@@ -176,7 +172,8 @@ class  ParticlesLayer extends React.Component {
         if (this.state.loaded_files >= (this.state.selected_model.num_files - 3)) {
             // console.log("Done reading and uncompressing all the files!!!!")
             // console.log(this.state.total_timesteps + total_timesteps)
-            cur_state = STATUS.playing
+            // cur_state = STATUS.playing
+            cur_state = STATUS.paused
         }
 
         let model_id = this.state.selected_model.id
@@ -215,14 +212,11 @@ class  ParticlesLayer extends React.Component {
             }
             this.props.updateCountriesData(country_names, ocean_names, continent_names)
 
-            console.log("Model time steps:", model_timesteps)
+            // console.log("Model time steps:", model_timesteps)
             this.setState({
                 canvas_layer: canv_lay,
                 data: {...current_data},
                 loaded_files: this.state.loaded_files + 1,
-                continent_names: continent_names,
-                country_names: country_names,
-                ocean_names: ocean_names,
                 total_timesteps: {...model_timesteps},
                 status: cur_state,
                 index_by_country: global_index_by_country
@@ -272,7 +266,7 @@ class  ParticlesLayer extends React.Component {
     // }
 
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
-        console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
+        // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
 
         this.canvasWidth = size[0]
         this.canvasHeight = size[1]
@@ -477,7 +471,6 @@ class  ParticlesLayer extends React.Component {
         let file_number = (Math.floor(this.state.time_step / 100)).toString()
         let start_time = this.state.time_step % 100;
         // console.log(`Drawing lines time step: ${start_time} file number: ${file_number}   (global ${this.state.time_step})`)
-
         if (available_files.includes(file_number)) {
             for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
                 ctx.beginPath()
@@ -531,205 +524,6 @@ class  ParticlesLayer extends React.Component {
             this.props.map.render()
         }
     }
-
-    /**
-     * Draws the lines for a single day. It iterates over different countries
-     * @param ctx Context of the canvas object to use
-     */
-    // drawLinesOld(ctx) {
-    //     // ------------------- NEW Manuall -------------------
-    //     // console.log(`Domain: ${this.state.domain}  Extent: ${this.state.extent}  Size: ${this.state.ol_canvas_size}`)
-    //     let global_start_time = this.state.time_step;
-    //     let global_end_time = this.state.time_step + 1;
-    //     if (this.draw_until_day) {
-    //         global_start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS * (6 - this.state.transparency_index) / 6);
-    //     }
-    //     let file_number = (Math.floor(global_start_time / 100)).toString()
-    //     let global_c_time = global_start_time % 100
-    //     let global_next_time = global_c_time + 1
-    //
-    //     ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
-    //     // console.log(`Drawing lines time step: ${global_c_time} file number: ${file_number}   (global ${this.state.time_step})`)
-    //     let available_files = Object.keys(this.state.data[model_id])
-    //     if (available_files.includes(file_number)) {
-    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-    //             ctx.beginPath()
-    //             // Retreive all the information from the first available file
-    //             ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
-    //             let country_start = this.state.data[file_number][this.country_keys[cur_country_id]]
-    //             let country_end = country_start
-    //             let tot_part = country_start["lat_lon"][0].length
-    //             let local_file_number = file_number
-    //             let local_global_start_time = global_start_time
-    //             let c_time = global_c_time
-    //             let next_time = global_next_time
-    //             while (local_global_start_time < global_end_time) {
-    //                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
-    //                 console.log(`RUNS: ${c_time - global_c_time}`)
-    //                 if (c_time == 99) {
-    //                     next_time = 0
-    //                     local_file_number = file_number + 1
-    //                     country_end = this.state.data[local_file_number][this.country_keys[cur_country_id]]
-    //                 }
-    //                 for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                     let clon = country_start["lat_lon"][1][part_id][c_time]
-    //                     let clat = country_start["lat_lon"][0][part_id][c_time]
-    //
-    //                     let nlon = country_end["lat_lon"][1][part_id][next_time]
-    //                     let nlat = country_end["lat_lon"][0][part_id][next_time]
-    //                     let oldpos = [0, 0]
-    //                     let newpos = [0, 0]
-    //                     if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2]) && (clon !== 200) && (nlon !== 200)) {
-    //                         oldpos = this.geoToCanvas(clon, clat)
-    //                         newpos = this.geoToCanvas(nlon, nlat)
-    //                         // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-    //                         // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-    //                         ctx.moveTo(oldpos[0], oldpos[1])
-    //                         ctx.lineTo(newpos[0], newpos[1])
-    //                     }
-    //                     if ((this.state.extent[2] >= 180) && (clon !== 200) && (nlon !== 200)) {
-    //                         let clon = clon + 360
-    //                         let nlon = nlon + 360
-    //                         if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-    //                             oldpos = this.geoToCanvas(clon, clat)
-    //                             newpos = this.geoToCanvas(nlon, nlat)
-    //                             // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-    //                             // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-    //                             ctx.moveTo(oldpos[0], oldpos[1])
-    //                             ctx.lineTo(newpos[0], newpos[1])
-    //                         }
-    //                     }
-    //                     if ((this.state.extent[0] <= -180) && (clon !== 200) && (nlon !== 200)) {
-    //                         let clon = clon - 360
-    //                         let nlon = nlon - 360
-    //                         if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-    //                             oldpos = this.geoToCanvas(clon, clat)
-    //                             newpos = this.geoToCanvas(nlon, nlat)
-    //                             // console.log(`domain ${this.state.domain} canvas ${this.state.ol_canvas_size}  extent ${this.state.extent}`)
-    //                             // console.log(`Final: x0: ${x0} y0: ${y0} x1: ${x1} y1: ${y1} `)
-    //                             ctx.moveTo(oldpos[0], oldpos[1])
-    //                             ctx.lineTo(newpos[0], newpos[1])
-    //                         }
-    //                     }
-    //                 }
-    //                 if (c_time == 99) {
-    //                     country_start = this.state.data[local_file_number][this.country_keys[cur_country_id]]
-    //                     c_time = -1
-    //                 }
-    //                 local_global_start_time += 1
-    //                 c_time += 1
-    //                 next_time += 1
-    //             }
-    //             ctx.stroke()
-    //             ctx.closePath()
-    //         }
-    //         this.props.map.render()
-    //     }
-    // }
-
-    /**
-     * Obtains the particles in the GeoJson format
-     * @param type
-     * @returns {[]}
-     */
-    // getFeatures(type='lines'){
-    //     let countries_feature_collection = []
-    //     let start_time = this.state.time_step
-    //     let end_time = start_time+1
-    //     if (this.draw_until_day) {
-    //         start_time = Math.max(0, this.state.time_step - DRAW_LAST_DAYS*(6-this.state.transparency_index)/6)
-    //     }
-    //     // let glob_tot_particles = 0
-    //     // Iterating over countries
-    //     for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-    //         let cur_country = this.state.data[this.country_keys[cur_country_id]]
-    //         let tot_part = cur_country["lat_lon"][0].length
-    //         // glob_tot_particles += tot_part
-    //
-    //         let features_array = []
-    //         // Iterate over all the particles
-    //         if(type.localeCompare('lines') === 0) {
-    //             if(end_time === (start_time+1)){
-    //                 for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                     let coordinates = []
-    //                     // Add the two positions of the current particle
-    //                     // Pushes the coordinates of the first position
-    //                     coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
-    //                         parseFloat(cur_country["lat_lon"][0][part_id][start_time])])
-    //                     // Pushes all the other particles times
-    //                     coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time+1]),
-    //                         parseFloat(cur_country["lat_lon"][0][part_id][start_time+1])])
-    //                     let single_part_feature = {
-    //                         "type": "Feature",
-    //                         "geometry": {
-    //                             "type": "LineString",
-    //                             "coordinates": coordinates
-    //                         }
-    //                     }
-    //                     features_array.push(single_part_feature)
-    //                 }
-    //
-    //             }else{// In this case we need to draw more than one time step
-    //                 for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                     let coordinates = []
-    //                     // Add the two positions of the current particle
-    //                     // Pushes the coordinates of the first position
-    //                     coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][start_time]),
-    //                         parseFloat(cur_country["lat_lon"][0][part_id][start_time])])
-    //                     // Pushes all the other particles times
-    //                     for (let time_step = start_time; time_step <= end_time; time_step++) {
-    //                         coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-    //                             parseFloat(cur_country["lat_lon"][0][part_id][time_step])])
-    //                     }
-    //                     let single_part_feature = {
-    //                         "type": "Feature",
-    //                         "geometry": {
-    //                             "type": "LineString",
-    //                             "coordinates": coordinates
-    //                         }
-    //                     }
-    //                     features_array.push(single_part_feature)
-    //                 }
-    //             }
-    //         }else{
-    //             // THis case is when we want to draw particles rather than lines
-    //             for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                 let coordinates = []
-    //                 // Add the position of the current particle
-    //                 coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][this.state.time_step]),
-    //                     parseFloat(cur_country["lat_lon"][0][part_id][this.state.time_step])])
-    //                 // If drawing more than one location, then add more particles
-    //                 for (let time_step = start_time; time_step < end_time; time_step++) {
-    //                     coordinates.push([parseFloat(cur_country["lat_lon"][1][part_id][time_step]),
-    //                         parseFloat(cur_country["lat_lon"][0][part_id][time_step])])
-    //                 }
-    //                 let single_part_feature = {
-    //                     "type": "Feature",
-    //                     "geometry": {
-    //                         "type": "MultiPoint",
-    //                         "coordinates": coordinates
-    //                     }
-    //                 }
-    //                 features_array.push(single_part_feature)
-    //             }
-    //         }
-    //
-    //         let features = {
-    //             "type": "FeatureCollection",
-    //             "features": features_array,
-    //             "country": this.country_names[cur_country_id]
-    //         }
-    //         countries_feature_collection.push(features)
-    //     }
-    //
-    //     // console.log("TOTAL NUMBER OF PARTICLES: ", glob_tot_particles)
-    //
-    //     if (this.draw_until_day) {
-    //         this.draw_until_day = false
-    //     }
-    //     return countries_feature_collection
-    // }
-
     componentDidMount() {
         this.updateAnimation()
     }
