@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from "underscore";
+import $ from 'jquery';
 import CanvasJSReact from './canvasjs.react';
 var CanvasJSChart = CanvasJSReact.CanvasJSChart
 
@@ -7,6 +8,7 @@ class  MakePlot extends React.Component {
     constructor(props){
         super(props)
         this.showStatistics= this.showStatistics.bind(this)
+        this.hidePlot= this.hidePlot.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -44,11 +46,13 @@ class  MakePlot extends React.Component {
                 container = 'chartContainerTo'
                 tooltip = `{y} tons from {label} ({perc}%)`
             }
+            // let plot_height = Math.min(parseInt(window.innerHeight * .20), 200)
+            let plot_height = 200
             const options = {
                 container: container,
                 animationEnabled: true,
                 exportEnabled: true,
-                height: 200,
+                height: plot_height,
                 title: {
                     text: title,
                     fontSize: 18,
@@ -82,24 +86,48 @@ class  MakePlot extends React.Component {
         }
     }
 
+    hidePlot(){
+        let popup = document.getElementById('popup')
+        $(popup).hide();
+    }
+
     render(){
         let stats_data = this.props.country_data
+
         return (
             <div className="container-fluid bg-white rounded-lg">
                 <div className="row justify-content-center">
-                    <div className="col-12 mt-1 text-center">
-                        <h4 className="d-inline"> {this.props.country_name} exports {stats_data['from'].tot_tons} tons per year </h4>
-                        <h6>
-                            {stats_data['from'].ocean_tons} ({stats_data['from'].ocean_perc}%) end up in the ocean,
-                            {stats_data['from'].beach_tons} ({stats_data['from'].beach_perc}%) end up on the beach.
-                        </h6>
-                    </div>
+                    {!_.isUndefined(stats_data['from']) ?
+                        <div className="col-12 mt-1 text-center">
+                            <button className="d-inline float-right" type="button" className="close"
+                                    onClick={this.hidePlot}
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 className="d-inline"> {this.props.country_name} exports {stats_data['from'].tot_tons} tons
+                                per year </h5>
+                            <h6>
+                                {stats_data['from'].ocean_tons} ({stats_data['from'].ocean_perc}%) end up in the ocean,
+                                &nbsp;
+                                {stats_data['from'].beach_tons} ({stats_data['from'].beach_perc}%) end up on the beach.
+                            </h6>
+                        </div>
+                        :
+                        <div className="col-12 mt-1 text-center">
+                            <button className="d-inline float-right" type="button" className="close"
+                                    onClick={this.hidePlot}
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 className="d-inline"> No input data for {this.props.country_name} </h4>
+                        </div>
+                    }
                 </div>
                 <div className="row justify-content-center">
-                    <div className="col-xl-4 col-lg-5 col-md-6 col-sm-12"  id="chartContainerFrom">
+                    <div className="col-xl-5 col-md-6 col-12 p-0"  id="chartContainerFrom">
                         {_.isUndefined(stats_data['from']) ? <span></span>: this.showStatistics('from') }
                     </div>
-                    <div className="col-xl-4 col-lg-5 col-md-6 col-sm-12" id="chartContainerTo">
+                    <div className="col-xl-5 col-md-6 col-12 p-0" id="chartContainerTo">
                         {_.isUndefined(stats_data['to']) ? <span></span>: this.showStatistics('to') }
                     </div>
                 </div>

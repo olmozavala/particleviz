@@ -50,7 +50,6 @@ class  StatesLayer extends React.Component{
 
         this.clickEvent = this.clickEvent.bind(this);
         this.hoverEvent = this.hoverEvent.bind(this);
-        this.showPlot = this.showPlot.bind(this);
         this.drawStatesLayer = this.drawStatesLayer.bind(this);
 
         this.state = {
@@ -60,15 +59,6 @@ class  StatesLayer extends React.Component{
         }
     }
 
-    showPlot(name){
-        let country_data  =this.reached_data[name.toLowerCase()];
-        let element = <div></div>
-        if(!_.isUndefined(country_data)){
-            // element = <MakeTable country_name={name} country_data={country_data}></MakeTable>;
-            element = <MakePlot country_name={name} country_data={country_data}></MakePlot>;
-        }
-        return  element;
-    }
 
     drawStatesLayer(){
         let features = this.state.states_layer.getSource().getFeatures()
@@ -150,14 +140,11 @@ class  StatesLayer extends React.Component{
      * table (if any).
      * @param e
      */
+
     clickEvent(e){
         this.clearHovered();
         let pixpos = e.pixel;
         let features = e.map.getFeaturesAtPixel(pixpos);
-
-        // Hide the previous table/plot
-        // let element = this.popup.getElement();
-        // $(element).hide();
 
         let popup = document.getElementById('popup')
         $(popup).hide();
@@ -172,8 +159,11 @@ class  StatesLayer extends React.Component{
             if (this.state.selected !== country) {
                 country.setStyle(this.getCountryStyle(selected_color, name)) // Set this country 'highlighted'
                 // Show the corresponding statistics
-                $(popup).show()
-                ReactDOM.render(this.showPlot(name), popup)
+                let country_data  =this.reached_data[name.toLowerCase()]
+                if(!_.isUndefined(country_data) && country_data['from'] !== -1){
+                    $(popup).show()
+                    ReactDOM.render(<MakePlot country_name={name} country_data={country_data}></MakePlot>, popup)
+                }
                 // Save current selection
                 this.setState({
                     selected: country,

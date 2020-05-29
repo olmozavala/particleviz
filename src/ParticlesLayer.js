@@ -172,8 +172,8 @@ class  ParticlesLayer extends React.Component {
         if (this.state.loaded_files >= (this.state.selected_model.num_files - 3)) {
             // console.log("Done reading and uncompressing all the files!!!!")
             // console.log(this.state.total_timesteps + total_timesteps)
-            // cur_state = STATUS.playing
-            cur_state = STATUS.paused
+            cur_state = STATUS.playing
+            // cur_state = STATUS.paused
         }
 
         let model_id = this.state.selected_model.id
@@ -295,29 +295,10 @@ class  ParticlesLayer extends React.Component {
         }
 
         if (!_.isUndefined(this.state.data)) {
-            // let r = 57.295779513082266; // TODO This needs to be fixed is hardcoded
-            // let scale = r / (resolution / pixelRatio)
-            // let center = toLonLat(getCenter(extent), projection)
-            // this.d3Projection.scale(scale).center(center)
-            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-            // let center_west = center.slice()
-            // center_west[0] += 360
-            // this.d3ProjectionWest.scale(scale).center(center_west)
-            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-            // let center_east = center.slice()
-            // center_east[0] -= 360
-            // this.d3ProjectionEast.scale(scale).center(center_east)
-            //     .translate([this.canvasWidth / 2, this.canvasHeight / 2])
-            //
-            // this.d3GeoGenerator = this.d3GeoGenerator.projection(this.d3Projection).context(ctx)
-            // this.d3GeoGeneratorWest = this.d3GeoGeneratorWest.projection(this.d3ProjectionWest).context(ctx)
-            // this.d3GeoGeneratorEast = this.d3GeoGeneratorEast.projection(this.d3ProjectionEast).context(ctx)
             let domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
             let new_status = this.state.status
-            // let data_geo = this.updateAllData(locextent, domain, locsize)
-            // console.log(`Domain: ${domain}  Extent: ${locextent}  Size: ${locsize}`)
             if ((this.state.status === STATUS.decompressing) && (this.state.loaded_files >= this.state.selected_model.num_files)) {
-                new_status = STATUS.paused
+                new_status = STATUS.playing
             }
 
             this.setState({
@@ -363,7 +344,7 @@ class  ParticlesLayer extends React.Component {
                 this.setState({
                     time_step: 0,
                     selected_model: this.props.selected_model,
-                    cur_state: STATUS.paused
+                    cur_state: STATUS.playing
                 })
             }
         } else {

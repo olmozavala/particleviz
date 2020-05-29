@@ -27,13 +27,41 @@
   border-top-right-radius: calc(0.3rem - 1px);
 }
 
-.stats_plot{
+.wl_popup{
   position: absolute;
-  background-color: aliceblue;
   bottom: 0;
+  height: 260px;
   z-index: 102;
   width: 100%;
-  opacity: .8;
+  opacity: .9;
+  display: none;
+}
+
+.wl_palette{
+  position: absolute;
+  right: 2%;
+  top: 20%;
+  height: 45%;
+  width: 80px;
+  z-index: 102;
+  background-color: red;
+  pointer-events: none;
+  display: none;
+  text-align: center;
+  opacity: .9;
+  background-color: white;
+}
+
+.palette_img{
+  height: 80%;
+  margin-bottom: 10px;
+}
+
+
+@media(max-width: 768px){
+  .wl_popup{
+    height: 480px;
+  }
 }
 
 .control {
@@ -52,3 +80,4 @@
   position: absolute;
   width: 100%;
 }
+
