@@ -17,10 +17,10 @@ import {Bullseye, SkipForwardFill} from "react-bootstrap-icons";
 import img_map_osm from "./imgs/osm.jpg";
 import DropdownItem from "react-bootstrap/DropdownItem";
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const wms_url = "http://localhost:8080/ncWMS2/wms"
+const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
@@ -110,23 +110,23 @@ const months = [
 ];
 
 let def_max_pal_value = 30000000
-let data_files = [
-    {
-        id: 1,
-        file: "1/TESTUN_output",
-        title: "TEST",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:"x-Sst",
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 1,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    }
-]
-// let data_files = []
+// let data_files = [
+//     {
+//         id: 1,
+//         file: "1/TESTUN_output",
+//         title: "TEST",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:"x-Sst",
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 1,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     }
+// ]
+let data_files = []
 let num_files = [18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
 let min_pal = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 

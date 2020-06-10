@@ -349,11 +349,16 @@ class  ParticlesLayer extends React.Component {
                 })
             }
         } else {
+            let canvas = this.d3canvas.node()
             if (this.state.status === STATUS.playing) {
-                this.interval = setTimeout(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000)
+                    if (!_.isNull(canvas)) {
+                        this.interval = setTimeout(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
+                    }
             }
             if (this.state.status === STATUS.paused) {
-                this.drawNextDay()
+                if (!_.isNull(canvas)) {
+                    this.drawNextDay(canvas)
+                }
             }
         }
     }
@@ -384,32 +389,29 @@ class  ParticlesLayer extends React.Component {
     /**
      * Draws a single day of litter using D3
      */
-    drawNextDay() {
-        let canvas = this.d3canvas.node()
-        if (!_.isNull(canvas)) {
-            let ctx = canvas.getContext('2d')
-            if (this.state.time_step === 0) {
-                // Clear the canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
-            } else {
-                // Make previous frame a little bit transparent
-                // var prev = ctx.globalCompositeOperation
-                // ctx.globalCompositeOperation = "destination-out"
-                ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
-                ctx.fillRect(0, 0, canvas.width, canvas.height)
-                // ctx.globalCompositeOperation = prev
-                ctx.fill()
-            }
-            // Draw next frame
-            this.drawLitter(ctx)
+    drawNextDay(canvas) {
+        let ctx = canvas.getContext('2d')
+        if (this.state.time_step === 0) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+        } else {
+            // Make previous frame a little bit transparent
+            // var prev = ctx.globalCompositeOperation
+            // ctx.globalCompositeOperation = "destination-out"
+            ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+            // ctx.globalCompositeOperation = prev
+            ctx.fill()
+        }
+        // Draw next frame
+        this.drawLitter(ctx)
 
-            if (this.state.status === STATUS.playing) {
-                let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps[this.state.selected_model.id]
-                // console.log(`Setting the time: ${next_time_step}`)
-                this.setState({
-                    time_step: next_time_step
-                })
-            }
+        if (this.state.status === STATUS.playing) {
+            let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps[this.state.selected_model.id]
+            // console.log(`Setting the time: ${next_time_step}`)
+            this.setState({
+                time_step: next_time_step
+            })
         }
     }
 
