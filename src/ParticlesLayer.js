@@ -106,6 +106,14 @@ class  ParticlesLayer extends React.Component {
             d3.blob(url).then((blob) => this.readOneZip(blob, i))
         }
 
+        this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
+        if (this.d3canvas.empty()) {
+            // console.log("Initializing canvas")
+            this.d3canvas = d3.select(document.createElement("canvas"))
+                .attr("id", "particle_canvas")
+            this.d3canvas.getContext('2d', { alpha: false });
+        }
+
         // this.getFeatures = this.getFeatures.bind(this)
         this.drawLitter = this.drawLitter.bind(this)
         // this.drawParticles = this.drawParticles.bind(this)
@@ -125,13 +133,12 @@ class  ParticlesLayer extends React.Component {
         this.playPause = this.playPause.bind(this)
         this.changeDayRange = this.changeDayRange.bind(this)
         this.readTwoUnzippedFile = this.readTwoUnzippedFile.bind(this)
-        this.clearInterval = this.clearInterval.bind(this)
+        this.clearPreviousLoop = this.clearPreviousLoop.bind(this)
         this.nextDay = this.nextDay.bind(this)
         this.prevDay = this.prevDay.bind(this)
         this.displayCurrentDay = this.displayCurrentDay.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
         // this.updateAllData = this.updateAllData.bind(this)
-
     }
 
     readTwoUnzippedFile(txtdata, filenum) {
@@ -208,7 +215,9 @@ class  ParticlesLayer extends React.Component {
                         canvasFunction: this.canvasFunction
                     })
                 })
-                this.props.map.addLayer(canv_lay)
+                // this.props.map.addLayer(canv_lay)
+                let map_layers = this.props.map.getLayers()
+                map_layers.insertAt(2, canv_lay)
             }
             this.props.updateCountriesData(country_names, ocean_names, continent_names)
 
@@ -264,20 +273,12 @@ class  ParticlesLayer extends React.Component {
     //     console.log("Done!....")
     //     return geoData
     // }
-
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
         // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
 
         this.canvasWidth = size[0]
         this.canvasHeight = size[1]
         this.draw_until_day = true; // Used to redraw all the positions until current time
-
-        this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
-        if (this.d3canvas.empty()) {
-            // console.log("Initializing canvas")
-            this.d3canvas = d3.select(document.createElement("canvas"))
-                .attr("id", "particle_canvas")
-        }
 
         this.d3canvas.attr('width', this.canvasWidth).attr('height', this.canvasHeight)
         let ctx = this.d3canvas.node().getContext('2d')
@@ -313,7 +314,7 @@ class  ParticlesLayer extends React.Component {
         return this.d3canvas.node()
     }
 
-    clearInterval() {
+    clearPreviousLoop() {
         if (!_.isUndefined(this.interval)) {
             clearInterval(this.interval)
         }
@@ -323,7 +324,7 @@ class  ParticlesLayer extends React.Component {
      * Updates the animation with the current frame rate
      */
     updateAnimation() {
-        this.clearInterval()
+        this.clearPreviousLoop()
         // Verify the update was caused by the parent component and we have updated
         // the file to read.
         if (this.state.selected_model !== this.props.selected_model) {
@@ -349,7 +350,7 @@ class  ParticlesLayer extends React.Component {
             }
         } else {
             if (this.state.status === STATUS.playing) {
-                this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000)
+                this.interval = setTimeout(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000)
             }
             if (this.state.status === STATUS.paused) {
                 this.drawNextDay()
@@ -391,12 +392,12 @@ class  ParticlesLayer extends React.Component {
                 // Clear the canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
             } else {
-                // Make previous frame transparent
-                var prev = ctx.globalCompositeOperation
-                ctx.globalCompositeOperation = "destination-out"
+                // Make previous frame a little bit transparent
+                // var prev = ctx.globalCompositeOperation
+                // ctx.globalCompositeOperation = "destination-out"
                 ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
                 ctx.fillRect(0, 0, canvas.width, canvas.height)
-                ctx.globalCompositeOperation = prev
+                // ctx.globalCompositeOperation = prev
                 ctx.fill()
             }
             // Draw next frame
@@ -460,6 +461,8 @@ class  ParticlesLayer extends React.Component {
                 let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
                 let tot_part = country_start["lat_lon"][0].length
                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+                let oldpos = [0, 0]
+                let newpos = [0, 0]
                 for (let part_id = 0; part_id < tot_part; part_id++) {
                     if (this.state.index_by_country[file_number]) {
                         let clon = country_start["lat_lon"][1][part_id][start_time]
@@ -467,8 +470,6 @@ class  ParticlesLayer extends React.Component {
                         let nlon = country_start["lat_lon"][1][part_id][start_time + 1]
                         let nlat = country_start["lat_lon"][0][part_id][start_time + 1]
 
-                        let oldpos = [0, 0]
-                        let newpos = [0, 0]
                         if ((clon !== 200) && (nlon !== 200)) {
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
                                 oldpos = this.geoToCanvas(clon, clat)
@@ -476,6 +477,7 @@ class  ParticlesLayer extends React.Component {
                                 ctx.moveTo(oldpos[0], oldpos[1])
                                 ctx.lineTo(newpos[0], newpos[1])
                             }
+                            // Draw the particles on the additional map on the east
                             if ((this.state.extent[2] >= 180)) {
                                 let tlon = clon + 360
                                 let tnlon = nlon + 360
@@ -486,6 +488,7 @@ class  ParticlesLayer extends React.Component {
                                     ctx.lineTo(newpos[0], newpos[1])
                                 }
                             }
+                            // Draw the particles on the additional map on the west
                             if ((this.state.extent[0] <= -180)) {
                                 let tlon = clon - 360
                                 let tnlon = nlon - 360
