@@ -17,10 +17,10 @@ import {Bullseye, SkipForwardFill} from "react-bootstrap-icons";
 import img_map_osm from "./imgs/osm.jpg";
 import DropdownItem from "react-bootstrap/DropdownItem";
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const wms_url = "http://localhost:8080/ncWMS2/wms"
+const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
@@ -130,7 +130,7 @@ let data_files = []
 let num_files = [18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
 let min_pal = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-for(let i=3; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
+for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
         id: i,
         file: `4/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
