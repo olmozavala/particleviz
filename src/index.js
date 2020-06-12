@@ -10,11 +10,11 @@ import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
 import "bootstrap/dist/css/bootstrap.min.css"
 import TileWMS from "ol/source/TileWMS";
-import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Style} from "ol/style";
 import GeoJSON from "ol/format/GeoJSON";
 import OSM from "ol/source/OSM";
+import VectorLayer from "ol/layer/Vector";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -30,19 +30,6 @@ let background_layer = new TileLayer({ source: new OSM() });
 
 // let ip_address = 'http://146.201.212.214'
 let ip_address = 'http://ozavala.coaps.fsu.edu/'
-
-
-let states_layer = new VectorLayer({
-    source: new VectorSource({
-        url:`${ip_address}/data/countries.json`,
-        format: new GeoJSON()
-    }),
-    //The style is defined on 'StatesLayer.js'
-    style: function (feature) {
-        return new Style({});
-    }
-});
-
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
@@ -68,7 +55,7 @@ let map_view = new View({
     })
 let map = new Map({
     layers: [
-        background_layer, states_layer
+        background_layer
     ],
     target: 'map',
     view: map_view

@@ -21,8 +21,10 @@ class  StatesLayer extends React.Component{
         super(props);
         let states_layer = new VectorLayer({
             source: new VectorSource({
-                url: `${this.props.url}/countries.json`,
-                format: new GeoJSON( {layers:['countries'] }),
+                // url: `${this.props.url}/countries.json`,
+                // format: new GeoJSON( {layers:['countries'] }),
+                url: `${this.props.url}/countries.geojson`,
+                format: new GeoJSON(),
                 overlaps: false
             }),
             style: this.setCountriesStyle.bind(this)

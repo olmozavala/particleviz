@@ -1,24 +1,21 @@
 import React from 'react'
 import './css/App.css'
-import coaps_logo from "./imgs/coaps_logo.png";
+import coaps_logo from "./imgs/coaps_logo.png"
 import un_logo from "./imgs/un_PNG20.png"
 import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
 import BackgroundLayerManager from "./BackgroundLayerManager"
 import Dropdown from "react-bootstrap/Dropdown"
 import * as d3 from "d3"
-import _ from "underscore";
+import _ from "underscore"
 
 import TileWMS from "ol/source/TileWMS"
-import TileLayer from "ol/layer/Tile";
-import {easeIn} from "ol/easing";
-import $ from "jquery";
-import {Bullseye, SkipForwardFill} from "react-bootstrap-icons";
-import img_map_osm from "./imgs/osm.jpg";
-import DropdownItem from "react-bootstrap/DropdownItem";
+import TileLayer from "ol/layer/Tile"
+import $ from "jquery"
+import {Bullseye, SkipForwardFill} from "react-bootstrap-icons"
 
-// const data_folder_url = "http://localhost/data"
-const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+const data_folder_url = "http://localhost/data"
+// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -76,7 +73,8 @@ const CONTINENTS = {
         // colors:["#b76935", "#143642"],
         // colors:["#fefcfb","#0a1128"],
         // colors:["#fefcfb", "#0466c8"],
-        colors:["#fefcfb", "#b3b128"],
+        // colors:["#fefcfb", "#b3b128"],
+        colors:["#9fc5e7", "#0833ac"],
         min_max: [1, 2300000]},
     south_america: {name:'south america',
         colors:["#57EBDE", "#0B2C24"],
@@ -107,32 +105,89 @@ const months = [
     'January', 'February', 'March', 'April', 'May',
     'June', 'July', 'August', 'September',
     'October', 'November', 'December'
-];
+]
 
 let def_max_pal_value = 30000000
-// let data_files = [
-//     {
-//         id: 1,
-//         file: "1/TESTUN_output",
-//         title: "TEST",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:"x-Sst",
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 1,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     }
-// ]
-let data_files = []
-let num_files = [18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
-let min_pal = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+let data_files = [
+    {
+        id: 1,
+        // file: "1/TESTUN_output",
+        file: "1/TESTUN_NewUnbeaching_output",
+        title: "TEST",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:"x-Sst",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 1,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 2,
+        file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
+        title: "OneYear_Currents_And_Diffusion",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:"x-Sst",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 3,
+        file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
+        title: "OneYear_Currents_Winds_Diffusion",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:"x-Sst",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 4,
+        file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
+        title: "OneYear_Only_Currents",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:"x-Sst",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 5,
+        file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
+        title: "OneYear_Currents_And_Wind",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:"x-Sst",
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+]
+// let data_files = []
+let num_files = [19, 18, 18, 18, 18, 17, 17, 17, 16, 16, 16, 15]
+let min_pal = new Array(12).fill(1)
 
 for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
-        id: i,
+        id: i+10,
         file: `4/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
         wms: `histo_${i_str}/histo`,
         title: `${months[i-1]} 2010`,
@@ -160,11 +215,12 @@ class  ParticleVizManager extends React.Component{
         this.initCountries = this.initCountries.bind(this)
         this.getHistogramSource= this.getHistogramSource.bind(this)
         this.updatePaletteRange= this.updatePaletteRange.bind(this)
+        this.displayPalette = this.displayPalette.bind(this)
 
         let histogram_layer = new TileLayer({
             source: this.getHistogramSource(data_files[0].wms),
-            opacity:.8});
-        histogram_layer.setVisible(false);
+            opacity:.8})
+        histogram_layer.setVisible(false)
 
         // let colors_by_country = new Array().fill("#FFFFFF")
         this.state = {
@@ -209,7 +265,7 @@ class  ParticleVizManager extends React.Component{
     updateMapLocation(){
         this.props.map.setSize( [window.innerWidth, window.innerHeight])
         // let popup = document.getElementById('popup')
-        // $(popup).hide();
+        // $(popup).hide()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -310,28 +366,94 @@ class  ParticleVizManager extends React.Component{
 
     }
 
-    toogleHistogramLayer(){
-        let palette = document.getElementById("palette_img")
-        let palette_container = document.getElementById("wl-palette")
+    displayPalette(){
+        let palette_canvas = document.getElementById("canvas-palette-horbar")
+        let palette_container = document.getElementById("div-palette-horbar")
+
+        console.log(this.state.selected_model)
+
+        var barWidth = Math.ceil($(window).width()*.80)
+        var barHeight = 15
 
         let params_pal = {
             request: "GetLegendGraphic",
             height: parseInt(window.innerHeight* .4),
-            width:20,
+            width:barWidth,
+            heigth:15,
             numcolorbands:250,
             colorbaronly:true,
-            vertical:true,
+            vertical:false,
             palette:this.state.selected_model.style,
         }
+
         let url = `${wms_url}?${$.param(params_pal)}`
 
-        console.log(`Palette url: ${url}`)
+        //------ Modifying the size of the div container
+        $(palette_container).css("WIDTH",barWidth+"px")
+        $(palette_container).css("HEIGHT",barHeight+"px")
+
+        var imageObj = new Image()
+        imageObj.src = url
+		console.log(url)
+
+        var ctx = $(palette_canvas)[0].getContext("2d")
+        //------ Modifying the size of the canvas container
+        var spaceForUnits = 30;// Space between the black part for units and the rest
+        ctx.canvas.width = barWidth+spaceForUnits
+        ctx.canvas.height = barHeight
+
+        imageObj.onload = function(){
+            ctx.drawImage(imageObj,spaceForUnits,0)
+            ctx.globalAlpha = 1
+            $(palette_container).show()
+            ctx.fillStyle = '#FFFFFF'; //Define color to use
+            var pixBellowText = 3;// How many pixels bellow text
+            ctx.font= (barHeight-pixBellowText)+"px Arial"
+
+            //How many numbers do we want in the color bar
+            // It is not perfect because the ticks function modifies
+            // the size of the array depending its parameters
+            var totNumbers = 6
+            var minVal = this.state.selected_model.min_pal
+            var maxVal = this.state.selected_model.max_pal
+//			console.log("-----",minVal,"-",maxVal)
+//			var values = d3.ticks(minVal,maxVal,totNumbers)
+//
+            //This scale is used to obtain the numbers
+            // that are written above the color palette
+            var logScaleValues = d3.scaleLog()
+                .domain([minVal, maxVal])
+                .range([0, 1])
+
+            //This scale is used to obtain the positions
+            // where we will writhe the numbers
+            var logScaleText = d3.scaleLog()
+                .domain([minVal, maxVal])
+                .range([20, barWidth-20])
+
+            // Obtains the numbers we will write in the color palette
+            var myNumbers = logScaleValues.ticks(totNumbers)
+
+            //Write the units first
+            ctx.fillText('Mt',2,Math.ceil(barHeight-pixBellowText))
+
+            //Write the rest of the numbers from the ticks and the positions
+            myNumbers.forEach(function(number){
+                //console.log(number)
+                //console.log(logScaleText(number))
+                // The -14 is just to move the letters in the middle
+                ctx.fillText(number,logScaleText(number)+spaceForUnits-14,Math.ceil(barHeight-pixBellowText))
+            })
+        }.bind(this)
+    }
+
+    toogleHistogramLayer(){
+        let palette_container = document.getElementById("div-palette-horbar")
         if(this.state.histogram_selected){
             $(palette_container).hide()
             this.state.histogram_layer.setVisible(false)
         }else{
-            $(palette).attr("src", url);
-            $(palette_container).show()
+            this.displayPalette()
             this.state.histogram_layer.setVisible(true)
         }
 
@@ -378,6 +500,13 @@ class  ParticleVizManager extends React.Component{
             selected_country: name,
         })
         this.updateColors()
+        // Hides the palette container
+        let palette_container = document.getElementById("div-palette-horbar")
+        $(palette_container).hide()
+        this.state.histogram_layer.setVisible(false)
+        this.setState({
+            histogram_selected: false
+        })
     }
 
     colorByOcean(ocean){

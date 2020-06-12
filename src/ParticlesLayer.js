@@ -16,7 +16,7 @@ import {
     SkipEndFill, SkipStartFill,
 } from 'react-bootstrap-icons'
 
-import {Form, ProgressBar} from "react-bootstrap"
+import {Form} from "react-bootstrap"
 
 import JSZip from "jszip"
 import {ButtonGroup} from "react-bootstrap"
@@ -115,7 +115,6 @@ class  ParticlesLayer extends React.Component {
         }
 
         // this.getFeatures = this.getFeatures.bind(this)
-        this.drawLitter = this.drawLitter.bind(this)
         // this.drawParticles = this.drawParticles.bind(this)
         this.drawLines = this.drawLines.bind(this)
         this.canvasFunction = this.canvasFunction.bind(this)
@@ -215,9 +214,9 @@ class  ParticlesLayer extends React.Component {
                         canvasFunction: this.canvasFunction
                     })
                 })
-                // this.props.map.addLayer(canv_lay)
-                let map_layers = this.props.map.getLayers()
-                map_layers.insertAt(2, canv_lay)
+                this.props.map.addLayer(canv_lay)
+                // let map_layers = this.props.map.getLayers()
+                // map_layers.insertAt(2, canv_lay)
             }
             this.props.updateCountriesData(country_names, ocean_names, continent_names)
 
@@ -396,15 +395,16 @@ class  ParticlesLayer extends React.Component {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
         } else {
             // Make previous frame a little bit transparent
-            // var prev = ctx.globalCompositeOperation
-            // ctx.globalCompositeOperation = "destination-out"
+            var prev = ctx.globalCompositeOperation
+            ctx.globalCompositeOperation = "destination-out"
             ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
             ctx.fillRect(0, 0, canvas.width, canvas.height)
-            // ctx.globalCompositeOperation = prev
+            ctx.globalCompositeOperation = prev
             ctx.fill()
         }
         // Draw next frame
-        this.drawLitter(ctx)
+        this.drawLines(ctx)
+        // this.drawParticles(ctx)
 
         if (this.state.status === STATUS.playing) {
             let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps[this.state.selected_model.id]
@@ -413,15 +413,6 @@ class  ParticlesLayer extends React.Component {
                 time_step: next_time_step
             })
         }
-    }
-
-    /**
-     * Draws the ocean litter, as particles or as lines
-     * @param ctx
-     */
-    drawLitter(ctx) {
-        this.drawLines(ctx)
-        // this.drawParticles(ctx)
     }
 
     /**
@@ -460,6 +451,7 @@ class  ParticlesLayer extends React.Component {
                 ctx.beginPath()
                 // Retreive all the information from the first available file
                 ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+                // ctx.strokeStyle = 'black'
                 let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
                 let tot_part = country_start["lat_lon"][0].length
                 // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )

@@ -47,7 +47,7 @@ class  MakePlot extends React.Component {
                 tooltip = `{y} tons from {label} ({perc}%)`
             }
             // let plot_height = Math.min(parseInt(window.innerHeight * .20), 200)
-            let plot_height = 200
+            let plot_height = 205
             const options = {
                 container: container,
                 animationEnabled: true,
