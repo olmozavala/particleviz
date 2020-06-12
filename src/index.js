@@ -9,24 +9,10 @@ import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
 import "bootstrap/dist/css/bootstrap.min.css"
-import TileWMS from "ol/source/TileWMS";
-import VectorSource from "ol/source/Vector";
-import {Style} from "ol/style";
-import GeoJSON from "ol/format/GeoJSON";
 import OSM from "ol/source/OSM";
-import VectorLayer from "ol/layer/Vector";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
-// let background_layer = new TileLayer({
-//     source: new TileWMS({
-//         url:'https://geonode.wfp.org/geoserver/wms',
-//         params: {
-//             'LAYERS':'geonode:wld_bnd_admin0_l_unmap_2019',
-//             'TILED':true
-//         }
-//     })
-// });
 
 // let ip_address = 'http://146.201.212.214'
 let ip_address = 'http://ozavala.coaps.fsu.edu/'

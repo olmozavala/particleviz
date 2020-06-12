@@ -99,7 +99,7 @@ class  MakePlot extends React.Component {
                 <div className="row justify-content-center">
                     {!_.isUndefined(stats_data['from']) ?
                         <div className="col-12 mt-1 text-center">
-                            <button className="d-inline float-right" type="button" className="close"
+                            <button className="d-inline float-right close" type="button"
                                     onClick={this.hidePlot}
                                     aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -114,7 +114,7 @@ class  MakePlot extends React.Component {
                         </div>
                         :
                         <div className="col-12 mt-1 text-center">
-                            <button className="d-inline float-right" type="button" className="close"
+                            <button className="d-inline float-right close" type="button"
                                     onClick={this.hidePlot}
                                     aria-label="Close">
                                 <span aria-hidden="true">&times;</span>

@@ -12,7 +12,7 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye, SkipForwardFill} from "react-bootstrap-icons"
+import {Bullseye} from "react-bootstrap-icons"
 
 const data_folder_url = "http://localhost/data"
 // const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
@@ -64,9 +64,10 @@ const OCEANS = {
 
 const CONTINENTS = {
     africa: {name:'africa',
-        // colors:["#fde74c","#E24E1B"],
+        colors:["#fde74c","#E24E1B"],
         // colors:["#edc4b3","#774936"],
-        colors:["#ffea47","#ff4b1f"],
+        // colors:["#e5f5f9","#2ca25f"],
+        // colors:["#f0f0f0","#636363"],
         min_max: [1, 130000]},
     asia: {name:'asia',
         // colors:["#F4D941", "#db1b1b"]},
@@ -74,14 +75,17 @@ const CONTINENTS = {
         // colors:["#fefcfb","#0a1128"],
         // colors:["#fefcfb", "#0466c8"],
         // colors:["#fefcfb", "#b3b128"],
-        colors:["#9fc5e7", "#0833ac"],
-        min_max: [1, 2300000]},
+        // colors:["#deebf7", "#3182bd"],
+        colors:["#92c1ed", "#07487b"],
+        // colors:["#d1eeea", "#2a5674"],
+        min_max: [1000, 2300000]},
     south_america: {name:'south america',
-        colors:["#57EBDE", "#0B2C24"],
-        min_max: [1, 1000000]},
+        colors:["#d3f2a3", "#074050"],
+        min_max: [1000, 1000000]},
     europe: {name:'europe',
         // colors:["#ABBDFF","#663177"]},
-        colors:["#ffdd55","#522888"],
+        // colors:["#e0ecf4","#522888"],
+        colors:["#f4d277","#5b2b7e"],
         min_max: [1, 50000]},
     oceania: {name:'oceania',
         colors:["#f0f3bd","#05668d"],
@@ -89,7 +93,9 @@ const CONTINENTS = {
     north_america: {name:'north america',
         // colors:["#45CDE9","#091970"],
         // colors:["#fefcfb","#0a1128"],
-        colors:["#ffc600","#710000"],
+        colors:["#fff7bc","#903933"],
+        // colors:["#fde0c5","#eb4a40"],
+        // colors:["#fef6b5","#e15383"],
         min_max: [1, 30000]},
     seven_seas: {name:'seven seas (open ocean)',
         colors:["#F6FFF8", "#6B9080"],
@@ -243,7 +249,6 @@ class  ParticleVizManager extends React.Component{
         let style= selected_model.style
         let min_val= selected_model.min_pal
         let max_val= selected_model.max_pal
-        console.log(selected_model)
         return new TileWMS({
             url:`${wms_url}`,
             params: {
@@ -278,7 +283,6 @@ class  ParticleVizManager extends React.Component{
         let max_pal_el = $(document.getElementById("max_pal_val"))
         let min_pal_el = $(document.getElementById("min_pal_val"))
         let tons_per_part = (32300 * 12)/ (6.4 * 10**6)
-        console.log("Aqui:", tons_per_part)
 
         max_pal_el.html(`${(this.state.selected_model.max_pal * tons_per_part / 10**6).toFixed(2)}x10 <sup>6</sup> Mt`)
         min_pal_el.html(`${parseInt(this.state.selected_model.min_pal * tons_per_part / 10**6)} Mt`)
@@ -491,13 +495,15 @@ class  ParticleVizManager extends React.Component{
 
     updateSelectedCountry(name){
         let current_country = this.state.selected_country
+        let countries = this.state.countries
         // Not sure in which cases the name comes empty but is not cached at StatesLayer
         // If the name is the same as before then we 'toogle it'
         if((current_country.localeCompare(name) === 0) && (name.length > 2)){
-            this.state.countries[name.toLowerCase()]['color'] = selected_color
+            countries[name.toLowerCase()]['color'] = selected_color
         }
         this.setState({
             selected_country: name,
+            countries: countries
         })
         this.updateColors()
         // Hides the palette container
@@ -551,14 +557,14 @@ class  ParticleVizManager extends React.Component{
     render(){
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">
+                <div>
                     <a className="navbar-brand" href="https://www.un.org/en/" >
-                        <img src={un_logo} className="rounded"  width="50px" height="50"/>
+                        <img src={un_logo} className="rounded"  width="50px" height="50" alt="United Nations"/>
                     </a>
                     <a className="navbar-brand" href="https://www.coaps.fsu.edu/" >
-                        <img src={coaps_logo} className="rounded" width="40px" height="40"/>
+                        <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
                     </a>
-                </a>
+                </div>
                 <button className="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
                         aria-label="Toggle navigation">
@@ -566,7 +572,7 @@ class  ParticleVizManager extends React.Component{
                 </button>
                 <div className="navbar-nav" id="loading">
                     <div className="spinner-border" role="status"> </div>
-                    <a id="load-perc" className="navbar-brand m-2" ></a>
+                    <div id="load-perc" className="navbar-brand m-2" ></div>
                 </div>
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">

@@ -36,7 +36,6 @@ class  StatesLayer extends React.Component{
                 this.reached_data = data;
                 let country_names = []
                 let country_tons = []
-                console.log(data)
                 for(let key of Object.keys(data)) {
                     if (!_.isUndefined(data[key]['from'])) {
                         country_tons.push(parseInt(data[key]['from']['tot_tons']))

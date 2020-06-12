@@ -60,7 +60,7 @@ const MODES={
     decrease:2
 }
 
-const DRAW_LAST_DAYS = 60
+// const DRAW_LAST_DAYS = 60
 const MAX_ANIMATION_SPEED = 45
 
 class  ParticlesLayer extends React.Component {
@@ -198,7 +198,7 @@ class  ParticlesLayer extends React.Component {
         current_data[model_id][filenum] = data
 
         // console.log("\t Total timesteps: ", this.state.total_timesteps)
-        if(filenum == 0) {
+        if(filenum === 0) {
             let country_names = this.country_keys.map((x) => x.toLowerCase())
             let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
             let continent_names = this.country_keys.map((x) => data[x]['continent'])
