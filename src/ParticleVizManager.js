@@ -113,7 +113,14 @@ const months = [
     'October', 'November', 'December'
 ]
 
-let def_max_pal_value = 30000000
+const def_style = "x-Sst"
+// const def_style = "x-Occam
+// const def_style = "seq-YlGnBu"
+// const def_style = "psu-viridis-inv"
+// const def_style = "div-Spectral-inv"
+// const def_style = "default-inv"
+// const def_style = "div-RdYlGn-inv"
+let def_max_pal_value = 3000000
 let data_files = [
     {
         id: 1,
@@ -122,7 +129,7 @@ let data_files = [
         title: "TEST",
         // style:"default-scalar/div-PRGn",
         // style:"div-PRGn",
-        style:"x-Sst",
+        style:def_style,
         wms: `histo_08/histo`,
         speed: "",
         start_date: new Date(2010, 0, 1),
@@ -136,7 +143,7 @@ let data_files = [
         title: "OneYear_Currents_And_Diffusion",
         // style:"default-scalar/div-PRGn",
         // style:"div-PRGn",
-        style:"x-Sst",
+        style:def_style,
         wms: `histo_08/histo`,
         speed: "",
         start_date: new Date(2010, 0, 1),
@@ -150,7 +157,7 @@ let data_files = [
         title: "OneYear_Currents_Winds_Diffusion",
         // style:"default-scalar/div-PRGn",
         // style:"div-PRGn",
-        style:"x-Sst",
+        style:def_style,
         wms: `histo_08/histo`,
         speed: "",
         start_date: new Date(2010, 0, 1),
@@ -164,7 +171,7 @@ let data_files = [
         title: "OneYear_Only_Currents",
         // style:"default-scalar/div-PRGn",
         // style:"div-PRGn",
-        style:"x-Sst",
+        style:def_style,
         wms: `histo_08/histo`,
         speed: "",
         start_date: new Date(2010, 0, 1),
@@ -178,7 +185,7 @@ let data_files = [
         title: "OneYear_Currents_And_Wind",
         // style:"default-scalar/div-PRGn",
         // style:"div-PRGn",
-        style:"x-Sst",
+        style:def_style,
         wms: `histo_08/histo`,
         speed: "",
         start_date: new Date(2010, 0, 1),
@@ -198,10 +205,11 @@ for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
         wms: `histo_${i_str}/histo`,
         title: `${months[i-1]} 2010`,
         speed: "",
-        style:"x-Sst",
+        style:def_style,
         start_date: new Date(2010, i-1, 1),
         num_files: num_files[i-1],
-        max_pal: parseInt(def_max_pal_value- (def_max_pal_value/(12*5))*i ),
+        // In each run we have more particles, so we need to change the maximum value on the palette
+        max_pal: parseInt(def_max_pal_value - (def_max_pal_value/(12*5))*i ),
         min_pal: min_pal[i]
     })
 }
@@ -220,7 +228,6 @@ class  ParticleVizManager extends React.Component{
         this.updateColors = this.updateColors.bind(this)
         this.initCountries = this.initCountries.bind(this)
         this.getHistogramSource= this.getHistogramSource.bind(this)
-        this.updatePaletteRange= this.updatePaletteRange.bind(this)
         this.displayPalette = this.displayPalette.bind(this)
 
         let histogram_layer = new TileLayer({
@@ -275,17 +282,7 @@ class  ParticleVizManager extends React.Component{
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.state.histogram_layer.setSource( this.getHistogramSource(this.state.selected_model))
-        this.updatePaletteRange()
         this.props.map.render()
-    }
-
-    updatePaletteRange(){
-        let max_pal_el = $(document.getElementById("max_pal_val"))
-        let min_pal_el = $(document.getElementById("min_pal_val"))
-        let tons_per_part = (32300 * 12)/ (6.4 * 10**6)
-
-        max_pal_el.html(`${(this.state.selected_model.max_pal * tons_per_part / 10**6).toFixed(2)}x10 <sup>6</sup> Mt`)
-        min_pal_el.html(`${parseInt(this.state.selected_model.min_pal * tons_per_part / 10**6)} Mt`)
     }
 
     initCountries(country_names){
@@ -417,11 +414,11 @@ class  ParticleVizManager extends React.Component{
             //How many numbers do we want in the color bar
             // It is not perfect because the ticks function modifies
             // the size of the array depending its parameters
-            var totNumbers = 6
+            var totNumbers = 5
+
+            let mt_per_part = (32300 * 12)/ (6.4 * 10**6)
             var minVal = this.state.selected_model.min_pal
-            var maxVal = this.state.selected_model.max_pal
-//			console.log("-----",minVal,"-",maxVal)
-//			var values = d3.ticks(minVal,maxVal,totNumbers)
+            var maxVal = parseInt(this.state.selected_model.max_pal * mt_per_part)
 //
             //This scale is used to obtain the numbers
             // that are written above the color palette
@@ -465,33 +462,6 @@ class  ParticleVizManager extends React.Component{
             histogram_selected: !this.state.histogram_selected,
         })
     }
-
-    // updateMinMax(layer){
-        // let params_minmax = {
-        //     request: "GetMetadata",
-        //     item: "minmax",
-        //     layers: layer,
-        //     version: "1.1.1",
-        //     srs: "EPSG:4326",
-        //     BBOX: "-180,-90,180,90",
-        //     width: 20,
-        //     height: 1
-        // }
-        // let url_minmax = `${wms_url}?${$.param(params_minmax)}`
-        // console.log(`Palette minmax: ${url_minmax}`)
-        // fetch(url_minmax)
-        //     .then(res => res.json())
-        //         .then(minmax_txt => {
-        //             let min_val = minmax_txt.min
-        //             let max_val = minmax_txt.max
-        //             $(document.getElementById("max_pal_val")).text(`${max_val} \n tons`)
-        //             $(document.getElementById("min_pal_val")).text(`${min_val} \n tons`)
-        //             this.setState({
-        //                 min_pal: min_val,
-        //                 max_val: max_val
-        //             })
-        //         })
-    // }
 
     updateSelectedCountry(name){
         let current_country = this.state.selected_country

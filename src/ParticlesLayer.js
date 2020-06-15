@@ -77,6 +77,7 @@ class  ParticlesLayer extends React.Component {
         this.d3canvas = d3.select("#particle_canvas")
         // https://github.com/d3/d3-time-format
         this.dateFormat = d3.timeFormat("%B %e, %Y ")
+        this.state = 0
 
         this.state = {
             time_step: 0,
