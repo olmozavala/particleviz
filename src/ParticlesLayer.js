@@ -60,27 +60,20 @@ const MODES={
     decrease:2
 }
 
-// const DRAW_LAST_DAYS = 60
+const DRAW_LAST_DAYS = 0
 const MAX_ANIMATION_SPEED = 45
 
 class  ParticlesLayer extends React.Component {
     constructor(props) {
+        console.log("CALLED")
         super(props)
 
         // Setting up d3 objects
-        this.d3Projection = d3.geoEquirectangular().scale(1).translate([0, 0]);//Corresponds to EPSG:4326
-        this.d3ProjectionEast = d3.geoEquirectangular().scale(1).translate([0, 0]);//Corresponds to EPSG:4326
-        this.d3ProjectionWest = d3.geoEquirectangular().scale(1).translate([0, 0]);//Corresponds to EPSG:4326
-        this.d3GeoGenerator = d3.geoPath().projection(this.d3Projection)
-        this.d3GeoGeneratorEast = d3.geoPath().projection(this.d3ProjectionEast)
-        this.d3GeoGeneratorWest = d3.geoPath().projection(this.d3ProjectionWest)
         this.d3canvas = d3.select("#particle_canvas")
         // https://github.com/d3/d3-time-format
         this.dateFormat = d3.timeFormat("%B %e, %Y ")
-        this.state = 0
-
+        this.time_step = 0
         this.state = {
-            time_step: 0,
             speed_hz: 10,
             transparency_index: 3,
             status: STATUS.loading,
@@ -99,12 +92,11 @@ class  ParticlesLayer extends React.Component {
         this.canvasWidth = 0
         this.canvasHeight = 0
         this.draw_until_day = true; // Used to redraw all the positions until current time
-
         // THis is repeated should go ina function
         for (let i = 0; i < this.props.selected_model.num_files; i++) {
             let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
             console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
-            d3.blob(url).then((blob) => this.readOneZip(blob, i))
+            d3.blob(url).then((blob) => this.readOneZip(blob, i, this.props.selected_model.file))
         }
 
         this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
@@ -124,6 +116,7 @@ class  ParticlesLayer extends React.Component {
         this.drawNextDay = this.drawNextDay.bind(this)
         this.increaseSpeed = this.increaseSpeed.bind(this)
         this.decreaseSpeed = this.decreaseSpeed.bind(this)
+        this.updateRange = this.updateRange.bind(this)
         this.increaseSize = this.increaseSize.bind(this)
         this.decreaseSize = this.decreaseSize.bind(this)
         this.updateAnimation = this.updateAnimation.bind(this)
@@ -141,104 +134,105 @@ class  ParticlesLayer extends React.Component {
         // this.updateAllData = this.updateAllData.bind(this)
     }
 
-    readTwoUnzippedFile(txtdata, filenum) {
-        // console.log(`Uncompressed file received, file number: ${filenum} ....`)
-        let data = JSON.parse(txtdata)
-        let th = 10
+    readTwoUnzippedFile(txtdata, filenum, name) {
+        // console.log(`ReadTwoUnzipped ${name} and ${this.props.selected_model.file}`)
+        if(name === this.props.selected_model.file) {
+            // console.log(`Uncompressed file received, file number: ${filenum} ....`)
+            let data = JSON.parse(txtdata)
+            let th = 10
 
-        // console.log("Reading final json data!!!!!!! ", data)
-        this.country_keys = Object.keys(data) // fixing those particles that 'jump' the map
-        let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length
-        let loc_index_by_country = {}
-        for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-            let this_country_idx = []
-            let cur_country = data[this.country_keys[cur_country_id]]
-            let tot_part = cur_country["lat_lon"][0].length
-            for (let part_id = 0; part_id < tot_part; part_id++) {
-                for (let c_time = 0; c_time < total_timesteps - 1; c_time++) {
-                    let lon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
-                    let nlon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time + 1]
+            // console.log("Reading final json data!!!!!!! ", data)
+            this.country_keys = Object.keys(data) // fixing those particles that 'jump' the map
+            let total_timesteps = data[this.country_keys[0]]["lat_lon"][0][0].length
+            let loc_index_by_country = {}
+            for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+                let this_country_idx = []
+                let cur_country = data[this.country_keys[cur_country_id]]
+                let tot_part = cur_country["lat_lon"][0].length
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    for (let c_time = 0; c_time < total_timesteps - 1; c_time++) {
+                        let lon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
+                        let nlon = data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time + 1]
 
-                    if ((lon !== 200) && (nlon !== 200)) {
-                        if (((lon > th) && (nlon < -th)) || ((lon < -th) && (nlon > th))) {
-                            // console.log(`This is added ${lon} and ${nlon} part ${part_id} time ${c_time}`)
-                            data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
+                        if ((lon !== 200) && (nlon !== 200)) {
+                            if (((lon > th) && (nlon < -th)) || ((lon < -th) && (nlon > th))) {
+                                // console.log(`This is added ${lon} and ${nlon} part ${part_id} time ${c_time}`)
+                                data[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = 200
+                            }
                         }
                     }
+                    loc_index_by_country[cur_country_id] = this_country_idx
                 }
-                loc_index_by_country[cur_country_id] = this_country_idx
             }
-        }
 
-        let global_index_by_country = this.state.index_by_country
-        global_index_by_country[filenum] = loc_index_by_country
-        // console.log("Global index by country: ", global_index_by_country)
-        let cur_state = this.state.status
+            let global_index_by_country = this.state.index_by_country
+            global_index_by_country[filenum] = loc_index_by_country
+            // console.log("Global index by country: ", global_index_by_country)
+            let cur_state = this.state.status
 
-        // Update the progress bar
-        if (this.state.loaded_files >= (this.state.selected_model.num_files - 3)) {
-            // console.log("Done reading and uncompressing all the files!!!!")
-            // console.log(this.state.total_timesteps + total_timesteps)
-            cur_state = STATUS.playing
-            // cur_state = STATUS.paused
-        }
+            // Update the progress bar
+            if (this.state.loaded_files >= (this.state.selected_model.num_files - 1)) {
+                // console.log("Done reading and uncompressing all the files!!!!")
+                // console.log(this.state.total_timesteps + total_timesteps)
+                cur_state = STATUS.playing
+                // cur_state = STATUS.paused
+            }
 
-        let model_id = this.state.selected_model.id
+            let model_id = this.state.selected_model.id
 
-        let current_data = this.state.data
-        // Verify we have already read at least one file for this model
-        let model_timesteps = this.state.total_timesteps
-        // console.log("Model time steps:", this.state.total_timesteps)
-        if(_.isUndefined(current_data[model_id])){
-            current_data[model_id] = {}
-            model_timesteps[model_id] = {}
-            model_timesteps[model_id] = total_timesteps
-        }else{
-            model_timesteps[model_id] += total_timesteps
-        }
-        current_data[model_id][filenum] = data
+            let current_data = this.state.data
+            // Verify we have already read at least one file for this model
+            let model_timesteps = this.state.total_timesteps
+            // console.log("Model time steps:", this.state.total_timesteps)
+            if(_.isUndefined(current_data[model_id])){
+                current_data[model_id] = {}
+                model_timesteps[model_id] = {}
+                model_timesteps[model_id] = total_timesteps
+            }else{
+                model_timesteps[model_id] += total_timesteps
+            }
+            current_data[model_id][filenum] = data
 
-        // console.log("\t Total timesteps: ", this.state.total_timesteps)
-        if(filenum === 0) {
-            let country_names = this.country_keys.map((x) => x.toLowerCase())
-            let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
-            let continent_names = this.country_keys.map((x) => data[x]['continent'])
+            // console.log("\t Total timesteps: ", this.state.total_timesteps)
+            if(filenum === 0) {
+                let country_names = this.country_keys.map((x) => x.toLowerCase())
+                let ocean_names = this.country_keys.map((x) => data[x]['oceans'])
+                let continent_names = this.country_keys.map((x) => data[x]['continent'])
 
-            // console.log("\t Countries names: ", country_names)
-            // console.log("\t Ocean names: ", ocean_names)
-            // console.log("\t Continent names: ", continent_names)
-
-            let canv_lay = null
-            if (this.state.canvas_layer === -1) {
-                let canv_lay = new ImageLayer({
-                    source: new ImageCanvasSource({
-                        canvasFunction: this.canvasFunction
+                // console.log("\t Countries names: ", country_names)
+                // console.log("\t Ocean names: ", ocean_names)
+                // console.log("\t Continent names: ", continent_names)
+                let canv_lay = null
+                if (this.state.canvas_layer === -1) {
+                    let canv_lay = new ImageLayer({
+                        source: new ImageCanvasSource({
+                            canvasFunction: this.canvasFunction
+                        })
                     })
+                    this.props.map.addLayer(canv_lay)
+                    // let map_layers = this.props.map.getLayers()
+                    // map_layers.insertAt(2, canv_lay)
+                }
+                this.props.updateCountriesData(country_names, ocean_names, continent_names)
+                this.setState({
+                    canvas_layer: canv_lay,
+                    data: {...current_data},
+                    loaded_files: this.state.loaded_files + 1,
+                    total_timesteps: {...model_timesteps},
+                    status: cur_state,
+                    index_by_country: global_index_by_country
                 })
-                this.props.map.addLayer(canv_lay)
-                // let map_layers = this.props.map.getLayers()
-                // map_layers.insertAt(2, canv_lay)
+            }else{
+                // console.log(`Loaded files:  ${this.state.loaded_files + 1}`)
+                this.setState({
+                    data: {...current_data},
+                    loaded_files: this.state.loaded_files + 1,
+                    total_timesteps: {...model_timesteps},
+                    status: cur_state,
+                    index_by_country: global_index_by_country
+                })
             }
-            this.props.updateCountriesData(country_names, ocean_names, continent_names)
-
-            // console.log("Model time steps:", model_timesteps)
-            this.setState({
-                canvas_layer: canv_lay,
-                data: {...current_data},
-                loaded_files: this.state.loaded_files + 1,
-                total_timesteps: {...model_timesteps},
-                status: cur_state,
-                index_by_country: global_index_by_country
-            })
-        }else{
             console.log("Model time steps:", model_timesteps)
-            this.setState({
-                data: {...current_data},
-                loaded_files: this.state.loaded_files + 1,
-                total_timesteps: {...model_timesteps},
-                status: cur_state,
-                index_by_country: global_index_by_country
-            })
         }
         // console.log("Done reading!")
     }
@@ -274,15 +268,15 @@ class  ParticlesLayer extends React.Component {
     //     return geoData
     // }
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
-        // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
+        console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
 
         this.canvasWidth = size[0]
         this.canvasHeight = size[1]
         this.draw_until_day = true; // Used to redraw all the positions until current time
 
         this.d3canvas.attr('width', this.canvasWidth).attr('height', this.canvasHeight)
-        let ctx = this.d3canvas.node().getContext('2d')
-        ctx.lineCap = 'round'; // butt, round, square
+        this.ctx = this.d3canvas.node().getContext('2d')
+        this.ctx.lineCap = 'round'; // butt, round, square
 
         this.show_west_map = false
         this.show_east_map = false
@@ -298,7 +292,7 @@ class  ParticlesLayer extends React.Component {
         if (!_.isUndefined(this.state.data)) {
             let domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
             let new_status = this.state.status
-            if ((this.state.status === STATUS.decompressing) && (this.state.loaded_files >= this.state.selected_model.num_files)) {
+            if ((this.state.status === STATUS.decompressing) && (this.state.loaded_files >= this.state.selected_model.num_files - 1)) {
                 new_status = STATUS.playing
             }
 
@@ -329,8 +323,8 @@ class  ParticlesLayer extends React.Component {
         // the file to read.
         if (this.state.selected_model !== this.props.selected_model) {
             if(_.isUndefined(this.state.data[this.props.selected_model.id])){
+                this.time_step= 0
                 this.setState({
-                    time_step: 0,
                     loaded_files: 0,
                     selected_model: this.props.selected_model,
                     status: STATUS.loading,
@@ -338,12 +332,12 @@ class  ParticlesLayer extends React.Component {
                 for (let i = 0; i < this.props.selected_model.num_files; i++) {
                     let url = `${this.props.url}/${this.props.selected_model.file}_${i < 10 ? '0' + i : i}.zip`
                     console.log(`Num of files ${this.props.selected_model.num_files}, reading ${url}`)
-                    d3.blob(url).then((blob) => this.readOneZip(blob, i))
+                    d3.blob(url).then((blob) => this.readOneZip(blob, i, this.props.selected_model.file))
                 }
             }else{
                 // console.log("Filas has been loaded previously")
+                this.time_step= 0
                 this.setState({
-                    time_step: 0,
                     selected_model: this.props.selected_model,
                     cur_state: STATUS.playing
                 })
@@ -352,7 +346,7 @@ class  ParticlesLayer extends React.Component {
             let canvas = this.d3canvas.node()
             if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
-                        this.interval = setTimeout(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
+                        this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
                     }
             }
             if (this.state.status === STATUS.paused) {
@@ -367,52 +361,59 @@ class  ParticlesLayer extends React.Component {
      * Reads a zip file and dispatches the correct function after unziping
      * @param blob
      */
-    readOneZip(blob, filenum) {
+    readOneZip(blob, filenum, name) {
         // console.log(`File has been received! file number ${filenum}`, blob)
-        let zip = new JSZip()
-        zip.loadAsync(blob)
-            .then(function (zip) {
-                // you now have every files contained in the loaded zip
-                // console.log(`Received zip for file number ${filenum}:`, zip)
-                for (let file in zip.files) {
-                    let zipobj = zip.files[file]
-                    return zipobj.async("string")
-                }
+        // console.log(`ReadOneZip ${name} and ${this.props.selected_model.file}`)
+        if(name === this.props.selected_model.file) {
+            let zip = new JSZip()
+            zip.loadAsync(blob)
+                .then(function (zip) {
+                    // you now have every files contained in the loaded zip
+                    // console.log(`Received zip for file number ${filenum}:`, zip)
+                    for (let file in zip.files) {
+                        let zipobj = zip.files[file]
+                        return zipobj.async("string")
+                    }
+                })
+                .then((txtdata) => this.readTwoUnzippedFile(txtdata, filenum, name))
+            this.setState({
+                status: STATUS.decompressing
             })
-            .then((txtdata) => this.readTwoUnzippedFile(txtdata, filenum))
-
-        this.setState({
-            status: STATUS.decompressing
-        })
+        }
     }
 
     /**
      * Draws a single day of litter using D3
      */
     drawNextDay(canvas) {
-        let ctx = canvas.getContext('2d')
-        if (this.state.time_step === 0) {
-            // Clear the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-        } else {
-            // Make previous frame a little bit transparent
-            var prev = ctx.globalCompositeOperation
-            ctx.globalCompositeOperation = "destination-out"
-            ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-            ctx.globalCompositeOperation = prev
-            ctx.fill()
-        }
-        // Draw next frame
-        this.drawLines(ctx)
-        // this.drawParticles(ctx)
 
-        if (this.state.status === STATUS.playing) {
-            let next_time_step = (this.state.time_step + 1) % this.state.total_timesteps[this.state.selected_model.id]
-            // console.log(`Setting the time: ${next_time_step}`)
-            this.setState({
-                time_step: next_time_step
-            })
+        this.displayCurrentDay()
+        let cur_date = this.time_step
+        let to_date = this.time_step
+        if(this.draw_until_day){
+            cur_date = this.time_step = Math.max(this.time_step - DRAW_LAST_DAYS, 1)
+            this.draw_until_day = false
+        }
+        for(; cur_date <= to_date; cur_date++){
+            if (cur_date === 0) {
+                // Clear the canvas
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+            } else {
+                // Make previous frame a little bit transparent
+                var prev = this.ctx.globalCompositeOperation
+                this.ctx.globalCompositeOperation = "destination-out"
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
+                this.ctx.fillRect(0, 0, canvas.width, canvas.height)
+                this.ctx.globalCompositeOperation = prev
+                this.ctx.fill()
+            }
+            // Draw next frame
+            this.drawLines(cur_date)
+            // this.drawParticles(this.ctx)
+        }// for
+
+        if( this.state.status === STATUS.playing) {
+            this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
         }
     }
 
@@ -420,11 +421,11 @@ class  ParticlesLayer extends React.Component {
      * Draws the particles for a single day. It iterates over different countries
      * @param ctx Context of the canvas object to use
      */
-    // drawParticles(ctx) {
+    // drawParticles(this.ctx) {
     //     let countries = this.getFeatures('points')
     //     for (let i = 0; i < countries.length; i++) {
-    //         ctx.beginPath()
-    //         ctx.fillStyle = this.props.colors_by_country[countries[i].country.toLowerCase()]
+    //         this.ctx.beginPath()
+    //         this.ctx.fillStyle = this.props.colors_by_country[countries[i].country.toLowerCase()]
     //         this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features})
     //         this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features})
     //         this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features})
@@ -434,43 +435,42 @@ class  ParticlesLayer extends React.Component {
     //         if(this.show_east_map) {
     //             this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features})
     //         }
-    //         ctx.fill()
-    //         ctx.closePath()
+    //         this.ctx.fill()
+    //         this.ctx.closePath()
     //     }
     //     this.props.map.render()
     // }
-
-    drawLines(ctx) {
-        ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
+    drawLines(cur_date) {
+        this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
-        let file_number = (Math.floor(this.state.time_step / 100)).toString()
-        let start_time = this.state.time_step % 100;
-        // console.log(`Drawing lines time step: ${start_time} file number: ${file_number}   (global ${this.state.time_step})`)
+        let file_number = (Math.floor(this.time_step / 100)).toString()
+        cur_date = cur_date % 100
+        // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
             for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-                ctx.beginPath()
+                this.ctx.beginPath()
                 // Retreive all the information from the first available file
-                ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
-                // ctx.strokeStyle = 'black'
+                this.ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+                // this.ctx.strokeStyle = 'black'
                 let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
                 let tot_part = country_start["lat_lon"][0].length
-                // console.log(`local global ${local_global_start_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+                // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
                 let oldpos = [0, 0]
                 let newpos = [0, 0]
                 for (let part_id = 0; part_id < tot_part; part_id++) {
                     if (this.state.index_by_country[file_number]) {
-                        let clon = country_start["lat_lon"][1][part_id][start_time]
-                        let clat = country_start["lat_lon"][0][part_id][start_time]
-                        let nlon = country_start["lat_lon"][1][part_id][start_time + 1]
-                        let nlat = country_start["lat_lon"][0][part_id][start_time + 1]
+                        let clon = country_start["lat_lon"][1][part_id][cur_date]
+                        let clat = country_start["lat_lon"][0][part_id][cur_date]
+                        let nlon = country_start["lat_lon"][1][part_id][cur_date + 1]
+                        let nlat = country_start["lat_lon"][0][part_id][cur_date + 1]
 
                         if ((clon !== 200) && (nlon !== 200)) {
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
                                 oldpos = this.geoToCanvas(clon, clat)
                                 newpos = this.geoToCanvas(nlon, nlat)
-                                ctx.moveTo(oldpos[0], oldpos[1])
-                                ctx.lineTo(newpos[0], newpos[1])
+                                this.ctx.moveTo(oldpos[0], oldpos[1])
+                                this.ctx.lineTo(newpos[0], newpos[1])
                             }
                             // Draw the particles on the additional map on the east
                             if ((this.state.extent[2] >= 180)) {
@@ -479,8 +479,8 @@ class  ParticlesLayer extends React.Component {
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
                                     oldpos = this.geoToCanvas(tlon, clat)
                                     newpos = this.geoToCanvas(tnlon, nlat)
-                                    ctx.moveTo(oldpos[0], oldpos[1])
-                                    ctx.lineTo(newpos[0], newpos[1])
+                                    this.ctx.moveTo(oldpos[0], oldpos[1])
+                                    this.ctx.lineTo(newpos[0], newpos[1])
                                 }
                             }
                             // Draw the particles on the additional map on the west
@@ -490,15 +490,15 @@ class  ParticlesLayer extends React.Component {
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
                                     oldpos = this.geoToCanvas(tlon, clat)
                                     newpos = this.geoToCanvas(tnlon, nlat)
-                                    ctx.moveTo(oldpos[0], oldpos[1])
-                                    ctx.lineTo(newpos[0], newpos[1])
+                                    this.ctx.moveTo(oldpos[0], oldpos[1])
+                                    this.ctx.lineTo(newpos[0], newpos[1])
                                 }
                             }
                         }
                     }
                 }
-                ctx.stroke()
-                ctx.closePath()
+                this.ctx.stroke()
+                this.ctx.closePath()
             }
             this.props.map.render()
         }
@@ -601,29 +601,40 @@ class  ParticlesLayer extends React.Component {
                 status: STATUS.playing
             })
         }
+        this.updateRange()
     }
 
     changeDayRange(e) {
         e.preventDefault()
-        this.draw_until_day = true
-        this.setState({time_step: parseInt(e.target.value)})
+        let cur_time_step = parseInt(e.target.value)
+        this.time_step = cur_time_step
         let canvas = this.d3canvas.node()
-        let ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.drawNextDay(this.d3canvas.node())
+        this.updateRange()
+    }
+
+    updateRange(){
+        this.setState({
+                time_step: this.time_step
+        })
     }
 
     nextDay(e) {
         e.preventDefault()
-        this.setState({time_step: Math.min(this.state.time_step + 1, this.state.total_timesteps[this.state.selected_model.id])})
+        this.time_step = Math.min(this.time_step + 1, this.state.total_timesteps[this.state.selected_model.id])
+        this.drawNextDay(this.d3canvas.node())
+        this.updateRange()
     }
 
     prevDay(e) {
         e.preventDefault()
         this.draw_until_day = true
-        this.setState({time_step: Math.max(this.state.time_step - 1, 1)})
+        this.time_step = Math.max(this.time_step - 1, 1)
         let canvas = this.d3canvas.node()
-        let ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.drawNextDay(this.d3canvas.node())
+        this.updateRange()
     }
 
     /**
@@ -701,17 +712,16 @@ class  ParticlesLayer extends React.Component {
     displayCurrentDay() {
         let start_date = this.state.selected_model.start_date
         let title = d3.select("#title")
-        let cur_date = new Date(start_date.getTime() + this.state.time_step * 24 * 3600000)
+        let cur_date = new Date(start_date.getTime() + this.time_step * 24 * 3600000)
         title.text(this.dateFormat(cur_date))
     }
 
     render() {
-        this.displayCurrentDay()
         let perc = 0
         let perctxt = ''
         let load = document.getElementById("loading")
         if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
-            perc = parseInt(100 * (this.state.loaded_files / (this.state.selected_model.num_files - 2)))
+            perc = parseInt(100 * (this.state.loaded_files / (this.state.selected_model.num_files - 1)))
             perctxt = `${perc} %`
             //VERY HARD CODED UGLY
             let load_perc = document.getElementById("load-perc")
@@ -760,12 +770,14 @@ class  ParticlesLayer extends React.Component {
                                 <Plus size={default_size}/>
                             </button>
                         </span>
-                        {/*---- Current day ------------*/}
+                        {/*---- Range Current day ------------*/}
                         <span className="navbar-brand col-md-2 d-none d-md-inline">
-                            <Form.Control type="range"
-                                          onChange={this.changeDayRange}
-                                          value={this.state.time_step}
-                                          min="0" max={this.state.total_timesteps[this.state.selected_model.id]} custom/>
+                                <Form.Control type="range"
+                                              onChange={this.changeDayRange}
+                                              value={this.time_step}
+                                              min="0" max={this.state.total_timesteps[this.state.selected_model.id]}
+                                              custom
+                                              disabled={this.state.status !== STATUS.paused}/>
                         </span>
                         {/*---- Play/Pause---------*/}
                         <span className="navbar-brand col-auto">

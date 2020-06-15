@@ -14,8 +14,8 @@ import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
 import {Bullseye} from "react-bootstrap-icons"
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -121,80 +121,80 @@ const def_style = "x-Sst"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
 let def_max_pal_value = 3000000
-let data_files = [
-    {
-        id: 1,
-        // file: "1/TESTUN_output",
-        file: "1/TESTUN_NewUnbeaching_output",
-        title: "TEST",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 1,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 2,
-        file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
-        title: "OneYear_Currents_And_Diffusion",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 3,
-        file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
-        title: "OneYear_Currents_Winds_Diffusion",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 4,
-        file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
-        title: "OneYear_Only_Currents",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 5,
-        file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
-        title: "OneYear_Currents_And_Wind",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-]
-// let data_files = []
+// let data_files = [
+//     {
+//         id: 1,
+//         // file: "1/TESTUN_output",
+//         file: "1/TESTUN_NewUnbeaching_output",
+//         title: "TEST",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 1,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 2,
+//         file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
+//         title: "OneYear_Currents_And_Diffusion",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 3,
+//         file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
+//         title: "OneYear_Currents_Winds_Diffusion",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 4,
+//         file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
+//         title: "OneYear_Only_Currents",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 5,
+//         file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
+//         title: "OneYear_Currents_And_Wind",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+// ]
+let data_files = []
 let num_files = [19, 18, 18, 18, 18, 17, 17, 17, 16, 16, 16, 15]
 let min_pal = new Array(12).fill(1)
 
