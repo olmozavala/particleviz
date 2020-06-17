@@ -11,7 +11,7 @@ import $ from 'jquery';
 import 'animate.css'
 import {
     ArrowRight, CircleFill, Plus, Dash,
-    PlayFill, PauseFill,
+    PlayFill, PauseFill, Slash, SquareFill,
     SkipBackwardFill, SkipForwardFill,
     SkipEndFill, SkipStartFill,
 } from 'react-bootstrap-icons'
@@ -60,6 +60,9 @@ const MODES={
     decrease:2
 }
 
+var newImageData
+var rAF
+
 const DRAW_LAST_DAYS = 0
 const MAX_ANIMATION_SPEED = 45
 
@@ -88,6 +91,7 @@ class  ParticlesLayer extends React.Component {
             ol_canvas_size: null,
             total_timesteps: {},
             index_by_country: {},
+            shape_type: true, // true for lines, false for dots
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -114,6 +118,7 @@ class  ParticlesLayer extends React.Component {
         this.getIconColorSize = this.getIconColorSize.bind(this)
         this.getIconColorSizeBoostrap = this.getIconColorSizeBoostrap.bind(this)
         this.drawNextDay = this.drawNextDay.bind(this)
+        this.changeShapeType = this.changeShapeType.bind(this)
         this.increaseSpeed = this.increaseSpeed.bind(this)
         this.decreaseSpeed = this.decreaseSpeed.bind(this)
         this.updateRange = this.updateRange.bind(this)
@@ -329,8 +334,9 @@ class  ParticlesLayer extends React.Component {
             let canvas = this.d3canvas.node()
             if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
-                        // this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
                         this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
+                        // rAF = requestAnimationFrame(() => this.drawNextDay(canvas))
+                        // this.drawNextDay(canvas)
                     }
             }
             if (this.state.status === STATUS.paused) {
@@ -392,12 +398,17 @@ class  ParticlesLayer extends React.Component {
                 this.ctx.fill()
             }
             // Draw next frame
-            this.drawLines(cur_date)
-            // this.drawParticles(this.ctx)
+            if(this.state.shape_type){
+                this.drawLines(cur_date)
+            }else {
+                this.drawParticles(cur_date)
+            }
         }// for
 
         if( this.state.status === STATUS.playing) {
             this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
+            // if (rAF) return;
+            // rAF = requestAnimationFrame(() => this.drawNextDay(canvas))
         }
     }
 
@@ -405,24 +416,90 @@ class  ParticlesLayer extends React.Component {
      * Draws the particles for a single day. It iterates over different countries
      * @param ctx Context of the canvas object to use
      */
-    // drawParticles(this.ctx) {
-    //     let countries = this.getFeatures('points')
-    //     for (let i = 0; i < countries.length; i++) {
-    //         this.ctx.beginPath()
-    //         this.ctx.fillStyle = this.props.colors_by_country[countries[i].country.toLowerCase()]
-    //         this.d3GeoGenerator({type: 'FeatureCollection', features: countries[i].features})
-    //         this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features})
-    //         this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features})
-    //         if(this.show_west_map) {
-    //             this.d3GeoGeneratorWest({type: 'FeatureCollection', features: countries[i].features})
+    drawParticles(cur_date) {
+        this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index] + 1
+        let model_id = this.state.selected_model.id
+        let available_files = Object.keys(this.state.data[model_id])
+        let file_number = (Math.floor(this.time_step / 100)).toString()
+        cur_date = cur_date % 100
+        // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
+        if (available_files.includes(file_number)) {
+            for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+                this.ctx.beginPath()
+                // Retreive all the information from the first available file
+                this.ctx.fillStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+                // this.ctx.strokeStyle = 'black'
+                let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
+                let tot_part = country_start["lat_lon"][0].length
+                // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+                let oldpos = [0, 0]
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    if (this.state.index_by_country[file_number]) {
+                        let clon = country_start["lat_lon"][1][part_id][cur_date]
+                        let clat = country_start["lat_lon"][0][part_id][cur_date]
+                        if (clon !== 200) {
+                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(clon, clat)
+                                this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                            }
+                            // Draw the particles on the additional map on the east
+                            if (this.show_east_map) {
+                                let tlon = clon + 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                                }
+                            }
+                            // Draw the particles on the additional map on the west
+                            if (this.show_west_map){
+                                let tlon = clon - 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                                }
+                            }
+                        }
+                    }
+                }
+                this.ctx.stroke()
+                this.ctx.closePath()
+            }
+        }
+        this.props.map.render()
+    }
+
+    // drawParticles(cur_date){
+    //     let canvas = this.d3canvas.node()
+    //     // this.ctx.globalCompositeOperation = "screen"
+    //     newImageData = this.ctx.createImageData(canvas.width, canvas.height)
+    //     let img_size = (canvas.width * canvas.height) * 4
+    //     let img_data = newImageData.data
+    //     let model_id = this.state.selected_model.id
+    //     let available_files = Object.keys(this.state.data[model_id])
+    //     let file_number = (Math.floor(this.time_step / 100)).toString()
+    //     cur_date = cur_date % 100
+    //     // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
+    //     if (available_files.includes(file_number)) {
+    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+    //             let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
+    //             let tot_part = country_start["lat_lon"][0].length
+    //             // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+    //             for (let part_id = 0; part_id < tot_part; part_id++) {
+    //                 if (this.state.index_by_country[file_number]) {
+    //                     let clon = country_start["lat_lon"][1][part_id][cur_date]
+    //                     let clat = country_start["lat_lon"][0][part_id][cur_date]
+    //                     let pos = this.geoToCanvas(clon, clat)
+    //                     let start_img_pos = parseInt((pos[1]*canvas.width + pos[0])*4 )
+    //                     img_data[start_img_pos] = 255
+    //                     img_data[start_img_pos + 1] = 0
+    //                     img_data[start_img_pos + 2] = 0
+    //                     img_data[start_img_pos + 3] = 255
+    //                 }
+    //             }
     //         }
-    //         if(this.show_east_map) {
-    //             this.d3GeoGeneratorEast({type: 'FeatureCollection', features: countries[i].features})
-    //         }
-    //         this.ctx.fill()
-    //         this.ctx.closePath()
     //     }
-    //     this.props.map.render()
+    //     this.ctx.putImageData(newImageData, 0, 0)
+    //     this.ctx.stroke()
     // }
 
     drawLines(cur_date) {
@@ -485,8 +562,8 @@ class  ParticlesLayer extends React.Component {
                 this.ctx.stroke()
                 this.ctx.closePath()
             }
-            this.props.map.render()
         }
+        this.props.map.render()
     }
     componentDidMount() {
         this.updateAnimation()
@@ -593,6 +670,7 @@ class  ParticlesLayer extends React.Component {
         e.preventDefault()
         let cur_time_step = parseInt(e.target.value)
         this.time_step = cur_time_step
+        console.log(this.time_step)
         let canvas = this.d3canvas.node()
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
         this.drawNextDay(this.d3canvas.node())
@@ -701,6 +779,12 @@ class  ParticlesLayer extends React.Component {
         title.text(this.dateFormat(cur_date))
     }
 
+    changeShapeType(){
+        this.setState({
+            shape_type: !(this.state.shape_type)
+        })
+    }
+
     render() {
         let perc = 0
         let perctxt = ''
@@ -720,8 +804,9 @@ class  ParticlesLayer extends React.Component {
             return (
                 <span>
                     <div className="row m-1">
-                        {/*---- Transparency ---------*/}
                         <span className="navbar-brand col-auto">
+
+                            {/*---- Transparency ---------*/}
                             <span style={{display: "inline-block", width: "25px"}}>
                                 <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
                             </span>
@@ -730,15 +815,14 @@ class  ParticlesLayer extends React.Component {
                                     disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
                                     <Dash size={default_size}/>
                             </button>
-                            {" "}
-                            <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                                    title="Increase litter trail"
-                                    disabled={this.state.transparency_index === 1}>
+                                                    {" "}
+                                                    <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                                                            title="Increase litter trail"
+                                                            disabled={this.state.transparency_index === 1}>
                                     <Plus size={default_size}/>
                             </button>
-                        </span>
-                        {/*---- Particle size ---------*/}
-                        <span className="navbar-brand col-auto">
+                            {" "}
+                            {/*---- Particle size ---------*/}
                             <span style={{display: "inline-block", width: "25px"}}>
                                 <CircleFill
                                     size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
@@ -754,13 +838,23 @@ class  ParticlesLayer extends React.Component {
                                     disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
                                 <Plus size={default_size}/>
                             </button>
-                        </span>
+                            {" "}
+                            {/*---- Shape selection---------*/}
+                            <button className={`btn btn-sm ${this.state.histogram_selected?' btn-outline-info':' btn-info'} d-none d-lg-inline`} onClick={this.changeShapeType}
+                                    title="Shape selection">
+                                {this.state.shape_type?
+                                    <Slash size={default_size}/>
+                                    :
+                                    <SquareFill size={default_size}/>
+                                }
+                            </button>
                         {/*---- Range Current day ------------*/}
-                        <span className="navbar-brand col-md-2 d-none d-md-inline">
+                        </span>
+                        <span className="navbar-brand d-none d-lg-inline range-ml">
                                 <Form.Control type="range"
                                               onChange={this.changeDayRange}
                                               value={this.time_step}
-                                              min="0" max={this.state.total_timesteps[this.state.selected_model.id]}
+                                              min="0" max={this.state.total_timesteps[this.state.selected_model.id] - 2}
                                               custom
                                               disabled={this.state.status !== STATUS.paused}/>
                         </span>

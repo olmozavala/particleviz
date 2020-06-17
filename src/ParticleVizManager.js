@@ -121,81 +121,82 @@ const def_style = "x-Sst"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
 let def_max_pal_value = 3000000
-// let data_files = [
-//     {
-//         id: 1,
-//         // file: "1/TESTUN_output",
-//         file: "1/TESTUN_NewUnbeaching_output",
-//         title: "TEST",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 1,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 2,
-//         file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
-//         title: "OneYear_Currents_And_Diffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 3,
-//         file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
-//         title: "OneYear_Currents_Winds_Diffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 4,
-//         file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
-//         title: "OneYear_Only_Currents",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 5,
-//         file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
-//         title: "OneYear_Currents_And_Wind",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-// ]
-let data_files = []
-let num_files = [19, 18, 18, 18, 18, 17, 17, 17, 16, 16, 16, 15]
+let data_files = [
+    {
+        id: 1,
+        // file: "1/TESTUN_output",
+        file: "1/TESTUN_NewUnbeaching_output",
+        title: "TEST",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:def_style,
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 1,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 2,
+        file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
+        title: "OneYear_Currents_And_Diffusion",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:def_style,
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 3,
+        file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
+        title: "OneYear_Currents_Winds_Diffusion",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:def_style,
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 4,
+        file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
+        title: "OneYear_Only_Currents",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:def_style,
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+    {
+        id: 5,
+        file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
+        title: "OneYear_Currents_And_Wind",
+        // style:"default-scalar/div-PRGn",
+        // style:"div-PRGn",
+        style:def_style,
+        wms: `histo_08/histo`,
+        speed: "",
+        start_date: new Date(2010, 0, 1),
+        num_files: 4,
+        max_pal: def_max_pal_value,
+        min_pal: 17,
+    },
+]
+// let data_files = []
+// let num_files = [19, 18, 18, 18, 18, 17, 17, 17, 16, 16, 16, 15]
+let num_files = [10, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8]
 let min_pal = new Array(12).fill(1)
 
 for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
@@ -296,8 +297,7 @@ class  ParticleVizManager extends React.Component{
                 countries[country_names[i]] = {
                     tons: 0,
                     color: "#FFFFFF",
-                    ocean: [],
-                    continent: ""
+                    ocean: [], continent: ""
                 }
             }
         }
@@ -526,7 +526,8 @@ class  ParticleVizManager extends React.Component{
 
     render(){
         return (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav className="navbar navbar-expand-md navbar-light bg-light">
+                {/*------------ Logos ------------------*/}
                 <div>
                     <a className="navbar-brand" href="https://www.un.org/en/" >
                         <img src={un_logo} className="rounded"  width="50px" height="50" alt="United Nations"/>
@@ -535,49 +536,57 @@ class  ParticleVizManager extends React.Component{
                         <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
                     </a>
                 </div>
+                {/*------------ Grouped icons ------------------*/}
                 <button className="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
+                {/*------------ Spinner ------------------*/}
                 <div className="navbar-nav" id="loading">
                     <div className="spinner-border" role="status"> </div>
                     <div id="load-perc" className="navbar-brand m-2" ></div>
                 </div>
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
+                        {/* ---------- Particles menu ------------*/}
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesData}
                                         url={data_folder_url}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
-                        <Dropdown className="m-2"  title="Release month">
-                            <Dropdown.Toggle variant="info">
-                                {this.state.selected_model.title} {this.state.selected_model.speed}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu onClick={this.changeFile}>
-                                {data_files.map((item,index) => (
-                                    <Dropdown.Item eventKey={item.name} key={index}>{item.title} {item.speed}</Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <div className="m-2">
-                                <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}  `}
-                                             onClick={this.toogleHistogramLayer}>
-                                    <Bullseye />
-                                </button>
-                        </div>
-                        <div className="m-2">
-                            <a title="Download Data"
-                                    className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}`}
-                               // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
-                                href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
-                                <Download />
-                            </a>
-                        </div>
-                        <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
+                        {/* ---------- Model selection ------------*/}
+                        <span className="m-1">
+                            <Dropdown className="m-2 d-inline"  title="Release month"  >
+                                <Dropdown.Toggle variant="info"  size="sm">
+                                    {this.state.selected_model.title} {this.state.selected_model.speed}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu onClick={this.changeFile} >
+                                    {data_files.map((item,index) => (
+                                        <Dropdown.Item eventKey={item.name} key={index}>{item.title} {item.speed}</Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            {/* ---------- Litter concentration ------------*/}
+                            <div className="m-2 d-inline">
+                                    <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
+                                                 onClick={this.toogleHistogramLayer}>
+                                        <Bullseye />
+                                    </button>
+                            </div>
+                            {/* ---------- Download data ------------*/}
+                            {/*<div className="m-2">*/}
+                            {/*    <a title="Download Data"*/}
+                            {/*            className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}`}*/}
+                            {/*       // href={`${data_folder_url}/World_litter_stats.tar.xz`}>*/}
+                            {/*        href={`${data_folder_url}/ReachedTablesData.tar.xz`}>*/}
+                            {/*        <Download />*/}
+                            {/*    </a>*/}
+                            {/*</div>*/}
+                            {/* ---------- Background selection ------------*/}
+                            <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
+                            </span>
                     </div>
-
                 </div>
                 <StatesLayer map={this.props.map}
                              url={data_folder_url}

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/index.css';
-import './css/App.css';
 import ParticleVizManager from './ParticleVizManager';
 import * as serviceWorker from './serviceWorker';
 
@@ -9,6 +8,7 @@ import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
 import "bootstrap/dist/css/bootstrap.min.css"
+import './css/App.css';
 import OSM from "ol/source/OSM";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
