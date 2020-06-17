@@ -246,29 +246,12 @@ class  ParticlesLayer extends React.Component {
     geoToCanvas(lon, lat) {
         let nlon = ((lon - this.state.extent[0]) / this.state.domain[0]) * this.state.ol_canvas_size[0]
         let nlat = this.state.ol_canvas_size[1] - (((lat - this.state.extent[1]) / this.state.domain[1]) * this.state.ol_canvas_size[1])
-        return [nlon, nlat]
+        return [parseInt(nlon), parseInt(nlat)]
     }
 
-    // updateAllData(extent, domain, size) {
-    //     console.log("Updating positions....")
-    //     let geoData = _.cloneDeep(this.state.data)
-    //     for (let c_time = 0; c_time < this.state.total_timesteps; c_time++) {
-    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-    //             let cur_country = geoData[this.country_keys[cur_country_id]]
-    //             let tot_part = cur_country["lat_lon"][0].length
-    //             for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                 let lon = geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time]
-    //                 let lat = geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time]
-    //                 geoData[this.country_keys[cur_country_id]]["lat_lon"][1][part_id][c_time] = ((lon - extent[0]) / domain[0]) * size[0]
-    //                 geoData[this.country_keys[cur_country_id]]["lat_lon"][0][part_id][c_time] = size[1] - (((lat - extent[1]) / domain[1]) * size[1])
-    //             }
-    //         }
-    //     }
-    //     console.log("Done!....")
-    //     return geoData
-    // }
+
     canvasFunction(extent, resolution, pixelRatio, size, projection) {
-        console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
+        // console.log(`Canvas Function Extent:${extent}, Res:${resolution}, Size:${size} projection:`, projection)
 
         this.canvasWidth = size[0]
         this.canvasHeight = size[1]
@@ -281,7 +264,7 @@ class  ParticlesLayer extends React.Component {
         this.show_west_map = false
         this.show_east_map = false
         if (extent[0] < -180) {
-            // console.log('Showing west map....')
+            console.log('Showing west map....')
             this.show_west_map = true
         }
         if (extent[2] > 180) {
@@ -346,6 +329,7 @@ class  ParticlesLayer extends React.Component {
             let canvas = this.d3canvas.node()
             if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
+                        // this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
                         this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
                     }
             }
@@ -440,6 +424,7 @@ class  ParticlesLayer extends React.Component {
     //     }
     //     this.props.map.render()
     // }
+
     drawLines(cur_date) {
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
         let model_id = this.state.selected_model.id
@@ -473,7 +458,7 @@ class  ParticlesLayer extends React.Component {
                                 this.ctx.lineTo(newpos[0], newpos[1])
                             }
                             // Draw the particles on the additional map on the east
-                            if ((this.state.extent[2] >= 180)) {
+                            if (this.show_east_map) {
                                 let tlon = clon + 360
                                 let tnlon = nlon + 360
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
@@ -484,7 +469,7 @@ class  ParticlesLayer extends React.Component {
                                 }
                             }
                             // Draw the particles on the additional map on the west
-                            if ((this.state.extent[0] <= -180)) {
+                            if (this.show_west_map){
                                 let tlon = clon - 360
                                 let tnlon = nlon - 360
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {

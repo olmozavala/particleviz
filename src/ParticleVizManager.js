@@ -12,10 +12,10 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye} from "react-bootstrap-icons"
+import {Bullseye, Download} from "react-bootstrap-icons"
 
-// const data_folder_url = "http://localhost/data"
-const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+const data_folder_url = "http://localhost/data"
+// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -566,7 +566,14 @@ class  ParticleVizManager extends React.Component{
                                              onClick={this.toogleHistogramLayer}>
                                     <Bullseye />
                                 </button>
-
+                        </div>
+                        <div className="m-2">
+                            <a title="Download Data"
+                                    className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}`}
+                               // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
+                                href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
+                                <Download />
+                            </a>
                         </div>
                         <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
                     </div>
