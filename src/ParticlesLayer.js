@@ -9,6 +9,7 @@ import ImageCanvasSource from "ol/source/ImageCanvas"
 import _ from "lodash"
 import $ from 'jquery';
 import 'animate.css'
+import { isMobile } from "react-device-detect";
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill,
@@ -38,13 +39,19 @@ const TRAIL_SIZE = {
     5: .4
 }
 
-const PARTICLE_SIZES= {
+
+let PARTICLE_SIZES= {
     1: .6,
     2: 1.4,
     3: 2,
     4: 4,
     5: 6,
 }
+// Double the size of particles when we are in mobile
+if(isMobile){
+    Object.keys(PARTICLE_SIZES).map(function(key, index) { PARTICLE_SIZES[key] *= 2 })
+}
+
 
 // const PARTICLE_SIZE_TXT = {
 //     1: 'Biggest ',

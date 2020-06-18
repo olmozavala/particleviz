@@ -8,19 +8,18 @@ import BackgroundLayerManager from "./BackgroundLayerManager"
 import Dropdown from "react-bootstrap/Dropdown"
 import * as d3 from "d3"
 import _ from "underscore";
+import { isMobile } from "react-device-detect";
 
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile";
-import {easeIn} from "ol/easing";
 import $ from "jquery";
 import {Bullseye, SkipForwardFill} from "react-bootstrap-icons";
 import img_map_osm from "./imgs/osm.jpg";
-import DropdownItem from "react-bootstrap/DropdownItem";
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const wms_url = "http://localhost:8080/ncWMS2/wms"
+const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
@@ -76,7 +75,7 @@ const CONTINENTS = {
         // colors:["#b76935", "#143642"],
         // colors:["#fefcfb","#0a1128"],
         // colors:["#fefcfb", "#0466c8"],
-        colors:["#fefcfb", "#b3b128"],
+        colors:["#fefcfb", "#03045e"],
         min_max: [1, 2300000]},
     south_america: {name:'south america',
         colors:["#57EBDE", "#0B2C24"],
@@ -130,10 +129,13 @@ let data_files = []
 let num_files = [18, 18, 18, 16, 17, 17, 16, 16, 16, 15]
 let min_pal = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
+let folder = 4
+if(isMobile){folder = 6}
+
 for(let i=3; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
         id: i,
-        file: `4/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
+        file: `${folder}/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
         wms: `histo_${i_str}/histo`,
         title: `${months[i-1]} 2010`,
         speed: "",
@@ -223,7 +225,6 @@ class  ParticleVizManager extends React.Component{
         let max_pal_el = $(document.getElementById("max_pal_val"))
         let min_pal_el = $(document.getElementById("min_pal_val"))
         let tons_per_part = (32300 * 12)/ (6.4 * 10**6)
-        console.log("Aqui:", tons_per_part)
 
         max_pal_el.html(`${(this.state.selected_model.max_pal * tons_per_part / 10**6).toFixed(2)}x10 <sup>6</sup> Mt`)
         min_pal_el.html(`${parseInt(this.state.selected_model.min_pal * tons_per_part / 10**6)} Mt`)
@@ -423,13 +424,11 @@ class  ParticleVizManager extends React.Component{
     render(){
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">
-                    <a className="navbar-brand" href="https://www.un.org/en/" >
-                        <img src={un_logo} className="rounded"  width="50px" height="50"/>
-                    </a>
-                    <a className="navbar-brand" href="https://www.coaps.fsu.edu/" >
-                        <img src={coaps_logo} className="rounded" width="40px" height="40"/>
-                    </a>
+                <a className="navbar-brand" href="https://www.un.org/en/" >
+                    <img src={un_logo} className="rounded"  width="50px" height="50"/>
+                </a>
+                <a className="navbar-brand" href="https://www.coaps.fsu.edu/" >
+                    <img src={coaps_logo} className="rounded" width="40px" height="40"/>
                 </a>
                 <button className="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
@@ -440,13 +439,16 @@ class  ParticleVizManager extends React.Component{
                     <div className="spinner-border" role="status"> </div>
                     <a id="load-perc" className="navbar-brand m-2" ></a>
                 </div>
-                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div className="collapse navbar-collapse" id="navbarNavAltMarkup" >
                     <div className="navbar-nav">
+                        {/*--------- All particles menus (trail size, particle size, animation controls)-----------*/}
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesData}
                                         url={data_folder_url}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
+
+                        {/*--------- Model file selection -----------*/}
                         <Dropdown className="m-2"  title="Release month">
                             <Dropdown.Toggle variant="info">
                                 {this.state.selected_model.title} {this.state.selected_model.speed}
@@ -457,16 +459,16 @@ class  ParticleVizManager extends React.Component{
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
-                        <div className="m-2">
-                                <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}  `}
-                                             onClick={this.toogleHistogramLayer}>
-                                    <Bullseye />
-                                </button>
 
+                        {/*--------- ncwms layer selection -----------*/}
+                        <div className="m-2" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
+                            <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}  `}
+                                    onClick={this.toogleHistogramLayer}>
+                                <Bullseye />
+                            </button>
                         </div>
                         <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
                     </div>
-
                 </div>
                 <StatesLayer map={this.props.map}
                              url={data_folder_url}
