@@ -9,7 +9,7 @@ import img_map_dark from "./imgs/dark.jpg";
 import img_map_stamen from "./imgs/stamen.jpg";
 import img_map_bingaer from "./imgs/bing_aer.jpg";
 import img_map_osm from "./imgs/osm.jpg";
-import img_map_un from "./imgs/un.jpg";
+// import img_map_un from "./imgs/un.jpg";
 import img_map_blank from "./imgs/blank.jpg";
 //https://geonode.wfp.org/layers/geonode%3Awld_bnd_admin0_l_unmap_2019
 import DropdownToggle from "react-bootstrap/DropdownToggle";
@@ -31,7 +31,6 @@ const BACKGROUND_MAPS = {
 class  BackgroundLayerManager extends React.Component{
     constructor(props){
         super(props);
-        console.log(`Constructor: Background layers`);
         this.state = {
             bk_layer: this.props.background_layer
         };
@@ -117,7 +116,7 @@ class  BackgroundLayerManager extends React.Component{
     render(){
         return (
             <span>
-                <Dropdown className="m-1" title="Switch background">
+                <Dropdown className="m-1 d-inline" title="Switch background">
                     <DropdownToggle variant="light">
                         <FontAwesomeIcon icon={faMap} size="lg"/>
                     </DropdownToggle>

@@ -21,8 +21,10 @@ class  StatesLayer extends React.Component{
         super(props);
         let states_layer = new VectorLayer({
             source: new VectorSource({
-                url: `${this.props.url}/countries.json`,
-                format: new GeoJSON( {layers:['countries'] }),
+                // url: `${this.props.url}/countries.json`,
+                // format: new GeoJSON( {layers:['countries'] }),
+                url: `${this.props.url}/countries.geojson`,
+                format: new GeoJSON(),
                 overlaps: false
             }),
             style: this.setCountriesStyle.bind(this)
@@ -34,7 +36,6 @@ class  StatesLayer extends React.Component{
                 this.reached_data = data;
                 let country_names = []
                 let country_tons = []
-                console.log(data)
                 for(let key of Object.keys(data)) {
                     if (!_.isUndefined(data[key]['from'])) {
                         country_tons.push(parseInt(data[key]['from']['tot_tons']))

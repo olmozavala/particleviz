@@ -5,6 +5,7 @@
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+      
     <meta
       name="description"
       content="Web site created using create-react-app"
@@ -31,10 +32,8 @@
   <body class="overflow-hidden" style="height: 100vh">
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="popup" class="wl_popup"></div>
-  <div id="wl-palette" class="wl_palette align-content-center rounded">
-      <p id="max_pal_val"></p>
-    <img id="palette_img" class="palette_img" src="">
-      <p id="min_pal_val"></p>
+  <div id="div-palette-horbar" class="wl-palette">
+    <canvas id="canvas-palette-horbar" class="wl-palette-canvas"></canvas>
   </div>
   <div id="root"></div>
   <div class="row p-0 m-0">
