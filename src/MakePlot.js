@@ -27,7 +27,7 @@ function showStatistics({country_data, country_name}, statsType='from'){
             container = 'chartContainerFrom'
             tooltip = `{y} tons to {label} ({perc}%)`
         }else{
-            title = `Waste towards ${country_name}.`
+            title = `Waste towards ${country_name}`
             label = `Tons towards ${country_name}`
             container = 'chartContainerTo'
             tooltip = `{y} tons from {label} ({perc}%)`

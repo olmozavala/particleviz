@@ -57,16 +57,24 @@
   margin-bottom: 10px;
 }
 
-
 @media(max-width: 768px){
+  #big-title{
+    display: none;
+  }
+}
+
+@media(max-width: 767px){
   .wl_popup{
-    height: 480px;
+    height: 447px;
   }
 }
 
 @media(min-width: 768px){
   .wl-title{
     top: 65px;
+  }
+  #big-title{
+    display: block;
   }
 }
 
@@ -94,5 +102,5 @@
 }
 
 .range-ml{
-  max-width: 80px;
+  max-width: 70px;
 }

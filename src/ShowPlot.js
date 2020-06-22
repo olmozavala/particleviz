@@ -37,11 +37,11 @@ class  ShowPlot extends React.Component {
             let label = ''
             let container = ''
             if(statsType === 'from'){
-                title = `Waste from ${this.props.country_name}.`
+                title = `Waste from ${this.props.country_name}`
                 label = `Tons from ${this.props.country_name}`
                 container = 'chartContainerFrom'
             }else{
-                title = `Waste towards ${this.props.country_name}.`
+                title = `Waste towards ${this.props.country_name}`
                 label = `Tons towards ${this.props.country_name}`
                 container = 'chartContainerTo'
             }

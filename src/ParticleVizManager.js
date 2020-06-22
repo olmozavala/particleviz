@@ -121,81 +121,80 @@ const def_style = "x-Sst"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
 let def_max_pal_value = 3000000
-let data_files = [
-    {
-        id: 1,
-        // file: "1/TESTUN_output",
-        file: "1/TESTUN_NewUnbeaching_output",
-        title: "TEST",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 1,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 2,
-        file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
-        title: "OneYear_Currents_And_Diffusion",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 3,
-        file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
-        title: "OneYear_Currents_Winds_Diffusion",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 4,
-        file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
-        title: "OneYear_Only_Currents",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-    {
-        id: 5,
-        file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
-        title: "OneYear_Currents_And_Wind",
-        // style:"default-scalar/div-PRGn",
-        // style:"div-PRGn",
-        style:def_style,
-        wms: `histo_08/histo`,
-        speed: "",
-        start_date: new Date(2010, 0, 1),
-        num_files: 4,
-        max_pal: def_max_pal_value,
-        min_pal: 17,
-    },
-]
-// let data_files = []
-// let num_files = [19, 18, 18, 18, 18, 17, 17, 17, 16, 16, 16, 15]
+// let data_files = [
+//     {
+//         id: 1,
+//         // file: "1/TESTUN_output",
+//         file: "1/TESTUN_NewUnbeaching_output",
+//         title: "TEST",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 1,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 2,
+//         file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
+//         title: "OneYear_Currents_And_Diffusion",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 3,
+//         file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
+//         title: "OneYear_Currents_Winds_Diffusion",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 4,
+//         file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
+//         title: "OneYear_Only_Currents",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+//     {
+//         id: 5,
+//         file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
+//         title: "OneYear_Currents_And_Wind",
+//         // style:"default-scalar/div-PRGn",
+//         // style:"div-PRGn",
+//         style:def_style,
+//         wms: `histo_08/histo`,
+//         speed: "",
+//         start_date: new Date(2010, 0, 1),
+//         num_files: 4,
+//         max_pal: def_max_pal_value,
+//         min_pal: 17,
+//     },
+// ]
+let data_files = []
 let num_files = [10, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8]
 let min_pal = new Array(12).fill(1)
 
@@ -273,13 +272,14 @@ class  ParticleVizManager extends React.Component{
 
     componentDidMount() {
         window.addEventListener("resize", this.updateMapLocation.bind(this))
-        $("#big-title").html("Worlds Ocean Litter")
     }
 
     updateMapLocation(){
         this.props.map.setSize( [window.innerWidth, window.innerHeight])
-        // let popup = document.getElementById('popup')
-        // $(popup).hide()
+        let palette_container = document.getElementById("div-palette-horbar")
+        if(this.state.histogram_selected){
+            this.displayPalette()
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -374,8 +374,8 @@ class  ParticleVizManager extends React.Component{
 
         console.log(this.state.selected_model)
 
-        var barWidth = Math.ceil($(window).width()*.80)
-        var barHeight = 15
+        let barWidth = Math.ceil($(window).width()*.80)
+        let barHeight = 15
 
         let params_pal = {
             request: "GetLegendGraphic",
@@ -394,13 +394,13 @@ class  ParticleVizManager extends React.Component{
         $(palette_container).css("WIDTH",barWidth+"px")
         $(palette_container).css("HEIGHT",barHeight+"px")
 
-        var imageObj = new Image()
+        let imageObj = new Image()
         imageObj.src = url
 		console.log(url)
 
-        var ctx = $(palette_canvas)[0].getContext("2d")
+        let ctx = $(palette_canvas)[0].getContext("2d")
         //------ Modifying the size of the canvas container
-        var spaceForUnits = 30;// Space between the black part for units and the rest
+        let spaceForUnits = 30;// Space between the black part for units and the rest
         ctx.canvas.width = barWidth+spaceForUnits
         ctx.canvas.height = barHeight
 
@@ -409,32 +409,41 @@ class  ParticleVizManager extends React.Component{
             ctx.globalAlpha = 1
             $(palette_container).show()
             ctx.fillStyle = '#FFFFFF'; //Define color to use
-            var pixBellowText = 3;// How many pixels bellow text
+            let pixBellowText = 3;// How many pixels bellow text
             ctx.font= (barHeight-pixBellowText)+"px Arial"
 
             //How many numbers do we want in the color bar
             // It is not perfect because the ticks function modifies
             // the size of the array depending its parameters
-            var totNumbers = 5
+            let totNumbersOrig = 5
+            let totNumbers = totNumbersOrig
 
-            let mt_per_part = (32300 * 12)/ (6.4 * 10**6)
-            var minVal = this.state.selected_model.min_pal
-            var maxVal = parseInt(this.state.selected_model.max_pal * mt_per_part)
-//
+            let mt_per_part = (32300 * 12) / (6.4 * 10 ** 6)
+            let minVal = this.state.selected_model.min_pal
+            let maxVal = parseInt(this.state.selected_model.max_pal * mt_per_part)
+            //
             //This scale is used to obtain the numbers
             // that are written above the color palette
-            var logScaleValues = d3.scaleLog()
+            let logScaleValues = d3.scaleLog()
                 .domain([minVal, maxVal])
                 .range([0, 1])
 
-            //This scale is used to obtain the positions
-            // where we will writhe the numbers
-            var logScaleText = d3.scaleLog()
-                .domain([minVal, maxVal])
-                .range([20, barWidth-20])
+            let logScaleText = new Array(totNumbers + 1)
+            let myNumbers = new Array()
+
+            do {
+                //This scale is used to obtain the positions
+                // where we will writhe the numbers
+                logScaleText = d3.scaleLog()
+                    .domain([minVal, maxVal])
+                    .range([20, barWidth - 20])
+
+                myNumbers = logScaleValues.ticks(totNumbers)
+                totNumbers -= 1
+            }
+            while(myNumbers.length > totNumbersOrig)
 
             // Obtains the numbers we will write in the color palette
-            var myNumbers = logScaleValues.ticks(totNumbers)
 
             //Write the units first
             ctx.fillText('Mt',2,Math.ceil(barHeight-pixBellowText))
@@ -569,16 +578,17 @@ class  ParticleVizManager extends React.Component{
                                 </Dropdown.Menu>
                             </Dropdown>
                             {/* ---------- Litter concentration ------------*/}
-                            <div className="m-2 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
-                                    <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
+                            <div className="m-1 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
+                                    <button title="Litter concentration"
+                                            className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
                                                  onClick={this.toogleHistogramLayer}>
                                         <Bullseye />
                                     </button>
                             </div>
                             {/* ---------- Download data ------------*/}
-                            <div className="m-2 d-inline">
+                            <div className="m-1 d-inline">
                                 <a title="Download Data"
-                                        className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
+                                        className="btn  btn-info btn-sm"
                                    // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
                                     href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
                                     <Download />

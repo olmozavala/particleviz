@@ -575,6 +575,7 @@ class  ParticlesLayer extends React.Component {
         this.props.map.render()
     }
     componentDidMount() {
+        $("#big-title").text("Worlds Ocean Litter")
         this.updateAnimation()
     }
 
@@ -849,7 +850,8 @@ class  ParticlesLayer extends React.Component {
                             </button>
                             {" "}
                             {/*---- Shape selection---------*/}
-                            <button className={`btn btn-sm ${this.state.histogram_selected?' btn-outline-info':' btn-info'} d-none d-lg-inline`} onClick={this.changeShapeType}
+                            <button className={`btn btn-sm ${this.state.histogram_selected?' btn-outline-info':' btn-info'} 
+                            d-md-none d-lg-inline `} onClick={this.changeShapeType}
                                     title="Shape selection">
                                 {this.state.shape_type?
                                     <Slash size={default_size}/>
@@ -861,6 +863,7 @@ class  ParticlesLayer extends React.Component {
                         </span>
                         <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml ">
                                 <Form.Control type="range"
+                                              title="Date selection"
                                               onChange={this.changeDayRange}
                                               value={this.time_step}
                                               min="0" max={this.state.total_timesteps[this.state.selected_model.id] - 2}
