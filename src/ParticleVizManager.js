@@ -8,11 +8,11 @@ import BackgroundLayerManager from "./BackgroundLayerManager"
 import Dropdown from "react-bootstrap/Dropdown"
 import * as d3 from "d3"
 import _ from "underscore"
-
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
 import {Bullseye, Download} from "react-bootstrap-icons"
+import { isMobile } from "react-device-detect";
 
 // const data_folder_url = "http://localhost/data"
 const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
@@ -548,7 +548,7 @@ class  ParticleVizManager extends React.Component{
                     <div className="spinner-border" role="status"> </div>
                     <div id="load-perc" className="navbar-brand m-2" ></div>
                 </div>
-                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div className="collapse navbar-collapse" id="navbarNavAltMarkup" >
                     <div className="navbar-nav">
                         {/* ---------- Particles menu ------------*/}
                         <ParticlesLayer map={this.props.map}
@@ -569,21 +569,21 @@ class  ParticleVizManager extends React.Component{
                                 </Dropdown.Menu>
                             </Dropdown>
                             {/* ---------- Litter concentration ------------*/}
-                            <div className="m-2 d-inline">
+                            <div className="m-2 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
                                     <button title="Litter concentration" className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
                                                  onClick={this.toogleHistogramLayer}>
                                         <Bullseye />
                                     </button>
                             </div>
                             {/* ---------- Download data ------------*/}
-                            {/*<div className="m-2">*/}
-                            {/*    <a title="Download Data"*/}
-                            {/*            className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'}`}*/}
-                            {/*       // href={`${data_folder_url}/World_litter_stats.tar.xz`}>*/}
-                            {/*        href={`${data_folder_url}/ReachedTablesData.tar.xz`}>*/}
-                            {/*        <Download />*/}
-                            {/*    </a>*/}
-                            {/*</div>*/}
+                            <div className="m-2 d-inline">
+                                <a title="Download Data"
+                                        className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
+                                   // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
+                                    href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
+                                    <Download />
+                                </a>
+                            </div>
                             {/* ---------- Background selection ------------*/}
                             <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
                             </span>

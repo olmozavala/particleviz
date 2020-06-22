@@ -9,6 +9,7 @@ import ImageCanvasSource from "ol/source/ImageCanvas"
 import _ from "lodash"
 import $ from 'jquery';
 import 'animate.css'
+import { isMobile } from "react-device-detect";
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill, Slash, SquareFill,
@@ -39,13 +40,21 @@ const TRAIL_SIZE = {
     5: .4
 }
 
-const PARTICLE_SIZES= {
+
+let PARTICLE_SIZES= {
     1: .6,
     2: 1.4,
     3: 2,
     4: 4,
     5: 6,
 }
+// Double the size of particles when we are in mobile
+if(isMobile){
+    for(let key of Object.keys(PARTICLE_SIZES)){
+        PARTICLE_SIZES[key] *= 2
+    }
+}
+
 
 // const PARTICLE_SIZE_TXT = {
 //     1: 'Biggest ',
@@ -61,15 +70,14 @@ const MODES={
     decrease:2
 }
 
-var newImageData
-var rAF
+// var newImageData
+// var rAF
 
 const DRAW_LAST_DAYS = 0
 const MAX_ANIMATION_SPEED = 45
 
 class  ParticlesLayer extends React.Component {
     constructor(props) {
-        console.log("CALLED")
         super(props)
 
         // Setting up d3 objects

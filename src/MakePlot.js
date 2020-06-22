@@ -1,5 +1,4 @@
 import React from 'react';
-import createClass from 'react';
 import _ from "underscore";
 import $ from 'jquery';
 import CanvasJSReact from './canvasjs.react';
