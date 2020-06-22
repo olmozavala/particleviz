@@ -14,8 +14,8 @@ import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
 import {Bullseye, Download} from "react-bootstrap-icons"
 
-const data_folder_url = "http://localhost/data"
-// const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
+// const data_folder_url = "http://localhost/data"
+const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -273,6 +273,7 @@ class  ParticleVizManager extends React.Component{
 
     componentDidMount() {
         window.addEventListener("resize", this.updateMapLocation.bind(this))
+        $("#big-title").html("Worlds Ocean Litter")
     }
 
     updateMapLocation(){

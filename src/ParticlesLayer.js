@@ -21,7 +21,8 @@ import {Form} from "react-bootstrap"
 import JSZip from "jszip"
 import {ButtonGroup} from "react-bootstrap"
 
-const default_size = 15
+const default_size = 15 // Font size
+const particles_per_file = 200 // How many particles does each file has
 const STATUS = {
     loading: 0,
     decompressing: 1,
@@ -420,8 +421,8 @@ class  ParticlesLayer extends React.Component {
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index] + 1
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
-        let file_number = (Math.floor(this.time_step / 100)).toString()
-        cur_date = cur_date % 100
+        let file_number = (Math.floor(this.time_step / particles_per_file)).toString()
+        cur_date = cur_date % particles_per_file
         // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
             for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
@@ -506,8 +507,8 @@ class  ParticlesLayer extends React.Component {
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
-        let file_number = (Math.floor(this.time_step / 100)).toString()
-        cur_date = cur_date % 100
+        let file_number = (Math.floor(this.time_step / particles_per_file)).toString()
+        cur_date = cur_date % particles_per_file
         // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
             for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
@@ -850,7 +851,7 @@ class  ParticlesLayer extends React.Component {
                             </button>
                         {/*---- Range Current day ------------*/}
                         </span>
-                        <span className="navbar-brand d-none d-lg-inline range-ml">
+                        <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml ">
                                 <Form.Control type="range"
                                               onChange={this.changeDayRange}
                                               value={this.time_step}

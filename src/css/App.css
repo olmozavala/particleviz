@@ -64,6 +64,12 @@
   }
 }
 
+@media(min-width: 768px){
+  .wl-title{
+    top: 65px;
+  }
+}
+
 .control {
   /*position: absolute;*/
   background-color: white;
@@ -75,6 +81,12 @@
 }
 
 .wl-title{
+  z-index: 102;
+  position: absolute;
+  width: 100%;
+}
+
+.wl-main-title{
   /*top: 30px;*/
   z-index: 102;
   position: absolute;

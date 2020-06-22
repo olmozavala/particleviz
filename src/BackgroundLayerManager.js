@@ -51,6 +51,7 @@ class  BackgroundLayerManager extends React.Component{
         switch(parseInt(e)) {
             case BACKGROUND_MAPS.empty:
                 d3.select("#title").style("color", "#212529");
+                d3.select("#big-title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
                 bk_layer.setSource();
                 break;
@@ -69,6 +70,7 @@ class  BackgroundLayerManager extends React.Component{
                 break;
             case BACKGROUND_MAPS.osm:
                 d3.select("#title").style("color", "#212529");
+                d3.select("#big-title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
                 bk_layer.setSource(new OSM());
                 break;
@@ -83,6 +85,7 @@ class  BackgroundLayerManager extends React.Component{
                 break;
             case BACKGROUND_MAPS.dark:
                 d3.select("#title").style("color", "#d1d1e0");
+                d3.select("#big-title").style("color", "#d1d1e0");
                 d3.select("#map").style("background-color", "black");
                 bk_layer.setSource(
                     new BingMaps({
@@ -93,6 +96,7 @@ class  BackgroundLayerManager extends React.Component{
                 break;
             case BACKGROUND_MAPS.nature:
                 d3.select("#title").style("color", "#d1e0e0");
+                d3.select("#big-title").style("color", "#d1d1e0");
                 d3.select("#map").style("background-color", "#00101D");
                 bk_layer.setSource(
                     new BingMaps({
@@ -103,6 +107,7 @@ class  BackgroundLayerManager extends React.Component{
                 break;
             default:
                 d3.select("#title").style("color", "#212529");
+                d3.select("#big-title").style("color", "#212529");
                 d3.select("#map").style("background-color", "white");
                 bk_layer.setSource();
                 break;
