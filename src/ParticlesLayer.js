@@ -153,7 +153,7 @@ class  ParticlesLayer extends React.Component {
         if(name === this.props.selected_model.file) {
             // console.log(`Uncompressed file received, file number: ${filenum} ....`)
             let data = JSON.parse(txtdata)
-            let th = 10
+            let th = 10  // Threshold used to decide if the particle is crossing from left to right of the screen
 
             // console.log("Reading final json data!!!!!!! ", data)
             this.country_keys = Object.keys(data) // fixing those particles that 'jump' the map
