@@ -575,7 +575,7 @@ class  ParticlesLayer extends React.Component {
         this.props.map.render()
     }
     componentDidMount() {
-        $("#big-title").text("Worlds Ocean Litter")
+        $("#big-title").text("World's Ocean Litter")
         this.updateAnimation()
     }
 
