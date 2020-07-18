@@ -257,7 +257,7 @@ let min_pal = new Array(12).fill(1)
 for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
         id: i+10,
-        file: `4/Single_Release_FiveYears_EachMonth_2010_${i_str}`,
+        file: `4/YesWinds_YesDiffusion_NoUnbeaching_2010_${i_str}`,
         wms: `histo_${i_str}/histo`,
         title: `${months[i-1]} 2010`,
         speed: "",

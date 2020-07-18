@@ -86,7 +86,6 @@ class  StatesLayer extends React.Component{
                 color: color
             }),
             stroke: new Stroke({
-                // color: '#319FD3',
                 color: '#6D6D6D',
                 width: 1
             }),
@@ -109,20 +108,20 @@ class  StatesLayer extends React.Component{
     getDefaultStyle(name){
         return new Style({
             fill: new Fill({
-                color: '#000000',
+                color: '#f8f9fa',
             }),
             stroke: new Stroke({
                 color: '#2f3e46',
                 width: 1
             }),
-            text: new Text({
-                font: '12px Calibri,sans-serif',
-                fill: new Fill({
-                    color: '#ffffff',
-                    width: 2
-                }),
-                text: name.charAt(0).toUpperCase() + name.slice(1)
-            })
+            // text: new Text({
+            //     font: '12px Calibri,sans-serif',
+            //     fill: new Fill({
+            //         color: '#212529',
+            //         width: 2
+            //     }),
+            //     text: name.charAt(0).toUpperCase() + name.slice(1)
+            // })
         });
     }
 
