@@ -108,7 +108,7 @@ class  StatesLayer extends React.Component{
     getDefaultStyle(name){
         return new Style({
             fill: new Fill({
-                color: '#f8f9fa',
+                color: 'rgba(255, 255, 255, .1)',
             }),
             stroke: new Stroke({
                 color: '#2f3e46',

@@ -251,21 +251,23 @@ let def_max_pal_value = 3000000
 //     },
 // ]
 let data_files = []
-let num_files = [10, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8]
-let min_pal = new Array(12).fill(1)
-
+let min_pal = new Array(13).fill(1)
+let folder = "4"  // Indicates the subsampling of the particles
+if(isMobile){
+    folder = "6"
+}
 for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
         id: i+10,
-        file: `4/YesWinds_YesDiffusion_NoUnbeaching_2010_${i_str}`,
+        file: `${folder}/YesWinds_YesDiffusion_NoUnbeaching_2010_${i_str}`,
         wms: `histo_${i_str}/histo`,
         title: `${months[i-1]} 2010`,
         speed: "",
         style:def_style,
         start_date: new Date(2010, i-1, 1),
-        num_files: num_files[i-1],
+        num_files: 1,
         // In each run we have more particles, so we need to change the maximum value on the palette
-        max_pal: parseInt(def_max_pal_value - (def_max_pal_value/(12*5))*i ),
+        max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
         min_pal: min_pal[i]
     })
 }

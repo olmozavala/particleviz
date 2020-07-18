@@ -793,9 +793,9 @@ class  ParticlesLayer extends React.Component {
     render() {
         let load = document.getElementById("loading")
         if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
-            let perc = "0 %"
+            let perc = ""
             if (this.state.status === STATUS.decompressing) {
-                perc = "50 %"
+                perc = ""
             }
             let load_perc = document.getElementById("load-perc")
             $(load_perc).text(perc)
