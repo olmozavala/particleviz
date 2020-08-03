@@ -2,19 +2,64 @@ import React from 'react';
 import _ from "underscore";
 import $ from 'jquery';
 import CanvasJSReact from './canvasjs.react';
+import { isMobile } from "react-device-detect";
 var CanvasJSChart = CanvasJSReact.CanvasJSChart
 
+/**
+ * Reduces the size of the names to a maximum. In order to have more homogenous plots
+ * @param name
+ * @returns {string|*}
+ */
+function shortenNames(name){
+    let max_size = 13
+    if(name.length > max_size){
+        // Search for spaces (multiple words)
+        if(name.search(" ") != -1){
+            let allspaces = [...name.matchAll(new RegExp(" ", 'gi'))].map(a => a.index)
+            // Select the last space before max_size
+            let i = 0
+            let last_space_before_max = name.length
+            while((allspaces[i] < max_size) && (i < allspaces.length)){
+                last_space_before_max = allspaces[i]
+                i += 1
+            }
+            name = name.substring(0, last_space_before_max + 2)
+            name = name + '.'
+            return name
+        }
+    }
+    return name
+}
+
+/**
+ * This is the function that generates the CanvasJS plots.
+ * @param country_data
+ * @param country_name
+ * @param statsType
+ * @returns {*}
+ */
 function showStatistics({country_data, country_name}, statsType='from'){
+    let max_num_countries = 15
+    let add_others = false // Indicates if we need to add the 'others' column
+    let others_value = 0
+    let others_perc = 0
     if(!_.isUndefined(country_data)) {
         let dataPoints = []
         for(let id in Object.keys(country_data[statsType][statsType])){
-            let text = country_data[statsType][statsType][id].name
+            let text = shortenNames(country_data[statsType][statsType][id].name)
             let value = country_data[statsType][statsType][id].tons
             let perc = country_data[statsType][statsType][id].perc
-            // console.log(perst0c)
-            if(perc > 1 || value > 50){
+            if(id <= max_num_countries){
                 dataPoints.push({label: text, y: value, perc: perc})
+            }else{
+                add_others = true
+                others_value += value
+                others_perc += perc
             }
+        }
+
+        if(add_others){
+            dataPoints.push({label: "Others", y: others_value, perc: Math.round(others_perc*100)/100 })
         }
 
         let title = ''
@@ -33,7 +78,7 @@ function showStatistics({country_data, country_name}, statsType='from'){
             tooltip = `{y} tons from {label} ({perc}%)`
         }
         // let plot_height = Math.min(parseInt(window.innerHeight * .20), 200)
-        let plot_height = 205
+        let plot_height = 225
         const options = {
             container: container,
             animationEnabled: true,
@@ -41,7 +86,7 @@ function showStatistics({country_data, country_name}, statsType='from'){
             height: plot_height,
             title: {
                 text: title,
-                fontSize: 18,
+                fontSize: isMobile? 16 : 20,
             },
             axisY: {
                 title:'Tons per year',
@@ -52,6 +97,7 @@ function showStatistics({country_data, country_name}, statsType='from'){
             },
             axisX:{
                 interval:1,
+                labelAngle: -23,
             },
             data: [{
                 toolTipContent: tooltip,

@@ -32,17 +32,17 @@ const STATUS = {
 
 // How much transparency should we add
 const TRAIL_SIZE = {
-    1: .020,
-    2: .040,
-    3: .080,
-    4: .12,
-    5: .4
+    1: .05, // Longest trail
+    2: .1,
+    3: .2,
+    4: .3,
+    5: .4  // Shortest trail
 }
 
 
 let PARTICLE_SIZES= {
-    1: .6,
-    2: 1.4,
+    1: 1,
+    2: 1.5,
     3: 2,
     4: 4,
     5: 6,

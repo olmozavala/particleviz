@@ -1,5 +1,4 @@
 import React from 'react'
-import './css/App.css'
 import coaps_logo from "./imgs/coaps_logo.png"
 import un_logo from "./imgs/un_PNG20.png"
 import StatesLayer from "./StatesLayer"
@@ -13,6 +12,7 @@ import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
 import {Bullseye, Download} from "react-bootstrap-icons"
 import { isMobile } from "react-device-detect";
+import './css/App.css'
 
 // const data_folder_url = "http://localhost/data"
 const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
@@ -124,8 +124,8 @@ let def_max_pal_value = 3000000
 // let data_files = [
 //     {
 //         id: 1,
-//         // file: "1/TESTUN_output",
-//         file: "4/JUN22Test_Unbeaching",
+//         file: "1/TESTUN_output",
+//         // file: "4/JUN22Test_Unbeaching",
 //         title: "TEST",
 //         // style:"default-scalar/div-PRGn",
 //         // style:"div-PRGn",
