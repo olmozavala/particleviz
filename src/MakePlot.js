@@ -83,6 +83,7 @@ function showStatistics({country_data, country_name}, statsType='from'){
             container: container,
             animationEnabled: true,
             exportEnabled: true,
+            // zoomEnabled: true,
             height: plot_height,
             title: {
                 text: title,
