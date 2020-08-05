@@ -105,7 +105,7 @@ const CONTINENTS = {
         min_max: [1, 10000000]},
 }
 
-let selected_color = `rgba(255,0,0,1)`
+let selected_color = `rgb(255, 0, 0)`
 
 const months = [
     'January', 'February', 'March', 'April', 'May',
@@ -267,7 +267,8 @@ for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
         start_date: new Date(2010, i-1, 1),
         num_files: 1,
         // In each run we have more particles, so we need to change the maximum value on the palette
-        max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
+        // max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
+        max_pal: (32300 * 31 * ((12 * 5) - i))/100,  // Particles by number of days / X X is subjective
         min_pal: min_pal[i]
     })
 }
@@ -287,11 +288,14 @@ class  ParticleVizManager extends React.Component{
         this.initCountries = this.initCountries.bind(this)
         this.getHistogramSource= this.getHistogramSource.bind(this)
         this.displayPalette = this.displayPalette.bind(this)
+        this.showHistogramLayer = this.showHistogramLayer.bind(this)
 
         let histogram_layer = new TileLayer({
-            source: this.getHistogramSource(data_files[0].wms),
+            source: this.getHistogramSource(data_files[0]),
             opacity:.8})
-        histogram_layer.setVisible(false)
+
+        let histogram_selected = true
+        histogram_layer.setVisible(histogram_selected)
 
         // let colors_by_country = new Array().fill("#FFFFFF")
         this.state = {
@@ -300,7 +304,7 @@ class  ParticleVizManager extends React.Component{
             countries: {},
             selected_model: data_files[0],
             histogram_layer: histogram_layer,
-            histogram_selected: false,
+            histogram_selected: histogram_selected,
             max_pal: 10,
             min_pa: 1
         }
@@ -330,18 +334,17 @@ class  ParticleVizManager extends React.Component{
 
     componentDidMount() {
         window.addEventListener("resize", this.updateMapLocation.bind(this))
+        this.showHistogramLayer()
     }
 
     updateMapLocation(){
         this.props.map.setSize( [window.innerWidth, window.innerHeight])
-        let palette_container = document.getElementById("div-palette-horbar")
-        if(this.state.histogram_selected){
-            this.displayPalette()
-        }
+        this.showHistogramLayer()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.state.histogram_layer.setSource( this.getHistogramSource(this.state.selected_model))
+        this.showHistogramLayer()
         this.props.map.render()
     }
 
@@ -473,11 +476,19 @@ class  ParticleVizManager extends React.Component{
             //How many numbers do we want in the color bar
             // It is not perfect because the ticks function modifies
             // the size of the array depending its parameters
-            let totNumbersOrig = 5
+            let totNumbersOrig = 8
             let totNumbers = totNumbersOrig
 
-            let mt_per_part = (32300 * 12) / (6.4 * 10 ** 6)
-            let minVal = this.state.selected_model.min_pal
+            // How to calculate the value of the color palette
+            // 32300 particles released every month
+            // This simulate 6.4 million tons of waste
+
+            // max_pal: (32300 * 31 * ((12 * 5) - i))/100,  // Particles by number of days / X X is subjective
+            // ~ total particles in run / 100
+            let mt_per_part =(6.4 * 10 ** 6) / 32300
+
+            // let minVal = this.state.selected_model.min_pal
+            let minVal = 1
             let maxVal = parseInt(this.state.selected_model.max_pal * mt_per_part)
             //
             //This scale is used to obtain the numbers
@@ -516,16 +527,18 @@ class  ParticleVizManager extends React.Component{
         }.bind(this)
     }
 
-    toogleHistogramLayer(){
+    showHistogramLayer(){
         let palette_container = document.getElementById("div-palette-horbar")
         if(this.state.histogram_selected){
-            $(palette_container).hide()
-            this.state.histogram_layer.setVisible(false)
-        }else{
             this.displayPalette()
             this.state.histogram_layer.setVisible(true)
+        }else{
+            $(palette_container).hide()
+            this.state.histogram_layer.setVisible(false)
         }
+    }
 
+    toogleHistogramLayer(){
         this.setState({
             histogram_selected: !this.state.histogram_selected,
         })
@@ -544,13 +557,6 @@ class  ParticleVizManager extends React.Component{
             countries: countries
         })
         this.updateColors()
-        // Hides the palette container
-        let palette_container = document.getElementById("div-palette-horbar")
-        $(palette_container).hide()
-        this.state.histogram_layer.setVisible(false)
-        this.setState({
-            histogram_selected: false
-        })
     }
 
     colorByOcean(ocean){
@@ -565,7 +571,8 @@ class  ParticleVizManager extends React.Component{
         return colors[sel_ocean.color]
     }
     colorByContinent(continent){
-        let colors = ["#FFFFFF", "#FFFFFF"]
+        // Default color
+        let colors = ["#000000", "#000000"]
         let min_max = [0, 100000]
         for(const c_continent in CONTINENTS){
             if(CONTINENTS[c_continent].name.localeCompare(continent.toLowerCase()) === 0){

@@ -39,6 +39,7 @@ class  BackgroundLayerManager extends React.Component{
     }
 
     componentDidMount() {
+        // Here we set the default background map
         this.updateBackgroundLayer(BACKGROUND_MAPS.empty)
     }
 

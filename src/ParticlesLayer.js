@@ -34,17 +34,17 @@ const STATUS = {
 const TRAIL_SIZE = {
     1: .05, // Longest trail
     2: .1,
-    3: .2,
-    4: .3,
-    5: .4  // Shortest trail
+    3: .15,
+    4: .25,
+    5: .35  // Shortest trail
 }
 
 
 let PARTICLE_SIZES= {
     1: 1,
-    2: 1.5,
-    3: 2,
-    4: 4,
+    2: 2,
+    3: 3,
+    4: 4.5,
     5: 6,
 }
 // Double the size of particles when we are in mobile
@@ -99,7 +99,7 @@ class  ParticlesLayer extends React.Component {
             ol_canvas_size: null,
             total_timesteps: {},
             index_by_country: {},
-            shape_type: true, // true for lines, false for dots
+            shape_type: false, // true for lines, false for dots
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -420,7 +420,8 @@ class  ParticlesLayer extends React.Component {
      * @param ctx Context of the canvas object to use
      */
     drawParticles(cur_date) {
-        this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index] + 1
+        let square_size = parseInt(PARTICLE_SIZES[this.state.particle_size_index] + 1)
+        this.ctx.lineWidth = square_size
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
         let file_number = "0"  // This part must always be 0 now. Before we were splitting into multiple files
@@ -442,14 +443,14 @@ class  ParticlesLayer extends React.Component {
                         if (clon !== 200) {
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
                                 oldpos = this.geoToCanvas(clon, clat)
-                                this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                             }
                             // Draw the particles on the additional map on the east
                             if (this.show_east_map) {
                                 let tlon = clon + 360
                                 if (tlon >= this.state.extent[0]) {
                                     oldpos = this.geoToCanvas(tlon, clat)
-                                    this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                 }
                             }
                             // Draw the particles on the additional map on the west
@@ -457,7 +458,7 @@ class  ParticlesLayer extends React.Component {
                                 let tlon = clon - 360
                                 if (tlon >= this.state.extent[0]) {
                                     oldpos = this.geoToCanvas(tlon, clat)
-                                    this.ctx.fillRect(oldpos[0], oldpos[1], PARTICLE_SIZES[this.state.particle_size_index], PARTICLE_SIZES[this.state.particle_size_index])
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                 }
                             }
                         }
@@ -469,40 +470,6 @@ class  ParticlesLayer extends React.Component {
         }
         this.props.map.render()
     }
-
-    // drawParticles(cur_date){
-    //     let canvas = this.d3canvas.node()
-    //     // this.ctx.globalCompositeOperation = "screen"
-    //     newImageData = this.ctx.createImageData(canvas.width, canvas.height)
-    //     let img_size = (canvas.width * canvas.height) * 4
-    //     let img_data = newImageData.data
-    //     let model_id = this.state.selected_model.id
-    //     let available_files = Object.keys(this.state.data[model_id])
-    //     let file_number = (Math.floor(this.time_step / 100)).toString()
-    //     cur_date = cur_date % 100
-    //     // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
-    //     if (available_files.includes(file_number)) {
-    //         for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-    //             let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
-    //             let tot_part = country_start["lat_lon"][0].length
-    //             // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
-    //             for (let part_id = 0; part_id < tot_part; part_id++) {
-    //                 if (this.state.index_by_country[file_number]) {
-    //                     let clon = country_start["lat_lon"][1][part_id][cur_date]
-    //                     let clat = country_start["lat_lon"][0][part_id][cur_date]
-    //                     let pos = this.geoToCanvas(clon, clat)
-    //                     let start_img_pos = parseInt((pos[1]*canvas.width + pos[0])*4 )
-    //                     img_data[start_img_pos] = 255
-    //                     img_data[start_img_pos + 1] = 0
-    //                     img_data[start_img_pos + 2] = 0
-    //                     img_data[start_img_pos + 3] = 255
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     this.ctx.putImageData(newImageData, 0, 0)
-    //     this.ctx.stroke()
-    // }
 
     drawLines(cur_date) {
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
@@ -842,8 +809,7 @@ class  ParticlesLayer extends React.Component {
                             </button>
                             {" "}
                             {/*---- Shape selection---------*/}
-                            <button className={`btn btn-sm ${this.state.histogram_selected?' btn-outline-info':' btn-info'} 
-                            d-md-none d-lg-inline `} onClick={this.changeShapeType}
+                            <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
                                     title="Shape selection">
                                 {this.state.shape_type?
                                     <Slash size={default_size}/>
