@@ -19,6 +19,8 @@ const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
+let mt_total = 6.4 // Total amount of waste tons on each simulation
+
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
     ["#0968E5", "#095BD2", "#094EBE", "#0941AB", "#093397", "#092684", "#091970"],
@@ -120,7 +122,8 @@ const def_style = "x-Sst"
 // const def_style = "div-Spectral-inv"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
-let def_max_pal_value = 3000000
+
+// let def_max_pal_value = 3000000
 // let data_files = [
 //     {
 //         id: 1,
@@ -268,7 +271,7 @@ for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
         num_files: 1,
         // In each run we have more particles, so we need to change the maximum value on the palette
         // max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
-        max_pal: (32300 * 31 * ((12 * 5) - i))/100,  // Particles by number of days / X X is subjective
+        max_pal: (32300 * 31 * ((12 * 5) - i)),  // Particles by number of days in average / X X is subjective
         min_pal: min_pal[i]
     })
 }
@@ -461,7 +464,7 @@ class  ParticleVizManager extends React.Component{
 
         let ctx = $(palette_canvas)[0].getContext("2d")
         //------ Modifying the size of the canvas container
-        let spaceForUnits = 30;// Space between the black part for units and the rest
+        let spaceForUnits = 90;// Space between the black part for units and the rest
         ctx.canvas.width = barWidth+spaceForUnits
         ctx.canvas.height = barHeight
 
@@ -483,13 +486,15 @@ class  ParticleVizManager extends React.Component{
             // 32300 particles released every month
             // This simulate 6.4 million tons of waste
 
-            // max_pal: (32300 * 31 * ((12 * 5) - i))/100,  // Particles by number of days / X X is subjective
-            // ~ total particles in run / 100
-            let mt_per_part =(6.4 * 10 ** 6) / 32300
+            // ~ total particles in run (max value on each grid)
+            // max_pal: (32300 * 31 * ((12 * 5) - i))  // Particles by number of days
+            let kt_per_day = this.state.selected_model.max_pal
+            let tons_per_particle_per_day = (6.4 * 10**6) / (this.state.selected_model.max_pal)
+            console.log("Tons per particle per day: ", tons_per_particle_per_day)
 
             // let minVal = this.state.selected_model.min_pal
             let minVal = 1
-            let maxVal = parseInt(this.state.selected_model.max_pal * mt_per_part)
+            let maxVal = parseInt(this.state.selected_model.max_pal) // 1 Mt per day (is the maximul value)
             //
             //This scale is used to obtain the numbers
             // that are written above the color palette
@@ -503,6 +508,7 @@ class  ParticleVizManager extends React.Component{
             do {
                 //This scale is used to obtain the positions
                 // where we will writhe the numbers
+                // The 'while' hack is necesary to enforce the correct number of tick values
                 logScaleText = d3.scaleLog()
                     .domain([minVal, maxVal])
                     .range([20, barWidth - 20])
@@ -515,7 +521,8 @@ class  ParticleVizManager extends React.Component{
             // Obtains the numbers we will write in the color palette
 
             //Write the units first
-            ctx.fillText('Mt',2,Math.ceil(barHeight-pixBellowText))
+            // ctx.fillText('90 kg/0.125°',2,Math.ceil(barHeight-pixBellowText))
+            ctx.fillText('100 kg / 0.125°',2,Math.ceil(barHeight-pixBellowText))
 
             //Write the rest of the numbers from the ticks and the positions
             myNumbers.forEach(function(number){
