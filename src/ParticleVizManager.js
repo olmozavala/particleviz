@@ -435,8 +435,7 @@ class  ParticleVizManager extends React.Component{
     displayPalette(){
         let palette_canvas = document.getElementById("canvas-palette-horbar")
         let palette_container = document.getElementById("div-palette-horbar")
-
-        console.log(this.state.selected_model)
+        // console.log(this.state.selected_model)
 
         let barWidth = Math.ceil($(window).width()*.80)
         let barHeight = 15
@@ -488,9 +487,8 @@ class  ParticleVizManager extends React.Component{
 
             // ~ total particles in run (max value on each grid)
             // max_pal: (32300 * 31 * ((12 * 5) - i))  // Particles by number of days
-            let kt_per_day = this.state.selected_model.max_pal
-            let tons_per_particle_per_day = (6.4 * 10**6) / (this.state.selected_model.max_pal)
-            console.log("Tons per particle per day: ", tons_per_particle_per_day)
+            let tons_per_particle = (6.4 * 10**6) / (this.state.selected_model.max_pal)
+            // console.log("Tons per particle: ", tons_per_particle_per_day)
 
             // let minVal = this.state.selected_model.min_pal
             let minVal = 1
