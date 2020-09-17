@@ -14,7 +14,7 @@ function shortenNames(name){
     let max_size = 13
     if(name.length > max_size){
         // Search for spaces (multiple words)
-        if(name.search(" ") != -1){
+        if(name.search(" ") !== -1){
             let allspaces = [...name.matchAll(new RegExp(" ", 'gi'))].map(a => a.index)
             // Select the last space before max_size
             let i = 0

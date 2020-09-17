@@ -10,6 +10,8 @@ import _ from "lodash"
 import $ from 'jquery';
 import 'animate.css'
 import { isMobile } from "react-device-detect";
+import {chardinJs} from "./chardinjsoz";
+
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill, Slash, SquareFill,
@@ -32,20 +34,19 @@ const STATUS = {
 
 // How much transparency should we add
 const TRAIL_SIZE = {
-    1: .05, // Longest trail
-    2: .1,
-    3: .15,
+    1: .01, // Longest trail
+    2: .03,
+    3: .05,
     4: .25,
     5: .35  // Shortest trail
 }
 
-
 let PARTICLE_SIZES= {
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4.5,
-    5: 6,
+    1: .5,
+    2: 1,
+    3: 2,
+    4: 3,
+    5: 4,
 }
 // Double the size of particles when we are in mobile
 if(isMobile){
@@ -53,7 +54,6 @@ if(isMobile){
         PARTICLE_SIZES[key] *= 2
     }
 }
-
 
 // const PARTICLE_SIZE_TXT = {
 //     1: 'Biggest ',
@@ -63,7 +63,7 @@ if(isMobile){
 //     5: 'Smallest'
 // }
 
-// Modes in how to increase/decrase a variable
+// Modes in how to increase/decrease a variable
 const MODES={
     increase:1,
     decrease:2
@@ -79,8 +79,6 @@ class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props)
 
-        // Setting up d3 objects
-        this.d3canvas = d3.select("#particle_canvas")
         // https://github.com/d3/d3-time-format
         this.dateFormat = d3.timeFormat("%B %e, %Y ")
         this.time_step = 0
@@ -99,7 +97,8 @@ class  ParticlesLayer extends React.Component {
             ol_canvas_size: null,
             total_timesteps: {},
             index_by_country: {},
-            shape_type: false, // true for lines, false for dots
+            shape_type: true, // true for lines, false for dots
+            chardin: new chardinJs("body")
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -108,13 +107,14 @@ class  ParticlesLayer extends React.Component {
         let url = `${this.props.url}/${this.props.selected_model.file}.txt`
         d3.text(url).then( (blob) => this.readOneZip(blob))
 
+        // Setting up d3 objects TODO somethings doesn't make sense here
         this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
         if (this.d3canvas.empty()) {
             // console.log("Initializing canvas")
-            this.d3canvas = d3.select(document.createElement("canvas"))
-                .attr("id", "particle_canvas")
-            this.d3canvas.getContext('2d', { alpha: false });
+            this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
+            this.d3canvas.getContext('2d', { alpha: false })
         }
+        this.ctx = this.d3canvas.node().getContext('2d')
 
         // this.getFeatures = this.getFeatures.bind(this)
         // this.drawParticles = this.drawParticles.bind(this)
@@ -297,7 +297,7 @@ class  ParticlesLayer extends React.Component {
         this.draw_until_day = true; // Used to redraw all the positions until current time
 
         this.d3canvas.attr('width', this.canvasWidth).attr('height', this.canvasHeight)
-        this.ctx = this.d3canvas.node().getContext('2d')
+        // this.ctx = this.d3canvas.node().getContext('2d')
         this.ctx.lineCap = 'round'; // butt, round, square
 
         this.show_west_map = false
@@ -634,6 +634,7 @@ class  ParticlesLayer extends React.Component {
             })
         }
         this.updateRange()
+        this.state.chardin.start()
     }
 
     changeDayRange(e) {
@@ -766,16 +767,21 @@ class  ParticlesLayer extends React.Component {
             $(load_perc).text(perc)
             $(load).removeClass("d-none")
             $(load).addClass("d-inline")
-            return <span></span>
+            $(".btn").prop("disabled", true)
         } else {
             $(load).removeClass("d-inline")
             $(load).addClass("d-none")
-            return (
-                <span>
-                    <div className="row m-1">
-                        <span className="navbar-brand col-auto">
-
-                            {/*---- Transparency ---------*/}
+            $(".btn").prop("disabled", false)
+            // Manually disabling prev and next time
+            $("#pt").prop("disabled", true)
+            $("#nt").prop("disabled", true)
+        }
+        return (
+            <span>
+                <div className="row m-1">
+                    <span className="navbar-brand col-auto">
+                        {/*---- Transparency ---------*/}
+                        <span data-intro={"Sopas pericon"} data-info={"bottom"}>
                             <span style={{display: "inline-block", width: "25px"}}>
                                 <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
                             </span>
@@ -790,83 +796,83 @@ class  ParticlesLayer extends React.Component {
                                                             disabled={this.state.transparency_index === 1}>
                                     <Plus size={default_size}/>
                             </button>
-                            {" "}
-                            {/*---- Particle size ---------*/}
-                            <span style={{display: "inline-block", width: "25px"}}>
-                                <CircleFill
-                                    size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
-                            </span>
-                            <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
-                                    title="Decrease litter size"
-                                    disabled={this.state.particle_size_index === 1}>
-                                    <Dash size={default_size}/>
-                                </button>
-                            {" "}
-                            <button className="btn btn-info btn-sm" onClick={this.increaseSize}
-                                    title="Increase litter size"
-                                    disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
-                                <Plus size={default_size}/>
+                        </span>
+                        {" "}
+                        {/*---- Particle size ---------*/}
+                        <span style={{display: "inline-block", width: "25px"}}>
+                            <CircleFill
+                                size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
+                        </span>
+                        <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
+                                title="Decrease litter size"
+                                disabled={this.state.particle_size_index === 1}>
+                                <Dash size={default_size}/>
                             </button>
-                            {" "}
-                            {/*---- Shape selection---------*/}
-                            <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
-                                    title="Shape selection">
-                                {this.state.shape_type?
-                                    <Slash size={default_size}/>
-                                    :
-                                    <SquareFill size={default_size}/>
-                                }
+                        {" "}
+                        <button className="btn btn-info btn-sm" onClick={this.increaseSize}
+                                title="Increase litter size"
+                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
+                            <Plus size={default_size}/>
+                        </button>
+                        {" "}
+                        {/*---- Shape selection---------*/}
+                        <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
+                                title="Shape selection">
+                            {this.state.shape_type?
+                                <Slash size={default_size}/>
+                                :
+                                <SquareFill size={default_size}/>
+                            }
+                        </button>
+                    {/*---- Range Current day ------------*/}
+                    </span>
+                    <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml ">
+                            <Form.Control type="range"
+                                          title="Date selection"
+                                          onChange={this.changeDayRange}
+                                          value={this.time_step}
+                                          min="0" max={(this.state.status === STATUS.loading ||
+                                                       this.state.status === STATUS.decompressing)? 0:
+                                                        this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                          custom
+                                          disabled={this.state.status !== STATUS.paused}/>
+                    </span>
+                    {/*---- Play/Pause---------*/}
+                    <span className="navbar-brand col-auto">
+                        <ButtonGroup>
+                            <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
+                                    title="Decrease animation speed"
+                                    disabled={(this.state.status !== STATUS.playing) ||
+                                    (this.state.speed_hz <= .6)}>
+                                <SkipBackwardFill size={default_size}/>
                             </button>
-                        {/*---- Range Current day ------------*/}
-                        </span>
-                        <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml ">
-                                <Form.Control type="range"
-                                              title="Date selection"
-                                              onChange={this.changeDayRange}
-                                              value={this.time_step}
-                                              min="0" max={this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                              custom
-                                              disabled={this.state.status !== STATUS.paused}/>
-                        </span>
-                        {/*---- Play/Pause---------*/}
-                        <span className="navbar-brand col-auto">
-                            <ButtonGroup>
-                                <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
-                                        title="Decrease animation speed"
-                                        disabled={(this.state.status !== STATUS.playing) ||
-                                        (this.state.speed_hz <= .6)}>
-                                {/*<FontAwesomeIcon icon={faBackward} size="xs"/>*/}
-                                    <SkipBackwardFill size={default_size}/>
-                                </button>
-                                <button className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
-                                        title="Previous time step"
-                                        disabled={this.state.status !== STATUS.paused}>
-                                {/*<FontAwesomeIcon icon={faStepBackward} size="xs"/>*/}
-                                    <SkipStartFill size={default_size}/>
-                                </button>
-                                <button className="btn btn-info btn-sm"
-                                        title="Play/pause animation"
-                                        onClick={this.playPause}>{this.state.status === STATUS.playing ?
-                                    <PauseFill size={default_size}/> :
-                                    <PlayFill size={default_size}/>}
-                                </button>
-                                <button className="btn btn-info btn-sm" onClick={this.nextDay}
-                                        title="Next time step"
-                                        disabled={this.state.status !== STATUS.paused}>
-                                        <SkipEndFill size={default_size}/>
-                                </button>
-                                <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                        title="Incrase animation speed"
-                                        disabled={(this.state.status !== STATUS.playing) ||
-                                        (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
-                                <SkipForwardFill size={default_size}/>
-                                </button>
-                            </ButtonGroup>
-                        </span>
-                    </div>
-                </span>
-            )
-        }
+                            <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
+                                    title="Previous time step"
+                                    disabled={this.state.status !== STATUS.paused}>
+                                <SkipStartFill size={default_size}/>
+                            </button>
+                            <button className="btn btn-info btn-sm"
+                                    title="Play/pause animation"
+                                    onClick={this.playPause}>{this.state.status === STATUS.playing ?
+                                <PauseFill size={default_size}/> :
+                                <PlayFill size={default_size}/>}
+                            </button>
+                            <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
+                                    title="Next time step"
+                                    disabled={this.state.status !== STATUS.paused}>
+                                    <SkipEndFill size={default_size}/>
+                            </button>
+                            <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
+                                    title="Incrase animation speed"
+                                    disabled={(this.state.status !== STATUS.playing) ||
+                                    (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
+                            <SkipForwardFill size={default_size}/>
+                            </button>
+                        </ButtonGroup>
+                    </span>
+                </div>
+            </span>
+        )
     }
 }
 

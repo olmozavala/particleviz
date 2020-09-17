@@ -19,7 +19,7 @@ const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
-let mt_total = 6.4 // Total amount of waste tons on each simulation
+// let mt_total = 6.4 // Total amount of waste tons on each simulation
 
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
@@ -297,7 +297,7 @@ class  ParticleVizManager extends React.Component{
             source: this.getHistogramSource(data_files[0]),
             opacity:.8})
 
-        let histogram_selected = true
+        let histogram_selected = false
         histogram_layer.setVisible(histogram_selected)
 
         // let colors_by_country = new Array().fill("#FFFFFF")
@@ -487,7 +487,7 @@ class  ParticleVizManager extends React.Component{
 
             // ~ total particles in run (max value on each grid)
             // max_pal: (32300 * 31 * ((12 * 5) - i))  // Particles by number of days
-            let tons_per_particle = (6.4 * 10**6) / (this.state.selected_model.max_pal)
+            // let tons_per_particle = (6.4 * 10**6) / (this.state.selected_model.max_pal)
             // console.log("Tons per particle: ", tons_per_particle_per_day)
 
             // let minVal = this.state.selected_model.min_pal
@@ -501,7 +501,7 @@ class  ParticleVizManager extends React.Component{
                 .range([0, 1])
 
             let logScaleText = new Array(totNumbers + 1)
-            let myNumbers = new Array()
+            let myNumbers = []
 
             do {
                 //This scale is used to obtain the positions
