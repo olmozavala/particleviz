@@ -4,13 +4,10 @@ import './css/Animations.css'
 import * as d3 from "d3"
 import ImageLayer from "ol/layer/Image"
 import ImageCanvasSource from "ol/source/ImageCanvas"
-// import {toLonLat} from "ol/proj"
-// import {getCenter} from "ol/extent"
 import _ from "lodash"
 import $ from 'jquery';
 import 'animate.css'
 import { isMobile } from "react-device-detect";
-import {chardinJs} from "./chardinjsoz";
 
 import {
     ArrowRight, CircleFill, Plus, Dash,
@@ -35,9 +32,9 @@ const STATUS = {
 // How much transparency should we add
 const TRAIL_SIZE = {
     1: .01, // Longest trail
-    2: .03,
-    3: .05,
-    4: .25,
+    2: .02,
+    3: .04,
+    4: .15,
     5: .35  // Shortest trail
 }
 
@@ -98,7 +95,6 @@ class  ParticlesLayer extends React.Component {
             total_timesteps: {},
             index_by_country: {},
             shape_type: true, // true for lines, false for dots
-            chardin: new chardinJs("body")
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -106,6 +102,8 @@ class  ParticlesLayer extends React.Component {
         // THis is repeated should go ina function
         let url = `${this.props.url}/${this.props.selected_model.file}.txt`
         d3.text(url).then( (blob) => this.readOneZip(blob))
+
+        console.log(this.props)
 
         // Setting up d3 objects TODO somethings doesn't make sense here
         this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
@@ -634,7 +632,6 @@ class  ParticlesLayer extends React.Component {
             })
         }
         this.updateRange()
-        this.state.chardin.start()
     }
 
     changeDayRange(e) {
@@ -775,31 +772,31 @@ class  ParticlesLayer extends React.Component {
             // Manually disabling prev and next time
             $("#pt").prop("disabled", true)
             $("#nt").prop("disabled", true)
+            this.props.chardin.refresh()
         }
         return (
             <span>
                 <div className="row m-1">
-                    <span className="navbar-brand col-auto">
-                        {/*---- Transparency ---------*/}
-                        <span data-intro={"Sopas pericon"} data-info={"bottom"}>
-                            <span style={{display: "inline-block", width: "25px"}}>
-                                <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
-                            </span>
-                            <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
-                                    title="Decrease litter trail"
-                                    disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
-                                    <Dash size={default_size}/>
-                            </button>
-                                                    {" "}
-                                                    <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                                                            title="Increase litter trail"
-                                                            disabled={this.state.transparency_index === 1}>
-                                    <Plus size={default_size}/>
-                            </button>
-                        </span>
-                        {" "}
-                        {/*---- Particle size ---------*/}
+                    {/*---- Transparency ---------*/}
+                    <span className="navbar-brand col-auto" data-intro={"Litter trail length"} data-position={"bottom"} >
                         <span style={{display: "inline-block", width: "25px"}}>
+                            <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
+                        </span>
+                        <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
+                                title="Decrease litter trail"
+                                disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
+                                <Dash size={default_size}/>
+                        </button>
+                                                {" "}
+                                                <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                                                        title="Increase litter trail"
+                                                        disabled={this.state.transparency_index === 1}>
+                                <Plus size={default_size}/>
+                        </button>
+                    </span>
+                    {/*---- Particle size ---------*/}
+                    <span className="navbar-brand col-auto" data-intro={"Litter size"} data-position={"bottom"}>
+                        <span style={{display: "inline-block", width: "25px"}}  >
                             <CircleFill
                                 size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
                         </span>
@@ -814,8 +811,9 @@ class  ParticlesLayer extends React.Component {
                                 disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
                             <Plus size={default_size}/>
                         </button>
-                        {" "}
-                        {/*---- Shape selection---------*/}
+                    </span>
+                    {/*---- Shape selection---------*/}
+                    <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
                         <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
                                 title="Shape selection">
                             {this.state.shape_type?
@@ -824,9 +822,9 @@ class  ParticlesLayer extends React.Component {
                                 <SquareFill size={default_size}/>
                             }
                         </button>
-                    {/*---- Range Current day ------------*/}
                     </span>
-                    <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml ">
+                    {/*---- Range Current day ------------*/}
+                    <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml " data-intro="Day selection" data-position="bottom">
                             <Form.Control type="range"
                                           title="Date selection"
                                           onChange={this.changeDayRange}
@@ -838,7 +836,7 @@ class  ParticlesLayer extends React.Component {
                                           disabled={this.state.status !== STATUS.paused}/>
                     </span>
                     {/*---- Play/Pause---------*/}
-                    <span className="navbar-brand col-auto">
+                    <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
                         <ButtonGroup>
                             <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
                                     title="Decrease animation speed"

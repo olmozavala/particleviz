@@ -100,6 +100,13 @@
   width: 100%;
 }
 
+#intro_text{
+  top: 200px;
+  z-index: 103;
+  position: absolute;
+  /*display: none;*/
+}
+
 .wl-main-title{
   /*top: 30px;*/
   z-index: 102;

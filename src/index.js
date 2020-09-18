@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './css/index.css';
 import ParticleVizManager from './ParticleVizManager';
 import * as serviceWorker from './serviceWorker';
+import Card from "react-bootstrap/Card"
+import Button from "react-bootstrap/Button"
+import introjpg from "./imgs/ocean-litter.jpg"
 
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
@@ -10,6 +13,7 @@ import View from "ol/View";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
+import {House} from "react-bootstrap-icons";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -47,11 +51,35 @@ let map = new Map({
     view: map_view
 })
 
+function PageSummary(){
+    return (
+        <div className="row p-0 m-0">
+            <div className="col-sm-4 col-md-3 offset-sm-4 offset-md-4">
+                <div id="intro_text" className=" mt-3" >
+                    <Card style={{ width: '100%' }}>
+                        <Card.Img variant="top" src={introjpg} />
+                        <Card.Body>
+                            <Card.Title>World's Ocean Litter</Card.Title>
+                            <Card.Text>
+                                This site provides a dynamic display of litter trajectories in the ocean,
+                                and statistics of the litter generated and received from each country.
+                                For more information on the model built to simulate these trajectories go to
+                                <a title="Home" className="btn ml-2 btn-info btn-sm"
+                                   href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
+                                    <House/>
+                                </a>
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </div>
+            </div>
+        </div>)
+}
 
-// console.log(map.getView().getResolution())
-
+ReactDOM.render(<PageSummary/>, document.getElementById('summary'));
 ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} url={ip_address}/>,
     document.getElementById('root'));
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -1,4 +1,5 @@
 import $ from "jquery"
+import './css/chardinjs.css'
 var overlay_layer
 
 export class chardinJs{
@@ -128,6 +129,7 @@ export class chardinJs{
             else {
                 styleText += "width: " + element_position.width + "px; height:" + element_position.height + "px; top:" + element_position.top + "px;left: " + element_position.left + "px;"
             }
+            styleText += "z-index: 102";
             overlay_layer.setAttribute("style", styleText)
         }
 

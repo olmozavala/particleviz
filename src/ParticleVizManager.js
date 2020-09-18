@@ -10,9 +10,12 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye, Download} from "react-bootstrap-icons"
+import {Bullseye, Download, QuestionCircle, House} from "react-bootstrap-icons"
 import { isMobile } from "react-device-detect";
 import './css/App.css'
+import './css/chardinjs.css'
+import {chardinJs} from "./chardinjsoz";
+import {ButtonGroup} from "react-bootstrap";
 
 // const data_folder_url = "http://localhost/data"
 const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
@@ -292,6 +295,7 @@ class  ParticleVizManager extends React.Component{
         this.getHistogramSource= this.getHistogramSource.bind(this)
         this.displayPalette = this.displayPalette.bind(this)
         this.showHistogramLayer = this.showHistogramLayer.bind(this)
+        this.toggleHelp= this.toggleHelp.bind(this)
 
         let histogram_layer = new TileLayer({
             source: this.getHistogramSource(data_files[0]),
@@ -309,7 +313,8 @@ class  ParticleVizManager extends React.Component{
             histogram_layer: histogram_layer,
             histogram_selected: histogram_selected,
             max_pal: 10,
-            min_pa: 1
+            min_pa: 1,
+            chardin: new chardinJs("body")
         }
 
         // this.updateMinMax(data_files[0].wms)
@@ -338,6 +343,12 @@ class  ParticleVizManager extends React.Component{
     componentDidMount() {
         window.addEventListener("resize", this.updateMapLocation.bind(this))
         this.showHistogramLayer()
+        // TODO search a better place to do this part
+        $("body").on('chardinJs:start', function(){ $("#intro_text").show() })
+        $("body").on('chardinJs:stop', function(){ $("#intro_text").hide() })
+        if(!isMobile){
+            this.toggleHelp()
+        }
     }
 
     updateMapLocation(){
@@ -575,6 +586,7 @@ class  ParticleVizManager extends React.Component{
         // return colors[sel_ocean.color][Math.floor(Math.random() * 7)]
         return colors[sel_ocean.color]
     }
+
     colorByContinent(continent){
         // Default color
         let colors = ["#000000", "#000000"]
@@ -604,11 +616,17 @@ class  ParticleVizManager extends React.Component{
         e.preventDefault()
     }
 
+    toggleHelp() {
+        this.state.chardin.refresh()
+        this.state.chardin.toggle()
+
+    }
+
     render(){
         return (
-            <nav className="navbar navbar-expand-md navbar-light bg-light">
+            <nav className="navbar navbar-expand-md navbar-light bg-light pt-0 pb-0  justify-content-center">
                 {/*------------ Logos ------------------*/}
-                <div>
+                <div data-intro="Logos" data-position="bottom">
                     <a className="navbar-brand" href="https://www.un.org/en/" >
                         <img src={un_logo} className="rounded"  width="50px" height="50" alt="United Nations"/>
                     </a>
@@ -627,17 +645,29 @@ class  ParticleVizManager extends React.Component{
                     <div className="spinner-border" role="status"> </div>
                     <div id="load-perc" className="navbar-brand m-2" ></div>
                 </div>
+                {/*------------ Collapsible navbar------------------*/}
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup" >
+                    {/* ---------- Particles menu ------------*/}
                     <div className="navbar-nav">
-                        {/* ---------- Particles menu ------------*/}
+                        {/* ---------- Home ------------*/}
+                        <span className="m-2" data-intro="Main site" data-position="bottom">
+                            <div className="m-1 d-inline" >
+                                <a title="Home" className="btn  btn-info btn-sm"
+                                   href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
+                                    <House/>
+                                </a>
+                            </div>
+                        </span>
+                        {/* ---------- All options from particles ------------*/}
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesData}
                                         url={data_folder_url}
+                                        chardin={this.state.chardin}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
                         {/* ---------- Model selection ------------*/}
-                        <span className="m-1">
-                            <Dropdown className="m-2 d-inline"  title="Release month"  >
+                        <span className="m-2" data-intro="Month of release" data-position="bottom" >
+                            <Dropdown className="m-2 d-inline"  title="Release month" >
                                 <Dropdown.Toggle variant="info"  size="sm">
                                     {this.state.selected_model.title} {this.state.selected_model.speed}
                                 </Dropdown.Toggle>
@@ -647,7 +677,9 @@ class  ParticleVizManager extends React.Component{
                                     ))}
                                 </Dropdown.Menu>
                             </Dropdown>
-                            {/* ---------- Litter concentration ------------*/}
+                        </span>
+                        {/* ---------- Litter concentration ------------*/}
+                        <span className="m-2" data-intro="Litter concentration" data-position="bottom:0,200">
                             <div className="m-1 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
                                     <button title="Litter concentration"
                                             className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
@@ -655,18 +687,30 @@ class  ParticleVizManager extends React.Component{
                                         <Bullseye />
                                     </button>
                             </div>
-                            {/* ---------- Download data ------------*/}
-                            <div className="m-1 d-inline">
-                                <a title="Download Data"
-                                        className="btn  btn-info btn-sm"
+                        </span>
+                        {/* ---------- Download data ------------*/}
+                        <span className="m-2" data-intro="Download stats" data-position="bottom">
+                            <div className="m-1 d-inline" >
+                                <a title="Download Data" className="btn  btn-info btn-sm"
                                    // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
                                     href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
                                     <Download />
                                 </a>
                             </div>
-                            {/* ---------- Background selection ------------*/}
+                        </span>
+                        {/* ---------- Background selection ------------*/}
+                        <span className="m-2" data-intro="Map Background" data-position="bottom:0,200">
                             <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
-                            </span>
+                        </span>
+                        {/* ---------- Help toggle ------------*/}
+                        <span className="m-2" data-intro="Help" data-position="bottom">
+                            <div className="m-1 d-inline" >
+                                <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
+                                    <QuestionCircle />
+                                </button>
+                            </div>
+                        </span>
+
                     </div>
                 </div>
                 <StatesLayer map={this.props.map}

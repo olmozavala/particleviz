@@ -122,9 +122,9 @@ class  BackgroundLayerManager extends React.Component{
     render(){
         return (
             <span>
-                <Dropdown className="m-1 d-inline" title="Switch background">
+                <Dropdown className="d-inline" title="Switch background">
                     <DropdownToggle variant="light">
-                        <FontAwesomeIcon icon={faMap} size="lg"/>
+                        <FontAwesomeIcon icon={faMap}/>
                     </DropdownToggle>
                     <DropdownMenu>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
