@@ -640,11 +640,6 @@ class  ParticleVizManager extends React.Component{
                         aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                {/*------------ Spinner ------------------*/}
-                <div className="navbar-nav" id="loading">
-                    <div className="spinner-border" role="status"> </div>
-                    <div id="load-perc" className="navbar-brand m-2" ></div>
-                </div>
                 {/*------------ Collapsible navbar------------------*/}
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup" >
                     {/* ---------- Particles menu ------------*/}

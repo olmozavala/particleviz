@@ -6,7 +6,6 @@ import ImageLayer from "ol/layer/Image"
 import ImageCanvasSource from "ol/source/ImageCanvas"
 import _ from "lodash"
 import $ from 'jquery';
-import 'animate.css'
 import { isMobile } from "react-device-detect";
 
 import {
@@ -20,6 +19,7 @@ import {Form} from "react-bootstrap"
 
 import JSZip from "jszip"
 import {ButtonGroup} from "react-bootstrap"
+import ReactDOM from "react-dom";
 
 const default_size = 15 // Font size
 const STATUS = {
@@ -533,7 +533,6 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidMount() {
-        $("#big-title").text("World's Ocean Litter")
         this.updateAnimation()
     }
 
@@ -742,7 +741,7 @@ class  ParticlesLayer extends React.Component {
      */
     displayCurrentDay() {
         let start_date = this.state.selected_model.start_date
-        let title = d3.select("#title")
+        let title = d3.select("#dates-title")
         let cur_date = new Date(start_date.getTime() + this.time_step * 24 * 3600000)
         title.text(this.dateFormat(cur_date))
     }
@@ -760,14 +759,11 @@ class  ParticlesLayer extends React.Component {
             if (this.state.status === STATUS.decompressing) {
                 perc = ""
             }
-            let load_perc = document.getElementById("load-perc")
-            $(load_perc).text(perc)
-            $(load).removeClass("d-none")
-            $(load).addClass("d-inline")
+            this.updateAnimation()
+            $("#loading-div").show()
             $(".btn").prop("disabled", true)
         } else {
-            $(load).removeClass("d-inline")
-            $(load).addClass("d-none")
+            $("#loading-div").hide()
             $(".btn").prop("disabled", false)
             // Manually disabling prev and next time
             $("#pt").prop("disabled", true)

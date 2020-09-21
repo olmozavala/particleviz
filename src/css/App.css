@@ -1,26 +1,3 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #09d3ac;
-}
-
 .my_round {
   border-bottom: 1px solid #ebebeb;
   border-top-left-radius: calc(0.3rem - 1px);
@@ -57,12 +34,6 @@
   margin-bottom: 10px;
 }
 
-@media(max-width: 768px){
-  #big-title{
-    display: none;
-  }
-}
-
 @media(max-width: 767px){
   h5 {
     font-size: 1.0rem;
@@ -75,11 +46,27 @@
   }
 }
 
+
+.wl-title{
+  z-index: 102;
+  position: absolute;
+  width: 100%;
+}
+
+
+@media(max-width: 768px){
+  #main-title{
+    display: none;
+  }
+}
+
+
 @media(min-width: 768px){
   .wl-title{
     top: 65px;
+    width: 100%;
   }
-  #big-title{
+  #main-title{
     display: block;
   }
 }
@@ -94,25 +81,13 @@
   opacity: .95;
 }
 
-.wl-title{
-  z-index: 102;
-  position: absolute;
-  width: 100%;
-}
-
 #intro_text{
-  top: 200px;
+  top: 130px;
   z-index: 103;
   position: absolute;
   /*display: none;*/
 }
 
-.wl-main-title{
-  /*top: 30px;*/
-  z-index: 102;
-  position: absolute;
-  width: 100%;
-}
 
 .range-ml{
   max-width: 70px;

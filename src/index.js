@@ -14,6 +14,8 @@ import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
 import {House} from "react-bootstrap-icons";
+import {Spinner} from "react-bootstrap";
+import $ from "jquery";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -76,8 +78,27 @@ function PageSummary(){
         </div>)
 }
 
-ReactDOM.render(<PageSummary/>, document.getElementById('summary'));
-ReactDOM.render(<ParticleVizManager map={map} background_layer={background_layer} url={ip_address}/>,
+ReactDOM.render(<span>
+                    <ParticleVizManager map={map} background_layer={background_layer} url={ip_address}/>
+                    <div className="container-fluid wl-title">
+                        <div className="row p-0 m-0">
+                            <div className="col-12 text-center">
+                               <div id="main-title" className="display-4 mt-3"> World's Ocean Litter </div>
+                            </div>
+                        </div>
+                        <div className="row p-0 m-0">
+                            <div className="col-12 text-center">
+                               <div id="dates-title" className="h4 mt-3"></div>
+                            </div>
+                        </div>
+                        <div className="row p-0 m-0">
+                            <div id="loading-div" className="h5 col-12 text-center">
+                               <Spinner animation="border" variant="info"/> Loading ...
+                           </div>
+                        </div>
+                    </div>
+                    <PageSummary/>
+                </span>,
     document.getElementById('root'));
 
 
