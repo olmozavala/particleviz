@@ -20,7 +20,7 @@ import $ from "jquery";
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
 
-// let ip_address = 'http://146.201.212.214'
+// const data_folder_url = "http://localhost/data"
 let ip_address = 'http://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
@@ -56,7 +56,7 @@ let map = new Map({
 function PageSummary(){
     return (
         <div className="row p-0 m-0">
-            <div className="col-sm-4 col-md-3 offset-sm-4 offset-md-4">
+            <div className="col-xs-6 col-sm-4 col-md-3 col-lg-3  offset-sm-4 offset-md-4 offset-lg-4">
                 <div id="intro_text" className=" mt-3" >
                     <Card style={{ width: '100%' }}>
                         <Card.Img variant="top" src={introjpg} />
@@ -71,6 +71,10 @@ function PageSummary(){
                                     <House/>
                                 </a>
                             </Card.Text>
+                            <div className="h5 col-12 text-center loading-div" >
+                                <Spinner animation="border" variant="info"/>
+                                {" "} Loading ...
+                            </div>
                         </Card.Body>
                     </Card>
                 </div>
@@ -92,8 +96,9 @@ ReactDOM.render(<span>
                             </div>
                         </div>
                         <div className="row p-0 m-0">
-                            <div id="loading-div" className="h5 col-12 text-center">
-                               <Spinner animation="border" variant="info"/> Loading ...
+                            <div className="h5 col-12 text-center loading-div" >
+                               <Spinner animation="border" variant="info"/>
+                                {" "} Loading ...
                            </div>
                         </div>
                     </div>

@@ -343,6 +343,7 @@ class  ParticlesLayer extends React.Component {
         // the file to read.
         if (this.state.selected_model !== this.props.selected_model) {
             if(_.isUndefined(this.state.data[this.props.selected_model.id])){
+                // In this case is a new file, we need to reset almost everything
                 this.time_step= 0
                 this.setState({
                     loaded_files: 0,
@@ -351,24 +352,32 @@ class  ParticlesLayer extends React.Component {
                 })
                 let url = `${this.props.url}/${this.props.selected_model.file}.txt`
                 d3.text(url).then( (blob) => this.readOneZip(blob))
-            }else{
-                // console.log("Filas has been loaded previously")
+                $(".loading-div").show() // Show the loading
+                // $(".btn").prop("disabled", true)  // Disable all the buttons
+            }else{ // In this case the file was loaded previously, not much to do
                 this.time_step= 0
                 this.setState({
                     selected_model: this.props.selected_model,
                     cur_state: STATUS.playing
                 })
+                // $(".btn").attr("disabled", false)  // Enable all the buttons
             }
-        } else {
-            let canvas = this.d3canvas.node()
-            if (this.state.status === STATUS.playing) {
+        } else { // The update is within the same file
+            if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
+                $(".loading-div").show() // In this case we are still loading something
+            }else{
+                $(".loading-div").hide() // Hide the loading
+                // $(".btn").attr("disabled", false)  // Enable all the buttons
+                let canvas = this.d3canvas.node()
+                if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
                         this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
                     }
-            }
-            if (this.state.status === STATUS.paused) {
-                if (!_.isNull(canvas)) {
-                    this.drawNextDay(canvas)
+                }
+                if (this.state.status === STATUS.paused) {
+                    if (!_.isNull(canvas)) {
+                        this.drawNextDay(canvas)
+                    }
                 }
             }
         }
@@ -759,17 +768,9 @@ class  ParticlesLayer extends React.Component {
             if (this.state.status === STATUS.decompressing) {
                 perc = ""
             }
-            this.updateAnimation()
-            $("#loading-div").show()
-            $(".btn").prop("disabled", true)
-        } else {
-            $("#loading-div").hide()
-            $(".btn").prop("disabled", false)
-            // Manually disabling prev and next time
-            $("#pt").prop("disabled", true)
-            $("#nt").prop("disabled", true)
-            this.props.chardin.refresh()
+            // this.updateAnimation()
         }
+        this.props.chardin.refresh()
         return (
             <span>
                 <div className="row m-1">
@@ -780,13 +781,15 @@ class  ParticlesLayer extends React.Component {
                         </span>
                         <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
                                 title="Decrease litter trail"
-                                disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length)}>
+                                disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
+                                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Dash size={default_size}/>
                         </button>
                                                 {" "}
                                                 <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
                                                         title="Increase litter trail"
-                                                        disabled={this.state.transparency_index === 1}>
+                                                        disabled={this.state.transparency_index === 1 ||
+                                                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Plus size={default_size}/>
                         </button>
                     </span>
@@ -798,20 +801,21 @@ class  ParticlesLayer extends React.Component {
                         </span>
                         <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
                                 title="Decrease litter size"
-                                disabled={this.state.particle_size_index === 1}>
+                                disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Dash size={default_size}/>
                             </button>
                         {" "}
                         <button className="btn btn-info btn-sm" onClick={this.increaseSize}
                                 title="Increase litter size"
-                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length)}>
+                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                             <Plus size={default_size}/>
                         </button>
                     </span>
                     {/*---- Shape selection---------*/}
                     <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
                         <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
-                                title="Shape selection">
+                                title="Shape selection"
+                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                             {this.state.shape_type?
                                 <Slash size={default_size}/>
                                 :
@@ -831,31 +835,38 @@ class  ParticlesLayer extends React.Component {
                                           custom
                                           disabled={this.state.status !== STATUS.paused}/>
                     </span>
-                    {/*---- Play/Pause---------*/}
+                    {/*---- Animation controls --------*/}
                     <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
                         <ButtonGroup>
+                            {/*---- Decrease speed --------*/}
                             <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
                                     title="Decrease animation speed"
                                     disabled={(this.state.status !== STATUS.playing) ||
                                     (this.state.speed_hz <= .6)}>
                                 <SkipBackwardFill size={default_size}/>
                             </button>
+                            {/*---- Previous day --------*/}
                             <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
                                     title="Previous time step"
                                     disabled={this.state.status !== STATUS.paused}>
                                 <SkipStartFill size={default_size}/>
                             </button>
+                            {/*---- Play/Pause--------*/}
                             <button className="btn btn-info btn-sm"
                                     title="Play/pause animation"
-                                    onClick={this.playPause}>{this.state.status === STATUS.playing ?
+                                    onClick={this.playPause}
+                                    disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                {this.state.status === STATUS.playing ?
                                 <PauseFill size={default_size}/> :
                                 <PlayFill size={default_size}/>}
                             </button>
+                            {/*---- Next day--------*/}
                             <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
                                     title="Next time step"
                                     disabled={this.state.status !== STATUS.paused}>
                                     <SkipEndFill size={default_size}/>
                             </button>
+                            {/*---- Increase speed --------*/}
                             <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
                                     title="Incrase animation speed"
                                     disabled={(this.state.status !== STATUS.playing) ||

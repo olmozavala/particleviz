@@ -17,8 +17,6 @@ import './css/chardinjs.css'
 import {chardinJs} from "./chardinjsoz";
 import {ButtonGroup} from "react-bootstrap";
 
-// const data_folder_url = "http://localhost/data"
-const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
@@ -304,6 +302,8 @@ class  ParticleVizManager extends React.Component{
         let histogram_selected = false
         histogram_layer.setVisible(histogram_selected)
 
+        this.data_folder_url = this.props.url + "/data"
+        console.log(this.data_folder_url)
         // let colors_by_country = new Array().fill("#FFFFFF")
         this.state = {
             colors_by_country: [],
@@ -341,7 +341,10 @@ class  ParticleVizManager extends React.Component{
     }
 
     componentDidMount() {
-        window.addEventListener("resize", this.updateMapLocation.bind(this))
+        window.addEventListener('resize', function(){
+            this.updateMapLocation()
+            this.state.chardin.stop()
+        }.bind(this) )
         this.showHistogramLayer()
         // TODO search a better place to do this part
         $("body").on('chardinJs:start', function(){ $("#intro_text").show() })
@@ -619,12 +622,11 @@ class  ParticleVizManager extends React.Component{
     toggleHelp() {
         this.state.chardin.refresh()
         this.state.chardin.toggle()
-
     }
 
     render(){
         return (
-            <nav className="navbar navbar-expand-md navbar-light bg-light pt-0 pb-0  justify-content-center">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0" style={{zIndex:"105"}}>
                 {/*------------ Logos ------------------*/}
                 <div data-intro="Logos" data-position="bottom">
                     <a className="navbar-brand" href="https://www.un.org/en/" >
@@ -636,12 +638,12 @@ class  ParticleVizManager extends React.Component{
                 </div>
                 {/*------------ Grouped icons ------------------*/}
                 <button className="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                        data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 {/*------------ Collapsible navbar------------------*/}
-                <div className="collapse navbar-collapse" id="navbarNavAltMarkup" >
+                <div className="collapse navbar-collapse" id="collapseNavMain" >
                     {/* ---------- Particles menu ------------*/}
                     <div className="navbar-nav">
                         {/* ---------- Home ------------*/}
@@ -656,7 +658,7 @@ class  ParticleVizManager extends React.Component{
                         {/* ---------- All options from particles ------------*/}
                         <ParticlesLayer map={this.props.map}
                                         updateCountriesData={this.updateCountriesData}
-                                        url={data_folder_url}
+                                        url={this.data_folder_url}
                                         chardin={this.state.chardin}
                                         colors_by_country={this.state.colors_by_country}
                                         selected_model={this.state.selected_model}/>
@@ -675,10 +677,10 @@ class  ParticleVizManager extends React.Component{
                         </span>
                         {/* ---------- Litter concentration ------------*/}
                         <span className="m-2" data-intro="Litter concentration" data-position="bottom:0,200">
-                            <div className="m-1 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#navbarNavAltMarkup"}:'')} >
+                            <div className="m-1 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#collapseNavMain"}:'')} >
                                     <button title="Litter concentration"
                                             className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
-                                                 onClick={this.toogleHistogramLayer}>
+                                            onClick={this.toogleHistogramLayer}>
                                         <Bullseye />
                                     </button>
                             </div>
@@ -687,8 +689,7 @@ class  ParticleVizManager extends React.Component{
                         <span className="m-2" data-intro="Download stats" data-position="bottom">
                             <div className="m-1 d-inline" >
                                 <a title="Download Data" className="btn  btn-info btn-sm"
-                                   // href={`${data_folder_url}/World_litter_stats.tar.xz`}>
-                                    href={`${data_folder_url}/ReachedTablesData.tar.xz`}>
+                                   href={`${this.data_folder_url}/ReachedTablesData.tar.xz`}>
                                     <Download />
                                 </a>
                             </div>
@@ -705,11 +706,10 @@ class  ParticleVizManager extends React.Component{
                                 </button>
                             </div>
                         </span>
-
                     </div>
                 </div>
                 <StatesLayer map={this.props.map}
-                             url={data_folder_url}
+                             url={this.data_folder_url}
                              colors_by_country={this.state.colors_by_country}
                              updateTonsByCountry={this.updateTonsByCountry}
                              updateSelectedCountry = {this.updateSelectedCountry}/>
