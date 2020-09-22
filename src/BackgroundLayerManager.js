@@ -30,12 +30,12 @@ const BACKGROUND_MAPS = {
 
 class  BackgroundLayerManager extends React.Component{
     constructor(props){
-        super(props);
+        super(props)
         this.state = {
             bk_layer: this.props.background_layer
         };
 
-        this.updateBackgroundLayer= this.updateBackgroundLayer.bind(this);
+        this.updateBackgroundLayer= this.updateBackgroundLayer.bind(this)
     }
 
     componentDidMount() {
@@ -46,19 +46,24 @@ class  BackgroundLayerManager extends React.Component{
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
+    updateTitlesColors(color){
+        d3.select("#dates-title").style("color", color)
+        d3.select("#main-title").style("color", color)
+        d3.select(".loading-div").style("color", color)
+    }
+
     updateBackgroundLayer(e){
-        // console.log("Updating background layer...");
+        // console.log("Updating background layer...")
         let bk_layer = this.state.bk_layer;
         switch(parseInt(e)) {
             case BACKGROUND_MAPS.empty:
-                d3.select("#title").style("color", "#212529");
-                d3.select("#main-title").style("color", "#212529");
-                d3.select("#map").style("background-color", "white");
-                bk_layer.setSource();
+                this.updateTitlesColors("#212529")
+                d3.select("#map").style("background-color", "white")
+                bk_layer.setSource()
                 break;
             case BACKGROUND_MAPS.un:
-                d3.select("#title").style("color", "#212529");
-                d3.select("#map").style("background-color", "#AAD3DF");
+                d3.select("#dates-title").style("color", "#212529")
+                d3.select("#map").style("background-color", "#AAD3DF")
                 bk_layer.setSource(
                     new TileWMS({
                         url: 'https://geonode.wfp.org/geoserver/wms',
@@ -67,56 +72,52 @@ class  BackgroundLayerManager extends React.Component{
                             'TILED': true
                         }
                     })
-                );
+                )
                 break;
             case BACKGROUND_MAPS.osm:
-                d3.select("#title").style("color", "#212529");
-                d3.select("#main-title").style("color", "#212529");
-                d3.select("#map").style("background-color", "white");
-                bk_layer.setSource(new OSM());
+                this.updateTitlesColors("#212529")
+                d3.select("#map").style("background-color", "white")
+                bk_layer.setSource(new OSM())
                 break;
             case BACKGROUND_MAPS.stamen:
-                d3.select("#title").style("color", "#212529");
-                d3.select("#map").style("background-color", "#60C5D7");
+                this.updateTitlesColors("#212529")
+                d3.select("#map").style("background-color", "#60C5D7")
                 bk_layer.setSource(
                     new Stamen({
                         layer: 'watercolor'
                     })
-                );
+                )
                 break;
             case BACKGROUND_MAPS.dark:
-                d3.select("#title").style("color", "#d1d1e0");
-                d3.select("#main-title").style("color", "#d1d1e0");
-                d3.select("#map").style("background-color", "black");
+                this.updateTitlesColors("#d1d1e0")
+                d3.select("#map").style("background-color", "black")
                 bk_layer.setSource(
                     new BingMaps({
                         key: 'AsEfPuLqG-YV7GULoIjqTCW89vNTo4vktzl5Ca4FFRIc7bU4fhc--YTL6-g-Lp9N',
                         imagerySet: 'CanvasDark'
                     })
-                );
+                )
                 break;
             case BACKGROUND_MAPS.nature:
-                d3.select("#title").style("color", "#d1e0e0");
-                d3.select("#main-title").style("color", "#d1d1e0");
-                d3.select("#map").style("background-color", "#00101D");
+                this.updateTitlesColors("#d1d1e0")
+                d3.select("#map").style("background-color", "#00101D")
                 bk_layer.setSource(
                     new BingMaps({
                         key: 'AsEfPuLqG-YV7GULoIjqTCW89vNTo4vktzl5Ca4FFRIc7bU4fhc--YTL6-g-Lp9N',
                         imagerySet: 'Aerial'
                     })
-                );
+                )
                 break;
             default:
-                d3.select("#title").style("color", "#212529");
-                d3.select("#main-title").style("color", "#212529");
-                d3.select("#map").style("background-color", "white");
-                bk_layer.setSource();
+                this.updateTitlesColors( "#212529")
+                d3.select("#map").style("background-color", "white")
+                bk_layer.setSource()
                 break;
         }
 
         this.setState({
             bk_layer: bk_layer
-        });
+        })
     }
 
     render(){
@@ -148,7 +149,7 @@ class  BackgroundLayerManager extends React.Component{
                     </DropdownMenu>
                 </Dropdown>
             </span>
-            );
+            )
     }
 }
 

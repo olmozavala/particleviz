@@ -10,12 +10,9 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye, Download, QuestionCircle, House} from "react-bootstrap-icons"
+import {Bullseye, Download, QuestionCircle, House, List} from "react-bootstrap-icons"
 import { isMobile } from "react-device-detect";
 import './css/App.css'
-import './css/chardinjs.css'
-import {chardinJs} from "./chardinjsoz";
-import {ButtonGroup} from "react-bootstrap";
 
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
@@ -68,6 +65,7 @@ const OCEANS = {
 const CONTINENTS = {
     africa: {name:'africa',
         colors:["#fde74c","#E24E1B"],
+        // colors:["#fde74c","#654e01"],
         // colors:["#edc4b3","#774936"],
         // colors:["#e5f5f9","#2ca25f"],
         // colors:["#f0f0f0","#636363"],
@@ -79,29 +77,32 @@ const CONTINENTS = {
         // colors:["#fefcfb", "#0466c8"],
         // colors:["#fefcfb", "#b3b128"],
         // colors:["#deebf7", "#3182bd"],
-        colors:["#92c1ed", "#07487b"],
+        // colors:["#92c1ed", "#07487b"],
+        colors:["#92c1ed", "#032879"],
         // colors:["#d1eeea", "#2a5674"],
         min_max: [1000, 2300000]},
     south_america: {name:'south america',
-        colors:["#d3f2a3", "#074050"],
+        colors:["#d3f2a3", "#05556a"],
         min_max: [1000, 1000000]},
     europe: {name:'europe',
         // colors:["#ABBDFF","#663177"]},
         // colors:["#e0ecf4","#522888"],
-        colors:["#f4d277","#5b2b7e"],
+        colors:["#f4d277","#7729a7"],
         min_max: [1, 50000]},
     oceania: {name:'oceania',
-        colors:["#f0f3bd","#05668d"],
+        colors:["#F6FFF8", "#5b5959"],
         min_max: [1, 10000000]},
     north_america: {name:'north america',
         // colors:["#45CDE9","#091970"],
         // colors:["#fefcfb","#0a1128"],
+        // colors:["#fff7bc","#c91507"],
         colors:["#fff7bc","#903933"],
         // colors:["#fde0c5","#eb4a40"],
         // colors:["#fef6b5","#e15383"],
         min_max: [1, 30000]},
     seven_seas: {name:'seven seas (open ocean)',
-        colors:["#F6FFF8", "#6B9080"],
+        colors:["#f0f3bd","#05668d"],
+        // colors:["#F6FFF8", "#6B9080"],
         min_max: [1, 10000000]},
     antarctica: {name:'antarctica',
         colors:["#E4E7E4", "#111111"],
@@ -295,6 +296,7 @@ class  ParticleVizManager extends React.Component{
         this.showHistogramLayer = this.showHistogramLayer.bind(this)
         this.toggleHelp= this.toggleHelp.bind(this)
 
+
         let histogram_layer = new TileLayer({
             source: this.getHistogramSource(data_files[0]),
             opacity:.8})
@@ -314,7 +316,7 @@ class  ParticleVizManager extends React.Component{
             histogram_selected: histogram_selected,
             max_pal: 10,
             min_pa: 1,
-            chardin: new chardinJs("body")
+            chardin: this.props.chardin
         }
 
         // this.updateMinMax(data_files[0].wms)
@@ -350,8 +352,16 @@ class  ParticleVizManager extends React.Component{
         $("body").on('chardinJs:start', function(){ $("#intro_text").show() })
         $("body").on('chardinJs:stop', function(){ $("#intro_text").hide() })
         if(!isMobile){
-            this.toggleHelp()
+            this.state.chardin.start()
         }
+
+        //TODO this is a patch for the collapse nabvar to hide the titles
+        $('#collapseNavMain').on('show.bs.collapse', function() {
+            $('.wl-title').hide()
+        });
+        $('#collapseNavMain').on('hidden.bs.collapse', function() {
+            $('.wl-title').show()
+        });
     }
 
     updateMapLocation(){
@@ -625,96 +635,194 @@ class  ParticleVizManager extends React.Component{
     }
 
     render(){
-        return (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0" style={{zIndex:"105"}}>
-                {/*------------ Logos ------------------*/}
-                <div data-intro="Logos" data-position="bottom">
-                    <a className="navbar-brand" href="https://www.un.org/en/" >
-                        <img src={un_logo} className="rounded"  width="50px" height="50" alt="United Nations"/>
-                    </a>
-                    <a className="navbar-brand" href="https://www.coaps.fsu.edu/" >
-                        <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
-                    </a>
-                </div>
-                {/*------------ Grouped icons ------------------*/}
-                <button className="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
-                        aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                {/*------------ Collapsible navbar------------------*/}
-                <div className="collapse navbar-collapse" id="collapseNavMain" >
-                    {/* ---------- Particles menu ------------*/}
-                    <div className="navbar-nav">
-                        {/* ---------- Home ------------*/}
-                        <span className="m-2" data-intro="Main site" data-position="bottom">
-                            <div className="m-1 d-inline" >
+        console.log(window.innerWidth)
+        if(isMobile ||  window.innerWidth <= 1200){
+            // --------------------- MOBILE  or < 1200---------------------------------
+            return (
+                <nav className="navbar navbar-expand-xl navbar-light bg-light pt-0 pb-0">
+                    {/*------------ Logos ------------------*/}
+                    <div data-intro="Logos" data-position="bottom">
+                        <a className="navbar-brand" href="https://www.un.org/en/">
+                            <img src={un_logo} className="rounded" width="50px" height="50" alt="United Nations"/>
+                        </a>
+                        <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
+                            <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
+                        </a>
+                    </div>
+                    {/* ---------- Home ------------*/}
+                    <span className="m-2" data-intro="Home" data-position="bottom">
+                            <div className="m-1 d-inline">
                                 <a title="Home" className="btn  btn-info btn-sm"
                                    href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
                                     <House/>
                                 </a>
                             </div>
                         </span>
-                        {/* ---------- All options from particles ------------*/}
-                        <ParticlesLayer map={this.props.map}
-                                        updateCountriesData={this.updateCountriesData}
-                                        url={this.data_folder_url}
-                                        chardin={this.state.chardin}
-                                        colors_by_country={this.state.colors_by_country}
-                                        selected_model={this.state.selected_model}/>
-                        {/* ---------- Model selection ------------*/}
-                        <span className="m-2" data-intro="Month of release" data-position="bottom" >
-                            <Dropdown className="m-2 d-inline"  title="Release month" >
-                                <Dropdown.Toggle variant="info"  size="sm">
-                                    {this.state.selected_model.title} {this.state.selected_model.speed}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu onClick={this.changeFile} >
-                                    {data_files.map((item,index) => (
-                                        <Dropdown.Item eventKey={item.name} key={index}>{item.title} {item.speed}</Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </span>
-                        {/* ---------- Litter concentration ------------*/}
-                        <span className="m-2" data-intro="Litter concentration" data-position="bottom:0,200">
-                            <div className="m-1 d-inline" {...(isMobile?{'data-toggle':"collapse",'data-target':"#collapseNavMain"}:'')} >
-                                    <button title="Litter concentration"
-                                            className={`btn ${this.state.histogram_selected?' btn-outline-info':' btn-info'} btn-sm`}
-                                            onClick={this.toogleHistogramLayer}>
-                                        <Bullseye />
-                                    </button>
-                            </div>
-                        </span>
-                        {/* ---------- Download data ------------*/}
-                        <span className="m-2" data-intro="Download stats" data-position="bottom">
-                            <div className="m-1 d-inline" >
-                                <a title="Download Data" className="btn  btn-info btn-sm"
-                                   href={`${this.data_folder_url}/ReachedTablesData.tar.xz`}>
-                                    <Download />
+                    {/*---------- Litter concentration ------------*/}
+                    <span className="m-2" data-intro="Concentration" data-position="bottom:0,200">
+                                    <div className="m-1 d-inline" {...(isMobile ? {
+                                        'data-toggle': "collapse",
+                                        'data-target': "#collapseNavMain"
+                                    } : '')} >
+                                            <button title="Litter concentration"
+                                                    className={`btn ${this.state.histogram_selected ? ' btn-outline-info' : ' btn-info'} btn-sm`}
+                                                    onClick={this.toogleHistogramLayer}>
+                                                <Bullseye/>
+                                            </button>
+                                    </div>
+                                </span>
+                    {/* ---------- Download data ------------*/}
+                    <span className="m-2" data-intro="Download stats" data-position="bottom">
+                        <div className="m-1 d-inline">
+                            <a title="Download Data" className="btn  btn-info btn-sm"
+                               href={`${this.data_folder_url}/World_Litter_Countries_Stats.zip`}>
+                                <Download/>
+                            </a>
+                        </div>
+                    </span>
+                    {/*------------ Grouped icons ------------------*/}
+                    <button className="navbar-toggler" type="button" data-toggle="collapse"
+                            data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
+                            data-intro="Menu" data-position="bottom"
+                            aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    {/*------------ Collapsible navbar------------------*/}
+                    <div className="collapse navbar-collapse" id="collapseNavMain">
+                        {/* ---------- Particles menu ------------*/}
+                        <div className="navbar-nav">
+                            <span>
+                                {/* ---------- Background selection ------------*/}
+                                <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                        map={this.props.map}/>
+                                {/*---------- Model selection ------------*/}
+                                <Dropdown className="m-2 d-inline" title="Release month">
+                                        <Dropdown.Toggle variant="info" size="sm">
+                                            {this.state.selected_model.title} {this.state.selected_model.speed}
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu onClick={this.changeFile}>
+                                            {data_files.map((item, index) => (
+                                                <Dropdown.Item eventKey={item.name}
+                                                               key={index}>{item.title} {item.speed}</Dropdown.Item>
+                                            ))}
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                {/*---------- All options from particles ------------*/}
+                                <ParticlesLayer map={this.props.map}
+                                                updateCountriesData={this.updateCountriesData}
+                                                url={this.data_folder_url}
+                                                chardin={this.state.chardin}
+                                                colors_by_country={this.state.colors_by_country}
+                                                selected_model={this.state.selected_model}/>
+                            </span>
+                        </div>
+                    </div>
+                    <StatesLayer map={this.props.map}
+                                 url={this.data_folder_url}
+                                 colors_by_country={this.state.colors_by_country}
+                                 updateTonsByCountry={this.updateTonsByCountry}
+                                 updateSelectedCountry={this.updateSelectedCountry}/>
+                </nav>
+
+            )
+        }else {
+            // --------------------- DESKTOP ---------------------------------
+            return (
+                <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0">
+                    {/*------------ Logos ------------------*/}
+                    <div data-intro="Logos" data-position="bottom">
+                        <a className="navbar-brand" href="https://www.un.org/en/">
+                            <img src={un_logo} className="rounded" width="50px" height="50" alt="United Nations"/>
+                        </a>
+                        <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
+                            <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
+                        </a>
+                    </div>
+                    {/* ---------- Home ------------*/}
+                    <span className="m-2" data-intro="Main site" data-position="bottom">
+                            <div className="m-1 d-inline">
+                                <a title="Home" className="btn  btn-info btn-sm"
+                                   href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
+                                    <House/>
                                 </a>
                             </div>
                         </span>
-                        {/* ---------- Background selection ------------*/}
-                        <span className="m-2" data-intro="Map Background" data-position="bottom:0,200">
-                            <BackgroundLayerManager background_layer={this.props.background_layer} map={this.props.map} />
-                        </span>
-                        {/* ---------- Help toggle ------------*/}
-                        <span className="m-2" data-intro="Help" data-position="bottom">
-                            <div className="m-1 d-inline" >
-                                <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
-                                    <QuestionCircle />
-                                </button>
-                            </div>
-                        </span>
+                    {/*------------ Grouped icons ------------------*/}
+                    <button className="navbar-toggler" type="button" data-toggle="collapse"
+                            data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    {/*------------ Collapsible navbar------------------*/}
+                    <div className="collapse navbar-collapse" id="collapseNavMain">
+                        {/* ---------- Particles menu ------------*/}
+                        <div className="navbar-nav">
+                            {/* ---------- All options from particles ------------*/}
+                            <ParticlesLayer map={this.props.map}
+                                            updateCountriesData={this.updateCountriesData}
+                                            url={this.data_folder_url}
+                                            chardin={this.state.chardin}
+                                            colors_by_country={this.state.colors_by_country}
+                                            selected_model={this.state.selected_model}/>
+                            {/* ---------- Model selection ------------*/}
+                            <span className="m-2" data-intro="Month of release" data-position="bottom">
+                                    <Dropdown className="m-2 d-inline" title="Release month">
+                                    <Dropdown.Toggle variant="info" size="sm">
+                                        {this.state.selected_model.title} {this.state.selected_model.speed}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu onClick={this.changeFile}>
+                                        {data_files.map((item, index) => (
+                                            <Dropdown.Item eventKey={item.name}
+                                                           key={index}>{item.title} {item.speed}</Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </span>
+                            {/* ---------- Litter concentration ------------*/}
+                            <span className="m-2" data-intro="Litter concentration" data-position="bottom:0,200">
+                                <div className="m-1 d-inline" {...(isMobile ? {
+                                    'data-toggle': "collapse",
+                                    'data-target': "#collapseNavMain"
+                                } : '')} >
+                                        <button title="Litter concentration"
+                                                className={`btn ${this.state.histogram_selected ? ' btn-outline-info' : ' btn-info'} btn-sm`}
+                                                onClick={this.toogleHistogramLayer}>
+                                            <Bullseye/>
+                                        </button>
+                                </div>
+                            </span>
+                            {/* ---------- Download data ------------*/}
+                            <span className="m-2" data-intro="Download stats" data-position="bottom">
+                                <div className="m-1 d-inline">
+                                    <a title="Download Data" className="btn  btn-info btn-sm"
+                                       href={`${this.data_folder_url}/World_Litter_Countries_Stats.zip`}>
+                                        <Download/>
+                                    </a>
+                                </div>
+                            </span>
+                            {/* ---------- Background selection ------------*/}
+                            <span className="m-2" data-intro="Map Background" data-position="bottom:0,200">
+                                <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                        map={this.props.map}/>
+                            </span>
+                            {/* ---------- Help toggle ------------*/}
+                            <span className="m-2" data-intro="Help" data-position="bottom">
+                                    <div className="m-1 d-inline">
+                                        <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
+                                            <QuestionCircle/>
+                                        </button>
+                                    </div>
+                                </span>
+                        </div>
                     </div>
-                </div>
-                <StatesLayer map={this.props.map}
-                             url={this.data_folder_url}
-                             colors_by_country={this.state.colors_by_country}
-                             updateTonsByCountry={this.updateTonsByCountry}
-                             updateSelectedCountry = {this.updateSelectedCountry}/>
-            </nav>
-        )
+                    <StatesLayer map={this.props.map}
+                                 url={this.data_folder_url}
+                                 colors_by_country={this.state.colors_by_country}
+                                 updateTonsByCountry={this.updateTonsByCountry}
+                                 updateSelectedCountry={this.updateSelectedCountry}/>
+                </nav>
+            )
+        }
     }
 }
 

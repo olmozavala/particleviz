@@ -1,21 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/index.css';
+import './css/chardinjs.css'
 import ParticleVizManager from './ParticleVizManager';
 import * as serviceWorker from './serviceWorker';
 import Card from "react-bootstrap/Card"
 import Button from "react-bootstrap/Button"
-import introjpg from "./imgs/ocean-litter.jpg"
+import introjpg from "./imgs/i2.jpg"
 
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
+import {FullScreen, Zoom} from "ol/control";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
-import {House} from "react-bootstrap-icons";
+import {House, QuestionCircle} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
 import $ from "jquery";
+import {chardinJs} from "./chardinjsoz";
+import { isMobile } from "react-device-detect";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -45,13 +49,24 @@ let map_view = new View({
         // maxZoom: 8,
         // minZoom: 2
     })
+
+let ol_controls = [new Zoom(),
+    // new FullScreen(),
+                    ]
+// if(isMobile){
+//     ol_controls = []
+// }
+ol_controls = []
+
 let map = new Map({
-    layers: [
-        background_layer
-    ],
+    layers: [ background_layer ],
     target: 'map',
-    view: map_view
+    view: map_view,
+    controls: ol_controls
 })
+
+
+var intro_chardin = new chardinJs("body")
 
 function PageSummary(){
     return (
@@ -63,13 +78,18 @@ function PageSummary(){
                         <Card.Body>
                             <Card.Title>World's Ocean Litter</Card.Title>
                             <Card.Text>
-                                This site provides a dynamic display of litter trajectories in the ocean,
-                                and statistics of the litter generated and received from each country.
-                                For more information on the model built to simulate these trajectories go to
+                                This site provides a dynamic display of marine litter trajectories in the ocean
+                                and statistics of the litter generated and received by each country.
+                                Click
+                                <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  intro_chardin.stop()}>
+                                    <QuestionCircle />
+                                </button>
+                                to continue and please wait for the site to load.
+                                For details on the model go to
                                 <a title="Home" className="btn ml-2 btn-info btn-sm"
                                    href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
                                     <House/>
-                                </a>
+                                </a>.
                             </Card.Text>
                             <div className="h5 col-12 text-center loading-div" >
                                 <Spinner animation="border" variant="info"/>
@@ -83,7 +103,7 @@ function PageSummary(){
 }
 
 ReactDOM.render(<span>
-                    <ParticleVizManager map={map} background_layer={background_layer} url={ip_address}/>
+                    <ParticleVizManager map={map} background_layer={background_layer} url={ip_address} chardin={intro_chardin}/>
                     <div className="container-fluid wl-title">
                         <div className="row p-0 m-0">
                             <div className="col-12 text-center">

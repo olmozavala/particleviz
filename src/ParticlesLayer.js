@@ -103,8 +103,6 @@ class  ParticlesLayer extends React.Component {
         let url = `${this.props.url}/${this.props.selected_model.file}.txt`
         d3.text(url).then( (blob) => this.readOneZip(blob))
 
-        console.log(this.props)
-
         // Setting up d3 objects TODO somethings doesn't make sense here
         this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
         if (this.d3canvas.empty()) {
@@ -643,7 +641,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     changeDayRange(e) {
-        e.preventDefault()
+        // e.preventDefault()
         let cur_time_step = parseInt(e.target.value)
         this.time_step = cur_time_step
         console.log(this.time_step)
@@ -768,33 +766,31 @@ class  ParticlesLayer extends React.Component {
             if (this.state.status === STATUS.decompressing) {
                 perc = ""
             }
-            // this.updateAnimation()
         }
         this.props.chardin.refresh()
         return (
-            <span>
-                <div className="row m-1">
-                    {/*---- Transparency ---------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Litter trail length"} data-position={"bottom"} >
+            <span className="m-1">
+                {/*---- Transparency ---------*/}
+                <span className="navbar-brand col-auto" data-intro={"Litter trail length"} data-position={"bottom"} >
                         <span style={{display: "inline-block", width: "25px"}}>
                             <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
                         </span>
                         <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
                                 title="Decrease litter trail"
                                 disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
-                                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Dash size={default_size}/>
                         </button>
-                                                {" "}
-                                                <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                                                        title="Increase litter trail"
-                                                        disabled={this.state.transparency_index === 1 ||
-                                                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                    {" "}
+                    <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                            title="Increase litter trail"
+                            disabled={this.state.transparency_index === 1 ||
+                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Plus size={default_size}/>
                         </button>
                     </span>
-                    {/*---- Particle size ---------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Litter size"} data-position={"bottom"}>
+                {/*---- Particle size ---------*/}
+                <span className="navbar-brand col-auto" data-intro={"Litter size"} data-position={"bottom"}>
                         <span style={{display: "inline-block", width: "25px"}}  >
                             <CircleFill
                                 size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
@@ -804,15 +800,15 @@ class  ParticlesLayer extends React.Component {
                                 disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Dash size={default_size}/>
                             </button>
-                        {" "}
-                        <button className="btn btn-info btn-sm" onClick={this.increaseSize}
-                                title="Increase litter size"
-                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                    {" "}
+                    <button className="btn btn-info btn-sm" onClick={this.increaseSize}
+                            title="Increase litter size"
+                            disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                             <Plus size={default_size}/>
                         </button>
                     </span>
-                    {/*---- Shape selection---------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
+                {/*---- Shape selection---------*/}
+                <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
                         <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
                                 title="Shape selection"
                                 disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
@@ -823,20 +819,22 @@ class  ParticlesLayer extends React.Component {
                             }
                         </button>
                     </span>
-                    {/*---- Range Current day ------------*/}
-                    <span id="date_range" className="navbar-brand d-none d-lg-inline range-ml " data-intro="Day selection" data-position="bottom">
-                            <Form.Control type="range"
-                                          title="Date selection"
-                                          onChange={this.changeDayRange}
-                                          value={this.time_step}
-                                          min="0" max={(this.state.status === STATUS.loading ||
-                                                       this.state.status === STATUS.decompressing)? 0:
-                                                        this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                          custom
-                                          disabled={this.state.status !== STATUS.paused}/>
-                    </span>
-                    {/*---- Animation controls --------*/}
-                    <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
+                {/*---- Range Current day ------------*/}
+                <span id="date_range" className="navbar-brand m-1" data-intro="Day selection" data-position="bottom">
+                    <Form.Control type="range"
+                                  id="range-ml"
+                                  title="Date selection"
+                                  onChange={this.changeDayRange}
+                                  value={this.time_step}
+                                  min="0" max={(this.state.status === STATUS.loading ||
+                        this.state.status === STATUS.decompressing)? 0:
+                        this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                  custom
+                                  disabled={this.state.status !== STATUS.paused}/>
+                </span>
+
+                {/*---- Animation controls --------*/}
+                <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
                         <ButtonGroup>
                             {/*---- Decrease speed --------*/}
                             <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
@@ -857,8 +855,8 @@ class  ParticlesLayer extends React.Component {
                                     onClick={this.playPause}
                                     disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 {this.state.status === STATUS.playing ?
-                                <PauseFill size={default_size}/> :
-                                <PlayFill size={default_size}/>}
+                                    <PauseFill size={default_size}/> :
+                                    <PlayFill size={default_size}/>}
                             </button>
                             {/*---- Next day--------*/}
                             <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
@@ -875,7 +873,6 @@ class  ParticlesLayer extends React.Component {
                             </button>
                         </ButtonGroup>
                     </span>
-                </div>
             </span>
         )
     }

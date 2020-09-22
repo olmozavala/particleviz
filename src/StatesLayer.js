@@ -11,6 +11,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import './css/App.css';
 import _ from "underscore";
 import * as d3 from "d3";
+import { isMobile } from "react-device-detect";
 
 require('ol/ol.css');
 
@@ -234,8 +235,10 @@ class  StatesLayer extends React.Component{
     componentDidMount() {
         this.props.map.on('click', this.clickEvent);
         this.props.map.on('pointermove', this.hoverEvent);
-        document.getElementsByClassName("ol-zoom")[0].style.zIndex = 101
-        document.getElementsByClassName("ol-zoom")[0].style.top = "50px"
+        if(!isMobile){
+            // document.getElementsByClassName("ol-zoom")[0].style.zIndex = 101
+            // document.getElementsByClassName("ol-full-screen")[0].style.zIndex = 111
+        }
     }
 
     render() {
