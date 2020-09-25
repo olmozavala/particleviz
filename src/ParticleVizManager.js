@@ -10,7 +10,7 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye, Download, QuestionCircle, House, List} from "react-bootstrap-icons"
+import {Bullseye, Download, QuestionCircle, House} from "react-bootstrap-icons"
 import { isMobile } from "react-device-detect";
 import './css/App.css'
 
@@ -305,7 +305,6 @@ class  ParticleVizManager extends React.Component{
         histogram_layer.setVisible(histogram_selected)
 
         this.data_folder_url = this.props.url + "/data"
-        console.log(this.data_folder_url)
         // let colors_by_country = new Array().fill("#FFFFFF")
         this.state = {
             colors_by_country: [],
@@ -635,7 +634,6 @@ class  ParticleVizManager extends React.Component{
     }
 
     render(){
-        console.log(window.innerWidth)
         if(isMobile ||  window.innerWidth <= 1200){
             // --------------------- MOBILE  or < 1200---------------------------------
             return (
@@ -732,10 +730,10 @@ class  ParticleVizManager extends React.Component{
                     {/*------------ Logos ------------------*/}
                     <div data-intro="Logos" data-position="bottom">
                         <a className="navbar-brand" href="https://www.un.org/en/">
-                            <img src={un_logo} className="rounded" width="50px" height="50" alt="United Nations"/>
+                            <img src={un_logo} className="rounded" width="40px" height="40px" alt="United Nations"/>
                         </a>
                         <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
-                            <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
+                            <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
                         </a>
                     </div>
                     {/* ---------- Home ------------*/}
@@ -765,7 +763,7 @@ class  ParticleVizManager extends React.Component{
                                             colors_by_country={this.state.colors_by_country}
                                             selected_model={this.state.selected_model}/>
                             {/* ---------- Model selection ------------*/}
-                            <span className="m-2" data-intro="Month of release" data-position="bottom">
+                            <span className="navbar-brand m-2" data-intro="Month of release" data-position="bottom">
                                     <Dropdown className="m-2 d-inline" title="Release month">
                                     <Dropdown.Toggle variant="info" size="sm">
                                         {this.state.selected_model.title} {this.state.selected_model.speed}
@@ -779,7 +777,7 @@ class  ParticleVizManager extends React.Component{
                                 </Dropdown>
                             </span>
                             {/* ---------- Litter concentration ------------*/}
-                            <span className="m-2" data-intro="Litter concentration" data-position="bottom:0,200">
+                            <span className="navbar-brand m-2" data-intro="Litter concentration" data-position="bottom:0,200">
                                 <div className="m-1 d-inline" {...(isMobile ? {
                                     'data-toggle': "collapse",
                                     'data-target': "#collapseNavMain"
@@ -792,7 +790,7 @@ class  ParticleVizManager extends React.Component{
                                 </div>
                             </span>
                             {/* ---------- Download data ------------*/}
-                            <span className="m-2" data-intro="Download stats" data-position="bottom">
+                            <span className="navbar-brand m-2" data-intro="Download stats" data-position="bottom">
                                 <div className="m-1 d-inline">
                                     <a title="Download Data" className="btn  btn-info btn-sm"
                                        href={`${this.data_folder_url}/World_Litter_Countries_Stats.zip`}>
@@ -801,12 +799,12 @@ class  ParticleVizManager extends React.Component{
                                 </div>
                             </span>
                             {/* ---------- Background selection ------------*/}
-                            <span className="m-2" data-intro="Map Background" data-position="bottom:0,200">
+                            <span className="navbar-brand m-2" data-intro="Map Background" data-position="bottom:0,200">
                                 <BackgroundLayerManager background_layer={this.props.background_layer}
                                                         map={this.props.map}/>
                             </span>
                             {/* ---------- Help toggle ------------*/}
-                            <span className="m-2" data-intro="Help" data-position="bottom">
+                            <span className="navbar-brand m-2" data-intro="Help" data-position="bottom">
                                     <div className="m-1 d-inline">
                                         <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
                                             <QuestionCircle/>

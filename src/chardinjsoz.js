@@ -118,7 +118,7 @@ export class chardinJs{
         var element_position = this._get_offset(this.$el.get()[0])
         if (element_position) {
             $('*').filter(function() {
-                return $(this).css('position') == 'fixed'
+                return $(this).css('position') === 'fixed'
             }).each(function () {
                 $(this)[0].className += " chardinjs-no-fixed"
             })
@@ -177,34 +177,34 @@ export class chardinJs{
     _get_position (element) {
         var positionString, _ref
         var helpref = element.getAttribute(this.data_attribute)
-        if (helpref[0] == '#' && this.data_helptext[helpref].position)
+        if (helpref[0] === '#' && this.data_helptext[helpref].position)
             positionString = this.data_helptext[helpref].position
         else
             positionString = element.getAttribute('data-position')
 
-        return positionString == null ? 'bottom' : (_ref = positionString.split(':')) != null ? _ref[0] : positionString
+        return positionString === null ? 'bottom' : (_ref = positionString.split(':')) != null ? _ref[0] : positionString
     }
 
     _get_position_offset (element) {
         var positionString, _ref
         var helpref = element.getAttribute(this.data_attribute)
-        if (helpref[0] == '#' && this.data_helptext[helpref].position)
+        if (helpref[0] === '#' && this.data_helptext[helpref].position)
             positionString = this.data_helptext[helpref].position
         else
             positionString = element.getAttribute('data-position')
 
-        return (positionString == null ? 1 : 1 + parseInt(((_ref = positionString.split(':')) != null ? (_ref[1] || '').split(',')[0] : void 0) || 0, 10) / 100)
+        return (positionString === null ? 1 : 1 + parseInt(((_ref = positionString.split(':')) != null ? (_ref[1] || '').split(',')[0] : void 0) || 0, 10) / 100)
     }
 
     _get_position_distance (element) {
         var positionString, _ref
         var helpref = element.getAttribute(this.data_attribute)
-        if (helpref[0] == '#' && this.data_helptext[helpref].position)
+        if (helpref[0] === '#' && this.data_helptext[helpref].position)
             positionString = this.data_helptext[helpref].position
         else
             positionString = element.getAttribute('data-position')
 
-        return (positionString == null ? 100 : parseInt(((_ref = positionString.split(':')) != null ? (_ref[1] || '').split(',')[1] : void 0) || 100, 10))
+        return (positionString === null ? 100 : parseInt(((_ref = positionString.split(':')) != null ? (_ref[1] || '').split(',')[1] : void 0) || 100, 10))
     }
 
     _get_css_attribute (element) {
@@ -272,6 +272,8 @@ export class chardinJs{
                 tooltipActualWidth = parseFloat(this._getStyle(tooltip_layer, "width"))
                 offset = 185 - (tooltipMaxWidth - tooltipActualWidth) + distance * 30
                 return tooltip_layer.style[position] = "-" + offset + "px"
+            default:
+                console.log("Error on charmin, missing argument.")
         }
     }
 
@@ -303,7 +305,7 @@ export class chardinJs{
         tooltip_layer = document.createElement("div")
 
         var helpref = element.getAttribute(this.data_attribute)
-        if (helpref[0] == '#') {
+        if (helpref[0] === '#') {
             var helptext = this.data_helptext[helpref]
             if (helptext)
                 tooltip_layer.innerHTML = "<div class='chardinjs-tooltiptext'>" + helptext.text + "</div>"
@@ -410,7 +412,7 @@ export class chardinJs{
     _handleMouseClick (event) {
         if (!this.active)
             return
-        let size = this._getMaxSize()
+        // let size = this._getMaxSize()
         event = event || window.event
         if (event.shiftKey) {
             return this.previous(false)

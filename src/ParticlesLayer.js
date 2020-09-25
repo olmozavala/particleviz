@@ -5,8 +5,9 @@ import * as d3 from "d3"
 import ImageLayer from "ol/layer/Image"
 import ImageCanvasSource from "ol/source/ImageCanvas"
 import _ from "lodash"
-import $ from 'jquery';
-import { isMobile } from "react-device-detect";
+import $ from 'jquery'
+import { isMobile } from "react-device-detect"
+import { OverlayTrigger, Tooltip } from "react-bootstrap"
 
 import {
     ArrowRight, CircleFill, Plus, Dash,
@@ -19,7 +20,6 @@ import {Form} from "react-bootstrap"
 
 import JSZip from "jszip"
 import {ButtonGroup} from "react-bootstrap"
-import ReactDOM from "react-dom";
 
 const default_size = 15 // Font size
 const STATUS = {
@@ -194,7 +194,7 @@ class  ParticlesLayer extends React.Component {
             // console.log(`Uncompressed file received, file number: ${filenum} ....`)
             let th = 10  // Threshold used to decide if the particle is crossing from left to right of the screen
 
-            console.log("Reading final data!!!!!!! ", data)
+            // console.log("Reading final data!!!!!!! ", data)
             // let country_keys = Object.keys(data).map((name) => name.toLocaleLowerCase()) // fixing those particles that 'jump' the map
             let country_keys = Object.keys(data)
             let total_timesteps = data[country_keys[0]]["lat_lon"][0][0].length
@@ -760,13 +760,13 @@ class  ParticlesLayer extends React.Component {
     }
 
     render() {
-        let load = document.getElementById("loading")
-        if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
-            let perc = ""
-            if (this.state.status === STATUS.decompressing) {
-                perc = ""
-            }
-        }
+        // let load = document.getElementById("loading")
+        // if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
+        //     let perc = ""
+        //     if (this.state.status === STATUS.decompressing) {
+        //         perc = ""
+        //     }
+        // }
         this.props.chardin.refresh()
         return (
             <span className="m-1">
@@ -820,7 +820,7 @@ class  ParticlesLayer extends React.Component {
                         </button>
                     </span>
                 {/*---- Range Current day ------------*/}
-                <span id="date_range" className="navbar-brand m-1" data-intro="Day selection" data-position="bottom">
+                <span id="date_range" className="navbar-brand mt-1" data-intro="Day selection" data-position="bottom">
                     <Form.Control type="range"
                                   id="range-ml"
                                   title="Date selection"
@@ -837,40 +837,59 @@ class  ParticlesLayer extends React.Component {
                 <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
                         <ButtonGroup>
                             {/*---- Decrease speed --------*/}
-                            <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
-                                    title="Decrease animation speed"
-                                    disabled={(this.state.status !== STATUS.playing) ||
-                                    (this.state.speed_hz <= .6)}>
-                                <SkipBackwardFill size={default_size}/>
-                            </button>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 1, hide: 1 }}
+                                overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip> )}>
+                                <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
+                                        disabled={(this.state.status !== STATUS.playing) ||
+                                        (this.state.speed_hz <= .6)}>
+                                    <SkipBackwardFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
                             {/*---- Previous day --------*/}
-                            <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
-                                    title="Previous time step"
-                                    disabled={this.state.status !== STATUS.paused}>
-                                <SkipStartFill size={default_size}/>
-                            </button>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 1, hide: 1 }}
+                                overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip> )}>
+                                    <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
+                                            disabled={this.state.status !== STATUS.paused}>
+                                        <SkipStartFill size={default_size}/>
+                                    </button>
+                            </OverlayTrigger>
                             {/*---- Play/Pause--------*/}
-                            <button className="btn btn-info btn-sm"
-                                    title="Play/pause animation"
-                                    onClick={this.playPause}
-                                    disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                {this.state.status === STATUS.playing ?
-                                    <PauseFill size={default_size}/> :
-                                    <PlayFill size={default_size}/>}
-                            </button>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 1, hide: 1 }}
+                                overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip> )}>
+                                    <button className="btn btn-info btn-sm"
+                                            onClick={this.playPause}
+                                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                        {this.state.status === STATUS.playing ?
+                                            <PauseFill size={default_size}/> :
+                                            <PlayFill size={default_size}/>}
+                                    </button>
+                            </OverlayTrigger>
                             {/*---- Next day--------*/}
-                            <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
-                                    title="Next time step"
-                                    disabled={this.state.status !== STATUS.paused}>
-                                    <SkipEndFill size={default_size}/>
-                            </button>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 1, hide: 1 }}
+                                overlay={(props) => ( <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip> )}>
+                                <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
+                                        disabled={this.state.status !== STATUS.paused}>
+                                        <SkipEndFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
                             {/*---- Increase speed --------*/}
-                            <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                    title="Incrase animation speed"
-                                    disabled={(this.state.status !== STATUS.playing) ||
-                                    (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
-                            <SkipForwardFill size={default_size}/>
-                            </button>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 1, hide: 1 }}
+                                overlay={(props) => ( <Tooltip id="tooltip_inc_speed" {...props}> Increase animation speed</Tooltip> )}>
+                                <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
+                                        disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
+                                    <SkipForwardFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
                         </ButtonGroup>
                     </span>
             </span>

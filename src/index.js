@@ -5,21 +5,18 @@ import './css/chardinjs.css'
 import ParticleVizManager from './ParticleVizManager';
 import * as serviceWorker from './serviceWorker';
 import Card from "react-bootstrap/Card"
-import Button from "react-bootstrap/Button"
 import introjpg from "./imgs/i2.jpg"
 
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
-import {FullScreen, Zoom} from "ol/control";
+import {Zoom} from "ol/control";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
 import {House, QuestionCircle} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
-import $ from "jquery";
 import {chardinJs} from "./chardinjsoz";
-import { isMobile } from "react-device-detect";
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
