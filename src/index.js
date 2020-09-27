@@ -21,7 +21,7 @@ import {chardinJs} from "./chardinjsoz";
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
 
-// const data_folder_url = "http://localhost/data"
+// let ip_address = "http://localhost/data"
 let ip_address = 'http://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
@@ -78,7 +78,9 @@ function PageSummary(){
                                 This site provides a dynamic display of marine litter trajectories in the ocean
                                 and statistics of the litter generated and received by each country.
                                 Click
-                                <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  intro_chardin.stop()}>
+                                <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  {
+                                    intro_chardin.stop()}
+                                }>
                                     <QuestionCircle />
                                 </button>
                                 to continue and please wait for the site to load.

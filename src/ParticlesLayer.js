@@ -348,10 +348,10 @@ class  ParticlesLayer extends React.Component {
                     selected_model: this.props.selected_model,
                     status: STATUS.loading,
                 })
+                // ========================= This was for the single file version =============================
                 let url = `${this.props.url}/${this.props.selected_model.file}.txt`
                 d3.text(url).then( (blob) => this.readOneZip(blob))
                 $(".loading-div").show() // Show the loading
-                // $(".btn").prop("disabled", true)  // Disable all the buttons
             }else{ // In this case the file was loaded previously, not much to do
                 this.time_step= 0
                 this.setState({

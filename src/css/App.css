@@ -16,7 +16,6 @@
 
 .wl-palette{
   position: absolute;
-  left: 5%;
   bottom: 1%;
   z-index: 101;
   pointer-events: none;
@@ -62,11 +61,18 @@
     top: 0px;
     left: 0px;
   }
+  .wl-palette{
+      left: 5%;
+  }
 }
 
 @media(min-width: 768px){
   #intro_text {
     top: 100px;
+
+  }
+  .wl-palette{
+    left: 20%;
   }
 }
 

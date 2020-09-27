@@ -125,156 +125,29 @@ const def_style = "x-Sst"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
 
-// let def_max_pal_value = 3000000
-// let data_files = [
-//     {
-//         id: 1,
-//         file: "1/TESTUN_output",
-//         // file: "4/JUN22Test_Unbeaching",
-//         title: "TEST",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 1,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 2,
-//         file: "1/OneYear_Currents_And_Diffusion2020-05-05_16_36_output",
-//         title: "OneYear_Currents_And_Diffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 3,
-//         file: "1/OneYear_Currents_Winds_Diffusion2020-05-05_16_36_output",
-//         title: "OneYear_Currents_Winds_Diffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 4,
-//         file: "1/OneYear_Only_Currents2020-05-05_16_36_output",
-//         title: "OneYear_Only_Currents",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 5,
-//         file: "1/OneYear_Currents_And_Wind2020-05-05_16_36_output",
-//         title: "OneYear_Currents_And_Wind",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 4,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 6,
-//         file: "4/NoWinds_NoDiffusion_2010_01_01",
-//         title: "NoWinds_NoDiffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 10,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 7,
-//         file: "4/NoWinds_YesDiffusion_2010_01",
-//         title: "NoWinds_YesDiffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `nowind_yesdiff/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 10,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 8,
-//         file: "4/YesWinds_NoDiffusion_2010_01",
-//         title: "YesWinds_NoDiffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `histo_08/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 8,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-//     {
-//         id: 9,
-//         file: "4/YesWinds_YesDiffusion_2010_01",
-//         title: "YesWinds_YesDiffusion",
-//         // style:"default-scalar/div-PRGn",
-//         // style:"div-PRGn",
-//         style:def_style,
-//         wms: `yeswind_yesdiff/histo`,
-//         speed: "",
-//         start_date: new Date(2010, 0, 1),
-//         num_files: 8,
-//         max_pal: def_max_pal_value,
-//         min_pal: 17,
-//     },
-// ]
 let data_files = []
-let min_pal = new Array(13).fill(1)
 let folder = "4"  // Indicates the subsampling of the particles
 if(isMobile){
     folder = "6"
 }
-for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
+// for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
+for(let i=1; i<=11; i++) { let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
         id: i+10,
         file: `${folder}/YesWinds_YesDiffusion_NoUnbeaching_2010_${i_str}`,
-        wms: `histo_${i_str}/histo`,
+        // wms: `histo_${i_str}/histo`,
+        wms: `merged_five_years/histo`,
         title: `${months[i-1]} 2010`,
         speed: "",
         style:def_style,
         start_date: new Date(2010, i-1, 1),
-        num_files: 1,
+        num_files: 10,
         // In each run we have more particles, so we need to change the maximum value on the palette
         // max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
-        max_pal: (32300 * 31 * ((12 * 5) - i)),  // Particles by number of days in average / X X is subjective
-        min_pal: min_pal[i]
+        // max_pal: (32300 * 31 * ((12 * 5) - i)),  // Particles by number of days in average / X X is subjective
+        // min_pal: min_pal[i]
+        max_pal: 1600,  // Particles by number of days in average / X X is subjective
+        min_pal: 0.1
     })
 }
 
@@ -313,8 +186,6 @@ class  ParticleVizManager extends React.Component{
             selected_model: data_files[0],
             histogram_layer: histogram_layer,
             histogram_selected: histogram_selected,
-            max_pal: 10,
-            min_pa: 1,
             chardin: this.props.chardin
         }
 
@@ -336,7 +207,9 @@ class  ParticleVizManager extends React.Component{
                 // 'COLORSCALERANGE':'1,503500',
                 'NUMCOLORBANDS':250,
                 'LOGSCALE':true,
-                'COLORSCALERANGE':`${min_val},${max_val}`
+                'COLORSCALERANGE':`${min_val},${max_val}`,
+                'ABOVEMAXCOLOR':'extend',
+                'BELOWMINCOLOR':'extend',
             }
         })
     }
@@ -458,11 +331,15 @@ class  ParticleVizManager extends React.Component{
     displayPalette(){
         let palette_canvas = document.getElementById("canvas-palette-horbar")
         let palette_container = document.getElementById("div-palette-horbar")
-        // console.log(this.state.selected_model)
 
-        let barWidth = Math.ceil($(window).width()*.80)
+
+        let barWidth = Math.ceil($(window).width()*.60)
+        if(isMobile){
+            barWidth = Math.ceil($(window).width()*.70)
+        }
         let barHeight = 15
 
+        // Builds the parameters of the request
         let params_pal = {
             request: "GetLegendGraphic",
             height: parseInt(window.innerHeight* .4),
@@ -482,11 +359,11 @@ class  ParticleVizManager extends React.Component{
 
         let imageObj = new Image()
         imageObj.src = url
-		console.log(url)
+		// console.log(url)
 
         let ctx = $(palette_canvas)[0].getContext("2d")
         //------ Modifying the size of the canvas container
-        let spaceForUnits = 90;// Space between the black part for units and the rest
+        let spaceForUnits = 60;// Space between the black part for units and the rest
         ctx.canvas.width = barWidth+spaceForUnits
         ctx.canvas.height = barHeight
 
@@ -495,7 +372,7 @@ class  ParticleVizManager extends React.Component{
             ctx.globalAlpha = 1
             $(palette_container).show()
             ctx.fillStyle = '#FFFFFF'; //Define color to use
-            let pixBellowText = 3;// How many pixels bellow text
+            let pixBellowText = 3;// How many pixels bellow default text size
             ctx.font= (barHeight-pixBellowText)+"px Arial"
 
             //How many numbers do we want in the color bar
@@ -514,7 +391,8 @@ class  ParticleVizManager extends React.Component{
             // console.log("Tons per particle: ", tons_per_particle_per_day)
 
             // let minVal = this.state.selected_model.min_pal
-            let minVal = 1
+            // let minVal = parseInt(Math.max(this.state.selected_model.min_pal, 1))
+            let minVal = 0.1
             let maxVal = parseInt(this.state.selected_model.max_pal) // 1 Mt per day (is the maximul value)
             //
             //This scale is used to obtain the numbers
@@ -543,12 +421,13 @@ class  ParticleVizManager extends React.Component{
 
             //Write the units first
             // ctx.fillText('90 kg/0.125°',2,Math.ceil(barHeight-pixBellowText))
-            ctx.fillText('100 kg / 0.125°',2,Math.ceil(barHeight-pixBellowText))
+            // ctx.fillText('100 kg / 0.125°',2,Math.ceil(barHeight-pixBellowText))
+            ctx.fillText('Tons / 0.1°',2,Math.ceil(barHeight-pixBellowText))
 
             //Write the rest of the numbers from the ticks and the positions
             myNumbers.forEach(function(number){
-                //console.log(number)
-                //console.log(logScaleText(number))
+                // console.log(number)
+                // console.log(logScaleText(number))
                 // The -14 is just to move the letters in the middle
                 ctx.fillText(number,logScaleText(number)+spaceForUnits-14,Math.ceil(barHeight-pixBellowText))
             })
@@ -658,10 +537,7 @@ class  ParticleVizManager extends React.Component{
                         </span>
                     {/*---------- Litter concentration ------------*/}
                     <span className="m-2" data-intro="Concentration" data-position="bottom:0,200">
-                                    <div className="m-1 d-inline" {...(isMobile ? {
-                                        'data-toggle': "collapse",
-                                        'data-target': "#collapseNavMain"
-                                    } : '')} >
+                                    <div className="m-1 d-inline" >
                                             <button title="Litter concentration"
                                                     className={`btn ${this.state.histogram_selected ? ' btn-outline-info' : ' btn-info'} btn-sm`}
                                                     onClick={this.toogleHistogramLayer}>
