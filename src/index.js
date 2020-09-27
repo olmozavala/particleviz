@@ -21,7 +21,7 @@ import {chardinJs} from "./chardinjsoz";
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
 
-// let ip_address = "http://localhost/data"
+// let ip_address = "http://localhost/"
 let ip_address = 'http://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
@@ -92,7 +92,7 @@ function PageSummary(){
                             </Card.Text>
                             <div className="h5 col-12 text-center loading-div" >
                                 <Spinner animation="border" variant="info"/>
-                                {" "} Loading ...
+                                {" "} Loading ... <span className="loading_perc"> </span>
                             </div>
                         </Card.Body>
                     </Card>
@@ -117,7 +117,7 @@ ReactDOM.render(<span>
                         <div className="row p-0 m-0">
                             <div className="h5 col-12 text-center loading-div" >
                                <Spinner animation="border" variant="info"/>
-                                {" "} Loading ...
+                                {" "} Loading ... <span className="loading_perc"> </span>
                            </div>
                         </div>
                     </div>

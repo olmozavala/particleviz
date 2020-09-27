@@ -125,15 +125,16 @@ const def_style = "x-Sst"
 // const def_style = "default-inv"
 // const def_style = "div-RdYlGn-inv"
 
+let num_files = [10, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8]
 let data_files = []
 let folder = "4"  // Indicates the subsampling of the particles
 if(isMobile){
     folder = "6"
 }
-// for(let i=1; i<=12; i++) { let i_str = `${i < 10 ? '0' + i : i}`
-for(let i=1; i<=11; i++) { let i_str = `${i < 10 ? '0' + i : i}`
+for(let i=1; i<=12; i++) {
+    let i_str = `${i < 10 ? '0' + i : i}`
     data_files.push({
-        id: i+10,
+        id: i,
         file: `${folder}/YesWinds_YesDiffusion_NoUnbeaching_2010_${i_str}`,
         // wms: `histo_${i_str}/histo`,
         wms: `merged_five_years/histo`,
@@ -141,7 +142,7 @@ for(let i=1; i<=11; i++) { let i_str = `${i < 10 ? '0' + i : i}`
         speed: "",
         style:def_style,
         start_date: new Date(2010, i-1, 1),
-        num_files: 10,
+        num_files: num_files[i - 1],
         // In each run we have more particles, so we need to change the maximum value on the palette
         // max_pal: parseInt(def_max_pal_value - (def_max_pal_value*i)/(12*5)) ,
         // max_pal: (32300 * 31 * ((12 * 5) - i)),  // Particles by number of days in average / X X is subjective
