@@ -101,6 +101,7 @@ class  ParticlesLayer extends React.Component {
         this.canvasHeight = 0
         this.draw_until_day = true; // Used to redraw all the positions until current time
         // THis is repeated should go ina function
+        $(".btn").attr("disabled", true)  // Enable all the buttons
         for(let file_number in _.range(0, this.props.selected_model.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
             let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
@@ -245,6 +246,7 @@ class  ParticlesLayer extends React.Component {
             if (this.state.loaded_files >= files_to_load) {
                 // console.log("Done reading and uncompressing all the files!!!!")
                 cur_state = STATUS.playing
+                $(".btn").attr("disabled", false)  // Enable all the buttons
             }else{
                 let perc = parseInt(100 * (this.state.loaded_files / files_to_load))
                 $(".loading_perc").text(`${perc} %`)
@@ -375,6 +377,7 @@ class  ParticlesLayer extends React.Component {
         // the file to read.
         if (this.state.selected_model !== this.props.selected_model) {
             if(_.isUndefined(this.state.data[this.props.selected_model.id])){
+                $(".btn").attr("disabled", true)  // Enable all the buttons
                 // In this case is a new file, we need to reset almost everything
                 this.time_step= 0
                 this.setState({
@@ -388,7 +391,6 @@ class  ParticlesLayer extends React.Component {
                     let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
                     d3.text(url).then( (blob) => this.readOneZip(blob, file_number))
                 }
-
                 $(".loading_perc").text("0 %")
                 $(".loading-div").show() // Show the loading
             }else{ // In this case the file was loaded previously, not much to do
@@ -397,7 +399,6 @@ class  ParticlesLayer extends React.Component {
                     selected_model: this.props.selected_model,
                     cur_state: STATUS.playing
                 })
-                // $(".btn").attr("disabled", false)  // Enable all the buttons
             }
         } else { // The update is within the same file
             if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
@@ -408,12 +409,14 @@ class  ParticlesLayer extends React.Component {
                 let canvas = this.d3canvas.node()
                 if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
-                        this.interval = setInterval(() => this.drawNextDay(canvas), (1.0 / this.state.speed_hz) * 1000)
+                        // this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000)
+                        this.time = Date.now()
+                        this.interval = requestAnimationFrame( this.drawNextDay )
                     }
                 }
                 if (this.state.status === STATUS.paused) {
                     if (!_.isNull(canvas)) {
-                        this.drawNextDay(canvas)
+                        this.drawNextDay()
                     }
                 }
             }
@@ -424,39 +427,44 @@ class  ParticlesLayer extends React.Component {
     /**
      * Draws a single day of litter using D3
      */
-    drawNextDay(canvas) {
-
-        this.displayCurrentDay()
-        let cur_date = this.time_step
-        let to_date = this.time_step
-        if(this.draw_until_day){
-            cur_date = this.time_step = Math.max(this.time_step - DRAW_LAST_DAYS, 1)
-            this.draw_until_day = false
-        }
-        for(; cur_date <= to_date; cur_date++){
-            if (cur_date === 0) {
-                // Clear the canvas
-                this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-            } else {
-                // Make previous frame a little bit transparent
-                var prev = this.ctx.globalCompositeOperation
-                this.ctx.globalCompositeOperation = "destination-out"
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
-                this.ctx.fillRect(0, 0, canvas.width, canvas.height)
-                this.ctx.globalCompositeOperation = prev
-                this.ctx.fill()
+    drawNextDay() {
+        let ctime = Date.now()
+        if( (ctime - this.time) > (1000/this.state.speed_hz)) {
+            let canvas = this.d3canvas.node()
+            this.displayCurrentDay()
+            let cur_date = this.time_step
+            let to_date = this.time_step
+            if (this.draw_until_day) {
+                cur_date = this.time_step = Math.max(this.time_step - DRAW_LAST_DAYS, 1)
+                this.draw_until_day = false
             }
-            // Draw next frame
-            if(this.state.shape_type){
-                this.drawLines(cur_date)
-            }else {
-                this.drawParticles(cur_date)
-            }
-        }// for
+            for (; cur_date <= to_date; cur_date++) {
+                if (cur_date === 0) {
+                    // Clear the canvas
+                    this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+                } else {
+                    // Make previous frame a little bit transparent
+                    var prev = this.ctx.globalCompositeOperation
+                    this.ctx.globalCompositeOperation = "destination-out"
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
+                    this.ctx.fillRect(0, 0, canvas.width, canvas.height)
+                    this.ctx.globalCompositeOperation = prev
+                    this.ctx.fill()
+                }
+                // Draw next frame
+                if (this.state.shape_type) {
+                    this.drawLines(cur_date)
+                } else {
+                    this.drawParticles(cur_date)
+                }
+            }// for
 
-        if( this.state.status === STATUS.playing) {
-            this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
+            if (this.state.status === STATUS.playing) {
+                this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
+            }
         }
+        cancelAnimationFrame(this.interval)
+        this.interval =  requestAnimationFrame( this.drawNextDay )
     }
 
     /**
@@ -520,33 +528,43 @@ class  ParticlesLayer extends React.Component {
     }
 
     drawLines(cur_date) {
+        // console.log(`DrawLines: ${this.state.speed_hz}`)
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
         let file_number = (Math.floor(this.time_step / particles_per_file)).toString()
         let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
 
+        let clon = 0
+        let clat = 0
+        let nlon = 0
+        let nlat = 0
+
+        let tlon = 0
+        let tnlon = 0
+
         cur_date = cur_date % particles_per_file
 
         // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
-            for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
-                this.ctx.beginPath()
-                // Retreive all the information from the first available file
-                this.ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
-                // this.ctx.strokeStyle = 'black'
-                let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
+            if (this.state.index_by_country[file_number_str]) {
+                for (let cur_country_id = 0; cur_country_id < this.country_keys.length; cur_country_id++) {
+                    this.ctx.beginPath()
+                    // Retreive all the information from the first available file
+                    this.ctx.strokeStyle = this.props.colors_by_country[this.country_keys[cur_country_id].toLowerCase()]
+                    // this.ctx.strokeStyle = 'black'
+                    let country_start = this.state.data[model_id][file_number][this.country_keys[cur_country_id]]
 
-                let tot_part = country_start["lat_lon"][0].length
-                // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
-                let oldpos = [0, 0]
-                let newpos = [0, 0]
-                for (let part_id = 0; part_id < tot_part; part_id++) {
-                    if (this.state.index_by_country[file_number_str]) {
-                        let clon = country_start["lat_lon"][1][part_id][cur_date]
-                        let clat = country_start["lat_lon"][0][part_id][cur_date]
-                        let nlon = country_start["lat_lon"][1][part_id][cur_date + 1]
-                        let nlat = country_start["lat_lon"][0][part_id][cur_date + 1]
+                    let tot_part = country_start["lat_lon"][0].length
+                    // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
+                    let oldpos = [0, 0]
+                    let newpos = [0, 0]
+
+                    for (let part_id = 0; part_id < tot_part; part_id++) {
+                        clon = country_start["lat_lon"][1][part_id][cur_date]
+                        clat = country_start["lat_lon"][0][part_id][cur_date]
+                        nlon = country_start["lat_lon"][1][part_id][cur_date + 1]
+                        nlat = country_start["lat_lon"][0][part_id][cur_date + 1]
 
                         if ((clon !== 200) && (nlon !== 200)) {
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
@@ -557,8 +575,8 @@ class  ParticlesLayer extends React.Component {
                             }
                             // Draw the particles on the additional map on the east
                             if (this.show_east_map) {
-                                let tlon = clon + 360
-                                let tnlon = nlon + 360
+                                tlon = clon + 360
+                                tnlon = nlon + 360
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
                                     oldpos = this.geoToCanvas(tlon, clat)
                                     newpos = this.geoToCanvas(tnlon, nlat)
@@ -568,8 +586,8 @@ class  ParticlesLayer extends React.Component {
                             }
                             // Draw the particles on the additional map on the west
                             if (this.show_west_map){
-                                let tlon = clon - 360
-                                let tnlon = nlon - 360
+                                tlon = clon - 360
+                                tnlon = nlon - 360
                                 if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
                                     oldpos = this.geoToCanvas(tlon, clat)
                                     newpos = this.geoToCanvas(tnlon, nlat)
@@ -579,9 +597,9 @@ class  ParticlesLayer extends React.Component {
                             }
                         }
                     }
-                }
                 this.ctx.stroke()
                 this.ctx.closePath()
+                }
             }
         }
         this.props.map.render()
@@ -695,7 +713,7 @@ class  ParticlesLayer extends React.Component {
         console.log(this.time_step)
         let canvas = this.d3canvas.node()
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.drawNextDay(this.d3canvas.node())
+        this.drawNextDay()
         this.updateRange()
     }
 
@@ -718,7 +736,7 @@ class  ParticlesLayer extends React.Component {
         this.time_step = Math.max(this.time_step - 1, 1)
         let canvas = this.d3canvas.node()
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.drawNextDay(this.d3canvas.node())
+        this.drawNextDay()
         this.updateRange()
     }
 
@@ -883,8 +901,8 @@ class  ParticlesLayer extends React.Component {
                                 delay={{ show: 1, hide: 1 }}
                                 overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip> )}>
                                 <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
-                                        disabled={(this.state.status !== STATUS.playing) ||
-                                        (this.state.speed_hz <= .6)}>
+                                        disabled={this.state.speed_hz <= .6}>
+                                        {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
                                     <SkipBackwardFill size={default_size}/>
                                 </button>
                             </OverlayTrigger>
@@ -893,8 +911,8 @@ class  ParticlesLayer extends React.Component {
                                 placement="bottom"
                                 delay={{ show: 1, hide: 1 }}
                                 overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip> )}>
-                                    <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}
-                                            disabled={this.state.status !== STATUS.paused}>
+                                    <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}>
+                                            {/*disabled={this.state.status !== STATUS.paused}>*/}
                                         <SkipStartFill size={default_size}/>
                                     </button>
                             </OverlayTrigger>
@@ -904,8 +922,8 @@ class  ParticlesLayer extends React.Component {
                                 delay={{ show: 1, hide: 1 }}
                                 overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip> )}>
                                     <button className="btn btn-info btn-sm"
-                                            onClick={this.playPause}
-                                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                            onClick={this.playPause}>
+                                            {/*disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
                                         {this.state.status === STATUS.playing ?
                                             <PauseFill size={default_size}/> :
                                             <PlayFill size={default_size}/>}
@@ -916,8 +934,8 @@ class  ParticlesLayer extends React.Component {
                                 placement="bottom"
                                 delay={{ show: 1, hide: 1 }}
                                 overlay={(props) => ( <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip> )}>
-                                <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}
-                                        disabled={this.state.status !== STATUS.paused}>
+                                <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
+                                        {/*disabled={this.state.status !== STATUS.paused}>*/}
                                         <SkipEndFill size={default_size}/>
                                 </button>
                             </OverlayTrigger>
@@ -927,7 +945,8 @@ class  ParticlesLayer extends React.Component {
                                 delay={{ show: 1, hide: 1 }}
                                 overlay={(props) => ( <Tooltip id="tooltip_inc_speed" {...props}> Increase animation speed</Tooltip> )}>
                                 <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                        disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>
+                                        disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                                        {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>*/}
                                     <SkipForwardFill size={default_size}/>
                                 </button>
                             </OverlayTrigger>

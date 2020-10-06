@@ -22,7 +22,7 @@ import {chardinJs} from "./chardinjsoz";
 let background_layer = new TileLayer({ source: new OSM() });
 
 // let ip_address = "http://localhost/"
-let ip_address = 'http://ozavala.coaps.fsu.edu/'
+let ip_address = 'https://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){

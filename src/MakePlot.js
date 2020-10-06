@@ -67,12 +67,12 @@ function showStatistics({country_data, country_name}, statsType='from'){
         let container = ''
         let tooltip = ''
         if(statsType === 'from'){
-            title = `Waste from ${country_name}`
+            title = `Litter from ${country_name}`
             label = `Tons from ${country_name}`
             container = 'chartContainerFrom'
             tooltip = `{y} tons to {label} ({perc}%)`
         }else{
-            title = `Waste towards ${country_name}`
+            title = `Litter towards ${country_name}`
             label = `Tons towards ${country_name}`
             container = 'chartContainerTo'
             tooltip = `{y} tons from {label} ({perc}%)`
