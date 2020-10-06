@@ -10,6 +10,7 @@ import View from "ol/View";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
+import Intro from "intro.js"
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -47,6 +48,7 @@ let map = new Map({
     view: map_view
 })
 
+Intro.introJs()
 
 // console.log(map.getView().getResolution())
 

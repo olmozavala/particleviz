@@ -13,6 +13,7 @@ import $ from "jquery"
 import {Bullseye, Download} from "react-bootstrap-icons"
 import { isMobile } from "react-device-detect";
 import './css/App.css'
+import Intro from "intro.js"
 
 // const data_folder_url = "http://localhost/data"
 const data_folder_url = "http://ozavala.coaps.fsu.edu/data"
