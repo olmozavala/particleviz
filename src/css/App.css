@@ -1,26 +1,3 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #09d3ac;
-}
-
 .my_round {
   border-bottom: 1px solid #ebebeb;
   border-top-left-radius: calc(0.3rem - 1px);
@@ -39,7 +16,6 @@
 
 .wl-palette{
   position: absolute;
-  left: 5%;
   bottom: 1%;
   z-index: 101;
   pointer-events: none;
@@ -57,12 +33,6 @@
   margin-bottom: 10px;
 }
 
-@media(max-width: 768px){
-  #big-title{
-    display: none;
-  }
-}
-
 @media(max-width: 767px){
   h5 {
     font-size: 1.0rem;
@@ -75,12 +45,47 @@
   }
 }
 
-@media(min-width: 768px){
-  .wl-title{
-    top: 65px;
+
+.wl-title{
+  z-index: 100;
+  position: absolute;
+  width: 100%;
+}
+
+
+@media(max-width: 768px){
+  #main-title{
+    display: none;
   }
-  #big-title{
+  #intro_text {
+    top: 0px;
+    left: 0px;
+  }
+  .wl-palette{
+      left: 5%;
+  }
+}
+
+@media(min-width: 768px){
+  #intro_text {
+    top: 100px;
+
+  }
+  .wl-palette{
+    left: 20%;
+  }
+}
+
+@media(min-width: 1200px){
+  .wl-title{
+    top: 55px;
+    width: 100%;
+  }
+  #main-title{
     display: block;
+  }
+  #intro_text {
+    top: 130px;
   }
 }
 
@@ -94,19 +99,19 @@
   opacity: .95;
 }
 
-.wl-title{
-  z-index: 102;
+#intro_text{
+  z-index: 103;
   position: absolute;
-  width: 100%;
+  /*display: none;*/
 }
 
-.wl-main-title{
-  /*top: 30px;*/
-  z-index: 102;
-  position: absolute;
-  width: 100%;
+#range-ml{
+  max-width: 50px;
 }
 
-.range-ml{
-  max-width: 70px;
+@media(min-width: 1300px){
+  #range-ml{
+    max-width: 100px;
+  }
 }
+
