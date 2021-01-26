@@ -21,8 +21,9 @@ import {chardinJs} from "./chardinjsoz";
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
 
-// let ip_address = "http://localhost/"
-let ip_address = 'https://ozavala.coaps.fsu.edu/'
+// This address indicates from where are we loading the binary files of the particles.
+let ip_address = "http://localhost/"
+// let ip_address = 'https://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
@@ -47,13 +48,11 @@ let map_view = new View({
         // minZoom: 2
     })
 
-let ol_controls = [new Zoom(),
+// let ol_controls = [new Zoom(),
     // new FullScreen(),
-                    ]
-// if(isMobile){
-//     ol_controls = []
-// }
-ol_controls = []
+    //                 ]
+
+let ol_controls = []
 
 let map = new Map({
     layers: [ background_layer ],

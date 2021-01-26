@@ -17,7 +17,6 @@ import './css/App.css'
 // const wms_url = "http://localhost:8080/ncWMS2/wms"
 const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
 const def_alpha = "FF"
-// let mt_total = 6.4 // Total amount of waste tons on each simulation
 
 let tempcolors = [
     ["#45CDE9", "#4EC3E5", "#57B8E2", "#60AEDE", "#68A4DA", "#7199D7", "#7A8FD3"],
