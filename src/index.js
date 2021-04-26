@@ -14,7 +14,7 @@ import {Zoom} from "ol/control";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
-import {House, QuestionCircle} from "react-bootstrap-icons";
+import {House, QuestionCircle, Check} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
 import {chardinJs} from "./chardinjsoz";
 
@@ -22,8 +22,8 @@ import {chardinJs} from "./chardinjsoz";
 let background_layer = new TileLayer({ source: new OSM() });
 
 // This address indicates from where are we loading the binary files of the particles.
-let ip_address = "http://localhost/"
-// let ip_address = 'https://ozavala.coaps.fsu.edu/'
+// let ip_address = "http://localhost/"
+let ip_address = 'https://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
@@ -79,7 +79,7 @@ function PageSummary(){
                                 <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  {
                                     intro_chardin.stop()}
                                 }>
-                                    <QuestionCircle />
+                                    <Check/>
                                 </button>
                                 to continue and please wait for the site to load.
                                 For details on the model go to

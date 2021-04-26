@@ -8,6 +8,7 @@ import _ from "lodash"
 import $ from 'jquery'
 import { isMobile } from "react-device-detect"
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
+import {Container, ButtonGroup, Collapse, Row, Col, Navbar, Nav, NavDropdown, Form, FormControl, Button}  from "react-bootstrap";
 
 import {
     ArrowRight, CircleFill, Plus, Dash,
@@ -16,10 +17,7 @@ import {
     SkipEndFill, SkipStartFill,
 } from 'react-bootstrap-icons'
 
-import {Form} from "react-bootstrap"
-
 import JSZip from "jszip"
-import {ButtonGroup} from "react-bootstrap"
 
 const default_size = 15 // Font size
 const particles_per_file = 200 // These MUST match with the number of particles per file
@@ -832,134 +830,304 @@ class  ParticlesLayer extends React.Component {
     }
 
     render() {
-        this.props.chardin.refresh()
-        return (
-            <span className="m-1">
-                {/*---- Transparency ---------*/}
-                <span className="navbar-brand col-auto" data-intro={"Litter trail length"} data-position={"bottom"} >
-                        <span style={{display: "inline-block", width: "25px"}}>
-                            <ArrowRight size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
-                        </span>
-                        <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
-                                title="Decrease litter trail"
-                                disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
-                                this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                <Dash size={default_size}/>
-                        </button>
-                    {" "}
-                    <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                            title="Increase litter trail"
-                            disabled={this.state.transparency_index === 1 ||
-                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                <Plus size={default_size}/>
-                        </button>
-                    </span>
-                {/*---- Particle size ---------*/}
-                <span className="navbar-brand col-auto" data-intro={"Litter size"} data-position={"bottom"}>
-                        <span style={{display: "inline-block", width: "25px"}}  >
-                            <CircleFill
-                                size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
-                        </span>
-                        <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
-                                title="Decrease litter size"
-                                disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                <Dash size={default_size}/>
-                            </button>
-                    {" "}
-                    <button className="btn btn-info btn-sm" onClick={this.increaseSize}
-                            title="Increase litter size"
-                            disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            <Plus size={default_size}/>
-                        </button>
-                    </span>
-                {/*---- Shape selection---------*/}
-                <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
-                        <button className={`btn btn-sm btn-info d-md-none d-lg-inline `} onClick={this.changeShapeType}
-                                title="Shape selection"
-                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            {this.state.shape_type?
-                                <Slash size={default_size}/>
-                                :
-                                <SquareFill size={default_size}/>
-                            }
-                        </button>
-                    </span>
-                {/*---- Range Current day ------------*/}
-                <span id="date_range" className="navbar-brand mt-1" data-intro="Day selection" data-position="bottom">
-                    <Form.Control type="range"
-                                  id="range-ml"
-                                  title="Date selection"
-                                  onChange={this.changeDayRange}
-                                  value={this.time_step}
-                                  min="0" max={(this.state.status === STATUS.loading ||
-                        this.state.status === STATUS.decompressing)? 0:
-                        this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                  custom
-                                  disabled={this.state.status !== STATUS.paused}/>
-                </span>
+        if(isMobile ||  window.innerWidth <= 1200){
+            return (
+                <Container fluid>
+                    <Row>
+                        {/*---- Train size---------*/}
+                        <Col xs={6}> <span className={"mt-1"}>Trail size</span> </Col>
+                        <Col xs={6}>
+                            <span style={{display: "inline-block", width: "25px"}}>
+                             <ArrowRight
+                                 size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
+                            </span>
+                             <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
+                                     title="Decrease litter trail"
+                                     disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
+                                     this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                             <Dash size={default_size}/>
+                             </button>
+                            {" "}
+                            <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                                    title="Increase litter trail"
+                                    disabled={this.state.transparency_index === 1 ||
+                                    this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                             <Plus size={default_size}/>
+                                             </button>
+                        </Col>
+                    </Row>
+                    <Row className={"mt-1"}>
+                        {/*---- Particle size ---------*/}
+                        <Col xs={6}><span>Particle size</span></Col>
+                        <Col xs={6}>
+                             <span style={{display: "inline-block", width: "25px"}}>
+                             <CircleFill
+                                 size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
+                             </span>
+                             <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
+                                     title="Decrease litter size"
+                                     disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                             <Dash size={default_size}/>
+                             </button>
+                            {" "}
+                            <button className="btn btn-info btn-sm" onClick={this.increaseSize}
+                                    title="Increase litter size"
+                                    disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                     <Plus size={default_size}/>
+                             </button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        {/*---- Range Current day ------------*/}
+                        <Col xs={6}><span>Select date</span></Col>
+                        <Col xs={6}>
+                            <span id="date_range" className="navbar-brand mt-1"
+                                  data-position="bottom">
+                                         <Form.Control type="range"
+                                                       className="range-ml"
+                                                       title="Date selection"
+                                                       onChange={this.changeDayRange}
+                                                       value={this.time_step}
+                                                       min="0" max={(this.state.status === STATUS.loading ||
+                                             this.state.status === STATUS.decompressing) ? 0 :
+                                             this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                                       custom />
+                            </span>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={5}><span>Animation controls</span></Col>
+                        <Col xs={7}>
+                            {/*---- Animation controls --------*/}
+                             <ButtonGroup>
+                             {/*---- Decrease speed --------*/}
+                                 <OverlayTrigger
+                                     placement="bottom"
+                                     delay={{show: 1, hide: 1}}
+                                     overlay={(props) => (
+                                         <Tooltip id="tooltip_dspeed" {...props}> Decrease animation
+                                             speed </Tooltip>)}>
+                             <button className="btn btn-info btn-sm" type="button"
+                                     onClick={this.decreaseSpeed}
+                                     disabled={this.state.speed_hz <= .6}>
+                             {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
+                                 <SkipBackwardFill size={default_size}/>
+                             </button>
+                             </OverlayTrigger>
+                                 {/*---- Previous day --------*/}
+                                 <OverlayTrigger
+                                     placement="bottom"
+                                     delay={{show: 1, hide: 1}}
+                                     overlay={(props) => (
+                                         <Tooltip id="tooltip_pday" {...props}> Previous time
+                                             step</Tooltip>)}>
+                             <button id="pt" className="btn btn-info btn-sm" type="button"
+                                     onClick={this.prevDay}>
+                             {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                 <SkipStartFill size={default_size}/>
+                             </button>
+                             </OverlayTrigger>
+                                 {/*---- Play/Pause--------*/}
+                                 <OverlayTrigger
+                                     placement="bottom"
+                                     delay={{show: 1, hide: 1}}
+                                     overlay={(props) => (
+                                         <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
+                             <button className="btn btn-info btn-sm"
+                                     onClick={this.playPause}>
+                             {/*disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
+                                 {this.state.status === STATUS.playing ?
+                                     <PauseFill size={default_size}/> :
+                                     <PlayFill size={default_size}/>}
+                             </button>
+                             </OverlayTrigger>
+                                 {/*---- Next day--------*/}
+                                 <OverlayTrigger
+                                     placement="bottom"
+                                     delay={{show: 1, hide: 1}}
+                                     overlay={(props) => (
+                                         <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
+                             <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
+                             {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                 <SkipEndFill size={default_size}/>
+                             </button>
+                             </OverlayTrigger>
+                                 {/*---- Increase speed --------*/}
+                                 <OverlayTrigger
+                                     placement="bottom"
+                                     delay={{show: 1, hide: 1}}
+                                     overlay={(props) => (
+                                         <Tooltip id="tooltip_inc_speed" {...props}> Increase animation
+                                             speed</Tooltip>)}>
+                             <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
+                                     disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                             {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>*/}
+                                 <SkipForwardFill size={default_size}/>
+                             </button>
+                             </OverlayTrigger>
+                             </ButtonGroup>
+                        </Col>
+                    </Row>
+                    {/*<Row>*/}
+                    {/*    <Col xs={12}>*/}
+                    {/*        /!*---- Shape selection---------*!/*/}
+                    {/*        <Button variant="info" size={"sm"} className={"m-1"}*/}
+                    {/*                 onClick={this.changeShapeType}*/}
+                    {/*                 disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
+                    {/*                     {this.state.shape_type ?*/}
+                    {/*                         <Slash size={default_size}/>*/}
+                    {/*                         :*/}
+                    {/*                         <SquareFill size={default_size}/>*/}
+                    {/*                     }*/}
+                    {/*             </Button>*/}
+                    {/*    </Col>*/}
+                    {/*</Row>*/}
+                </Container>
 
-                {/*---- Animation controls --------*/}
-                <span className="navbar-brand col-auto" data-intro="Animation controls" data-position="bottom">
-                        <ButtonGroup>
-                            {/*---- Decrease speed --------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{ show: 1, hide: 1 }}
-                                overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip> )}>
-                                <button className="btn btn-info btn-sm" type="button" onClick={this.decreaseSpeed}
-                                        disabled={this.state.speed_hz <= .6}>
-                                        {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
-                                    <SkipBackwardFill size={default_size}/>
-                                </button>
-                            </OverlayTrigger>
-                            {/*---- Previous day --------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{ show: 1, hide: 1 }}
-                                overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip> )}>
-                                    <button id="pt" className="btn btn-info btn-sm" type="button" onClick={this.prevDay}>
-                                            {/*disabled={this.state.status !== STATUS.paused}>*/}
-                                        <SkipStartFill size={default_size}/>
-                                    </button>
-                            </OverlayTrigger>
-                            {/*---- Play/Pause--------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{ show: 1, hide: 1 }}
-                                overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip> )}>
-                                    <button className="btn btn-info btn-sm"
-                                            onClick={this.playPause}>
-                                            {/*disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
-                                        {this.state.status === STATUS.playing ?
-                                            <PauseFill size={default_size}/> :
-                                            <PlayFill size={default_size}/>}
-                                    </button>
-                            </OverlayTrigger>
-                            {/*---- Next day--------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{ show: 1, hide: 1 }}
-                                overlay={(props) => ( <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip> )}>
-                                <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
-                                        {/*disabled={this.state.status !== STATUS.paused}>*/}
-                                        <SkipEndFill size={default_size}/>
-                                </button>
-                            </OverlayTrigger>
-                            {/*---- Increase speed --------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{ show: 1, hide: 1 }}
-                                overlay={(props) => ( <Tooltip id="tooltip_inc_speed" {...props}> Increase animation speed</Tooltip> )}>
-                                <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                        disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
-                                        {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>*/}
-                                    <SkipForwardFill size={default_size}/>
-                                </button>
-                            </OverlayTrigger>
-                        </ButtonGroup>
-                    </span>
-            </span>
-        )
+            )
+        }else {
+            this.props.chardin.refresh()
+            return (
+                <span className="mt-1">
+                                         {/*---- Transparency ---------*/}
+                    <span className="navbar-brand col-auto viz-control" data-intro={"Litter trail length"} data-position={"bottom"}>
+                                         <span style={{display: "inline-block", width: "25px"}}>
+                                         <ArrowRight
+                                             size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
+                                         </span>
+                                         <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
+                                                 title="Decrease litter trail"
+                                                 disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
+                                                 this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                         <Dash size={default_size}/>
+                                         </button>
+                        {" "}
+                        <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
+                                title="Increase litter trail"
+                                disabled={this.state.transparency_index === 1 ||
+                                this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                         <Plus size={default_size}/>
+                                         </button>
+                                         </span>
+                    {/*---- Particle size ---------*/}
+                    <span className="navbar-brand col-auto viz-control" data-intro={"Litter size"} data-position={"bottom"}>
+                                         <span style={{display: "inline-block", width: "25px"}}>
+                                         <CircleFill
+                                             size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
+                                         </span>
+                                         <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
+                                                 title="Decrease litter size"
+                                                 disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                         <Dash size={default_size}/>
+                                         </button>
+                        {" "}
+                        <button className="btn btn-info btn-sm" onClick={this.increaseSize}
+                                title="Increase litter size"
+                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                         <Plus size={default_size}/>
+                                         </button>
+                                         </span>
+                    {/*---- Shape selection---------*/}
+                    <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
+                                         <button className={`btn btn-sm btn-info d-md-none d-lg-inline `}
+                                                 onClick={this.changeShapeType}
+                                                 title="Shape selection"
+                                                 disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                         {this.state.shape_type ?
+                                             <Slash size={default_size}/>
+                                             :
+                                             <SquareFill size={default_size}/>
+                                         }
+                                         </button>
+                                         </span>
+                    {/*---- Range Current day ------------*/}
+                    <span id="date_range" className="navbar-brand m-1 range-ml" data-intro="Day selection" data-position="bottom">
+                        <span className={"mt-5"}>
+                             <Form.Control type="range"
+                                           title="Date selection"
+                                           onChange={this.changeDayRange}
+                                           value={this.time_step}
+                                           min="0" max={(this.state.status === STATUS.loading ||
+                                 this.state.status === STATUS.decompressing) ? 0 :
+                                 this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                           custom
+                                           disabled={this.state.status === STATUS.loading}/>
+                       </span>
+                     </span>
+
+                    {/*---- Animation controls --------*/}
+                    <span className="navbar-brand col-auto anim-controls" data-intro="Animation controls" data-position="bottom">
+                                         <ButtonGroup>
+                                         {/*---- Decrease speed --------*/}
+                                             <OverlayTrigger
+                                                 placement="bottom"
+                                                 delay={{show: 1, hide: 1}}
+                                                 overlay={(props) => (
+                                                     <Tooltip id="tooltip_dspeed" {...props}> Decrease animation
+                                                         speed </Tooltip>)}>
+                                         <button className="btn btn-info btn-sm" type="button"
+                                                 onClick={this.decreaseSpeed}
+                                                 disabled={this.state.speed_hz <= .6}>
+                                         {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
+                                             <SkipBackwardFill size={default_size}/>
+                                         </button>
+                                         </OverlayTrigger>
+                                             {/*---- Previous day --------*/}
+                                             <OverlayTrigger
+                                                 placement="bottom"
+                                                 delay={{show: 1, hide: 1}}
+                                                 overlay={(props) => (
+                                                     <Tooltip id="tooltip_pday" {...props}> Previous time
+                                                         step</Tooltip>)}>
+                                         <button id="pt" className="btn btn-info btn-sm" type="button"
+                                                 onClick={this.prevDay}>
+                                         {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                             <SkipStartFill size={default_size}/>
+                                         </button>
+                                         </OverlayTrigger>
+                                             {/*---- Play/Pause--------*/}
+                                             <OverlayTrigger
+                                                 placement="bottom"
+                                                 delay={{show: 1, hide: 1}}
+                                                 overlay={(props) => (
+                                                     <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
+                                         <button className="btn btn-info btn-sm"
+                                                 onClick={this.playPause}>
+                                         {/*disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
+                                             {this.state.status === STATUS.playing ?
+                                                 <PauseFill size={default_size}/> :
+                                                 <PlayFill size={default_size}/>}
+                                         </button>
+                                         </OverlayTrigger>
+                                             {/*---- Next day--------*/}
+                                             <OverlayTrigger
+                                                 placement="bottom"
+                                                 delay={{show: 1, hide: 1}}
+                                                 overlay={(props) => (
+                                                     <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
+                                         <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
+                                         {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                             <SkipEndFill size={default_size}/>
+                                         </button>
+                                         </OverlayTrigger>
+                                             {/*---- Increase speed --------*/}
+                                             <OverlayTrigger
+                                                 placement="bottom"
+                                                 delay={{show: 1, hide: 1}}
+                                                 overlay={(props) => (
+                                                     <Tooltip id="tooltip_inc_speed" {...props}> Increase animation
+                                                         speed</Tooltip>)}>
+                                         <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
+                                                 disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                                         {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz >= MAX_ANIMATION_SPEED)}>*/}
+                                             <SkipForwardFill size={default_size}/>
+                                         </button>
+                                         </OverlayTrigger>
+                                         </ButtonGroup>
+                                         </span>
+                                         </span>
+            )
+        }
     }
 }
 

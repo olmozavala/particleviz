@@ -1,5 +1,6 @@
 import React from 'react'
 import coaps_logo from "./imgs/coaps_logo.png"
+import gpml_logo from "./imgs/gpml_logo.png"
 import un_logo from "./imgs/un_PNG20.png"
 import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
@@ -10,7 +11,8 @@ import _ from "underscore"
 import TileWMS from "ol/source/TileWMS"
 import TileLayer from "ol/layer/Tile"
 import $ from "jquery"
-import {Bullseye, Download, QuestionCircle, House} from "react-bootstrap-icons"
+import {Bullseye, Download, QuestionCircle, House, List} from "react-bootstrap-icons"
+import {Collapse, Row, Col, Container, Navbar, Nav, NavDropdown, Form, FormControl, Button}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
 
@@ -168,6 +170,7 @@ class  ParticleVizManager extends React.Component{
         this.displayPalette = this.displayPalette.bind(this)
         this.showHistogramLayer = this.showHistogramLayer.bind(this)
         this.toggleHelp= this.toggleHelp.bind(this)
+        this.setOpen = this.setOpen.bind(this)
 
 
         let histogram_layer = new TileLayer({
@@ -186,7 +189,8 @@ class  ParticleVizManager extends React.Component{
             selected_model: data_files[0],
             histogram_layer: histogram_layer,
             histogram_selected: histogram_selected,
-            chardin: this.props.chardin
+            chardin: this.props.chardin,
+            open: false
         }
 
         // this.updateMinMax(data_files[0].wms)
@@ -263,6 +267,12 @@ class  ParticleVizManager extends React.Component{
             }
         }
         return countries
+    }
+
+    setOpen(){
+        this.setState({
+            open: !this.state.open
+        })
     }
 
     updateTonsByCountry(country_names, country_tons) {
@@ -516,61 +526,66 @@ class  ParticleVizManager extends React.Component{
         if(isMobile ||  window.innerWidth <= 1200){
             // --------------------- MOBILE  or < 1200---------------------------------
             return (
-                <nav className="navbar navbar-expand-xl navbar-light bg-light pt-0 pb-0">
-                    {/*------------ Logos ------------------*/}
-                    <div data-intro="Logos" data-position="bottom">
-                        <a className="navbar-brand" href="https://www.un.org/en/">
-                            <img src={un_logo} className="rounded" width="50px" height="50" alt="United Nations"/>
-                        </a>
-                        <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
-                            <img src={coaps_logo} className="rounded" width="40px" height="40" alt="COAPS"/>
-                        </a>
-                    </div>
-                    {/* ---------- Home ------------*/}
-                    <span className="m-2" data-intro="Home" data-position="bottom">
-                            <div className="m-1 d-inline">
-                                <a title="Home" className="btn  btn-info btn-sm"
-                                   href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
-                                    <House/>
-                                </a>
-                            </div>
-                        </span>
-                    {/*---------- Litter concentration ------------*/}
-                    <span className="m-2" data-intro="Concentration" data-position="bottom:0,200">
-                                    <div className="m-1 d-inline" >
-                                            <button title="Litter concentration"
-                                                    className={`btn ${this.state.histogram_selected ? ' btn-outline-info' : ' btn-info'} btn-sm`}
-                                                    onClick={this.toogleHistogramLayer}>
-                                                <Bullseye/>
-                                            </button>
-                                    </div>
-                                </span>
-                    {/* ---------- Download data ------------*/}
-                    <span className="m-2" data-intro="Download stats" data-position="bottom">
-                        <div className="m-1 d-inline">
-                            <a title="Download Data" className="btn  btn-info btn-sm"
+                <Container fluid>
+                    <Row className={`bg-light py-1`}>
+                        <Col xs={5}>
+                            {/*------------ Logos ------------------*/}
+                            <a href="https://www.un.org/en/" className={"me-2"}>
+                                <img src={un_logo} className="rounded" width="40px" alt="United Nations"/>
+                            </a>
+                            <a href="https://www.gpmarinelitter.org/" className={"mx-2"}>
+                                <img src={gpml_logo} className="rounded" width="40px" alt="Global Partnership on Marine Litter"/>
+                            </a>
+                            <a href="https://www.coaps.fsu.edu/">
+                                <img src={coaps_logo} className="rounded" width="35px" alt="COAPS"/>
+                            </a>
+                        </Col>
+                        <Col>
+                        {/* ---------- Home ------------*/}
+                            <Button variant="info" size={"sm"} className={"m-1"}
+                                    href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
+                                <House/>
+                            </Button>
+                            {/*---------- Litter concentration ------------*/}
+                                <button title="Litter concentration"
+                                        className={`btn ${this.state.histogram_selected ? ' btn-outline-info' : ' btn-info'} btn-sm m-1`}
+                                        onClick={this.toogleHistogramLayer}>
+                                    <Bullseye/>
+                                </button>
+                            {/* ---------- Download data ------------*/}
+                            <Button variant="info" size={"sm"} className={"m-1"}
                                href={`${this.data_folder_url}/World_Litter_Countries_Stats.zip`}>
                                 <Download/>
-                            </a>
-                        </div>
-                    </span>
-                    {/*------------ Grouped icons ------------------*/}
-                    <button className="navbar-toggler" type="button" data-toggle="collapse"
-                            data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
-                            data-intro="Menu" data-position="bottom"
-                            aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                    {/*------------ Collapsible navbar------------------*/}
-                    <div className="collapse navbar-collapse" id="collapseNavMain">
-                        {/* ---------- Particles menu ------------*/}
-                        <div className="navbar-nav">
-                            <span>
+                            </Button>
+                        </Col>
+                        <Col xs={2}>
+                            <Button
+                                className={"m-1"}
+                                size={"sm"}
+                                variant={"info"}
+                                onClick={() => this.setOpen()}
+                                aria-controls="col_content"
+                                aria-expanded={this.state.open}
+                            >
+                                <List />
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Collapse in={this.state.open} >
+                        <Container fluid id={"col_content"} className={"mt-4"}>
+                            <Row className={`bg-light p-2`} >
                                 {/* ---------- Background selection ------------*/}
-                                <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                        map={this.props.map}/>
+                                <Col xs={6}> <span className={"m-1"}>Background</span> </Col>
+                                <Col xs={{span:5, offset:1}}>
+                                    <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                            map={this.props.map}/>
+                                </Col>
+                            </Row>
+                            <Row className={`bg-light p-2`} >
                                 {/*---------- Model selection ------------*/}
-                                <Dropdown className="m-2 d-inline" title="Release month">
+                                <Col xs={6}> <span className={"m-1"}>Month of release</span> </Col>
+                                <Col xs={6}>
+                                    <Dropdown className="m-2 d-inline" title="Release month">
                                         <Dropdown.Toggle variant="info" size="sm">
                                             {this.state.selected_model.title} {this.state.selected_model.speed}
                                         </Dropdown.Toggle>
@@ -581,32 +596,39 @@ class  ParticleVizManager extends React.Component{
                                             ))}
                                         </Dropdown.Menu>
                                     </Dropdown>
-                                {/*---------- All options from particles ------------*/}
-                                <ParticlesLayer map={this.props.map}
-                                                updateCountriesData={this.updateCountriesData}
-                                                url={this.data_folder_url}
-                                                chardin={this.state.chardin}
-                                                colors_by_country={this.state.colors_by_country}
-                                                selected_model={this.state.selected_model}/>
-                            </span>
-                        </div>
-                    </div>
+                                </Col>
+                            </Row>
+                            <Row className={`bg-light`} >
+                                <Col xs={12}>
+                                    {/*---------- All options from particles ------------*/}
+                                    <ParticlesLayer map={this.props.map}
+                                                    updateCountriesData={this.updateCountriesData}
+                                                    url={this.data_folder_url}
+                                                    chardin={this.state.chardin}
+                                                    colors_by_country={this.state.colors_by_country}
+                                                    selected_model={this.state.selected_model}/>
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Collapse >
                     <StatesLayer map={this.props.map}
                                  url={this.data_folder_url}
                                  colors_by_country={this.state.colors_by_country}
                                  updateTonsByCountry={this.updateTonsByCountry}
                                  updateSelectedCountry={this.updateSelectedCountry}/>
-                </nav>
-
+                </Container>
             )
         }else {
             // --------------------- DESKTOP ---------------------------------
             return (
                 <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0">
                     {/*------------ Logos ------------------*/}
-                    <div data-intro="Logos" data-position="bottom">
+                    <div data-intro="Logos" data-position="bottom" className="logos">
                         <a className="navbar-brand" href="https://www.un.org/en/">
                             <img src={un_logo} className="rounded" width="40px" height="40px" alt="United Nations"/>
+                        </a>
+                        <a className="navbar-brand" href="https://www.gpmarinelitter.org/">
+                            <img src={gpml_logo} className="rounded" width="40px" height="40px" alt="Global Partnership on Marine Litter"/>
                         </a>
                         <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
                             <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
@@ -639,8 +661,8 @@ class  ParticleVizManager extends React.Component{
                                             colors_by_country={this.state.colors_by_country}
                                             selected_model={this.state.selected_model}/>
                             {/* ---------- Model selection ------------*/}
-                            <span className="navbar-brand m-2" data-intro="Month of release" data-position="bottom">
-                                    <Dropdown className="m-2 d-inline" title="Release month">
+                            <span className="navbar-brand mt-2" data-intro="Month of release" data-position="bottom">
+                                    <Dropdown className="mt-2 d-inline" title="Release month">
                                     <Dropdown.Toggle variant="info" size="sm">
                                         {this.state.selected_model.title} {this.state.selected_model.speed}
                                     </Dropdown.Toggle>
@@ -653,7 +675,7 @@ class  ParticleVizManager extends React.Component{
                                 </Dropdown>
                             </span>
                             {/* ---------- Litter concentration ------------*/}
-                            <span className="navbar-brand m-2" data-intro="Litter concentration" data-position="bottom:0,200">
+                            <span className="navbar-brand mt-2" data-intro="Litter concentration" data-position="bottom:0,200">
                                 <div className="m-1 d-inline" {...(isMobile ? {
                                     'data-toggle': "collapse",
                                     'data-target': "#collapseNavMain"
@@ -666,8 +688,8 @@ class  ParticleVizManager extends React.Component{
                                 </div>
                             </span>
                             {/* ---------- Download data ------------*/}
-                            <span className="navbar-brand m-2" data-intro="Download stats" data-position="bottom">
-                                <div className="m-1 d-inline">
+                            <span className="navbar-brand my-2" data-intro="Download stats" data-position="bottom">
+                                <div className="d-inline">
                                     <a title="Download Data" className="btn  btn-info btn-sm"
                                        href={`${this.data_folder_url}/World_Litter_Countries_Stats.zip`}>
                                         <Download/>
@@ -675,12 +697,12 @@ class  ParticleVizManager extends React.Component{
                                 </div>
                             </span>
                             {/* ---------- Background selection ------------*/}
-                            <span className="navbar-brand m-2" data-intro="Map Background" data-position="bottom:0,200">
+                            <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
                                 <BackgroundLayerManager background_layer={this.props.background_layer}
                                                         map={this.props.map}/>
                             </span>
                             {/* ---------- Help toggle ------------*/}
-                            <span className="navbar-brand m-2" data-intro="Help" data-position="bottom">
+                            <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
                                     <div className="m-1 d-inline">
                                         <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
                                             <QuestionCircle/>

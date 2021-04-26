@@ -1,6 +1,6 @@
 {
-  "homepage": "https://marinelitter.coaps.fsu.edu/",
-  "other": "https://ozavala.coaps.fsu.edu/",
+  "homepage": "https://ozavala.coaps.fsu.edu/marine_litter_dev/",
+  "other": "https://ozavala.coaps.fsu.edu/marine_litter_dev/",
   "name": "ocean_litter",
   "version": "0.1.0",
   "private": true,

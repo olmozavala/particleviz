@@ -124,6 +124,10 @@ function hidePlot(){
     $(popup).hide();
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+}
+
 const MakePlot = props => {
     let stats_data = props.country_data
     return (
@@ -136,12 +140,12 @@ const MakePlot = props => {
                                 aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h5 className="d-inline"> {props.country_name} exports {stats_data['from'].tot_tons} tons
-                            per year </h5>
+                        <h5 className="d-inline"> {props.country_name} exports {numberWithCommas(stats_data['from'].tot_tons)} tons
+                            in ten years</h5>
                         <h6>
-                            {stats_data['from'].ocean_tons} ({stats_data['from'].ocean_perc}%) end up in the ocean,
-                            &nbsp;
-                            {stats_data['from'].beach_tons} ({stats_data['from'].beach_perc}%) end up on the beach.
+                            {numberWithCommas(stats_data['from'].ocean_tons)} ({stats_data['from'].ocean_perc}%) end up in the ocean
+                            and&nbsp;
+                            {numberWithCommas(stats_data['from'].beach_tons)} ({stats_data['from'].beach_perc}%) end up on the beach.
                         </h6>
                     </div>
                     :

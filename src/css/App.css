@@ -105,13 +105,44 @@
   /*display: none;*/
 }
 
-#range-ml{
-  max-width: 50px;
+.viz-control{
+  max-width: 100px;
 }
 
-@media(min-width: 1300px){
-  #range-ml{
+@media(max-width: 768px){
+  .range-ml{
     max-width: 100px;
   }
 }
 
+
+@media(max-width: 1300px) and (min-width: 992px){
+    .logos{
+       min-width: 160px;
+    }
+    /*.anim-controls{*/
+    /*    margin-left: 100px;*/
+    /*}*/
+  .range-ml{
+      /*position: absolute;*/
+      /*bottom: 50%;*/
+      /*left: 40%;*/
+        max-width: 50px;
+  }
+}
+
+/*@media(max-width: 1400px) and (min-width: 769px){*/
+/*  .range-ml{*/
+/*    max-width: 50px;*/
+/*  }*/
+/*}*/
+
+
+@media(min-width: 1400px){
+  .range-ml{
+    max-width: 200px;
+  }
+  .viz-control{
+    max-width: 100%;
+  }
+}
