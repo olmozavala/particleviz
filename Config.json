@@ -1,0 +1,8 @@
+{
+  "preprocessing": {
+    "input_file": "../ExampleData/Global_Marine_Debris.nc",
+    "output_folder": "../ExampleOutput",
+    "subsample": [1, 3],
+    "timesteps_by_file": 20
+  }
+}
