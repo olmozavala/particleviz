@@ -1,6 +1,6 @@
 {
-  "homepage": "https://ozavala.coaps.fsu.edu/marine_litter_dev/",
-  "other": "https://ozavala.coaps.fsu.edu/marine_litter_dev/",
+  "homepage": "https://localhost/particleviz",
+  "other": "https://localhost/particleviz",
   "name": "ocean_litter",
   "version": "0.1.0",
   "private": true,

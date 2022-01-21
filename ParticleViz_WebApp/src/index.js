@@ -10,11 +10,10 @@ import introjpg from "./imgs/i2.jpg"
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import View from "ol/View";
-import {Zoom} from "ol/control";
 import './css/App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import OSM from "ol/source/OSM";
-import {House, QuestionCircle, Check} from "react-bootstrap-icons";
+import {House, Check} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
 import {chardinJs} from "./chardinjsoz";
 
@@ -22,15 +21,14 @@ import {chardinJs} from "./chardinjsoz";
 let background_layer = new TileLayer({ source: new OSM() });
 
 // This address indicates from where are we loading the binary files of the particles.
-// let ip_address = "http://localhost/"
-let ip_address = 'https://ozavala.coaps.fsu.edu/'
+let ip_address = "http://localhost/"
+// let ip_address = 'https://ozavala.coaps.fsu.edu/'
 const tot_res = 9;
 let resolutions = Array(tot_res);
 for(let i=0; i < tot_res; i++){
     resolutions[i] = .36/(2**i);
 }
 // console.log("Resolutions: ", resolutions);
-
 
 let map_view = new View({
         projection: 'EPSG:4326', //Equirectangular
@@ -63,6 +61,11 @@ let map = new Map({
 
 var intro_chardin = new chardinJs("body")
 
+/**
+ * This function generates the div of the intro section
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function PageSummary(){
     return (
         <div className="row p-0 m-0">
@@ -71,11 +74,9 @@ function PageSummary(){
                     <Card style={{ width: '100%' }}>
                         <Card.Img variant="top" src={introjpg} />
                         <Card.Body>
-                            <Card.Title>World's Ocean Litter</Card.Title>
+                            <Card.Title>ParticleViz</Card.Title>
                             <Card.Text>
-                                This site provides a dynamic display of marine litter trajectories in the ocean
-                                and statistics of the litter generated and received by each country.
-                                Click
+                                ENTRY TEXT
                                 <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  {
                                     intro_chardin.stop()}
                                 }>
@@ -104,7 +105,7 @@ ReactDOM.render(<span>
                     <div className="container-fluid wl-title">
                         <div className="row p-0 m-0">
                             <div className="col-12 text-center">
-                               <div id="main-title" className="display-4 mt-3"> World's Ocean Litter </div>
+                               <div id="main-title" className="display-4 mt-3"> ParticleViz </div>
                             </div>
                         </div>
                         <div className="row p-0 m-0">
@@ -122,7 +123,6 @@ ReactDOM.render(<span>
                     <PageSummary/>
                 </span>,
     document.getElementById('root'));
-
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
