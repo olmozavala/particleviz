@@ -20,10 +20,9 @@ import {
 import JSZip from "jszip"
 
 const data_key = 'def_part_viz'
-const timesteps_per_file = 200
+const timesteps_per_file = 20 // These MUST match with the number of particles per file
 const particle_color =  `rgba(4, 21, 98)`;
 const default_size = 15 // Font size
-const particles_per_file = 20// These MUST match with the number of particles per file
 const STATUS = {
     loading: 0,
     decompressing: 1,
@@ -95,7 +94,7 @@ class  ParticlesLayer extends React.Component {
         for(let file_number in _.range(0, this.props.selected_model.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
             let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
-            d3.text(url).then( (blob) => this.readOneZip(blob, file_number))
+            d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
         }
 
         // Setting up d3 objects TODO somethings doesn't make sense here
@@ -107,7 +106,7 @@ class  ParticlesLayer extends React.Component {
         }
         this.ctx = this.d3canvas.node().getContext('2d')
 
-        this.drawLines = this.drawLines.bind(this)
+        this.drawParticlesAsLines = this.drawParticlesAsLines.bind(this)
         this.canvasFunction = this.canvasFunction.bind(this)
         this.getIconColorSize = this.getIconColorSize.bind(this)
         this.getIconColorSizeBoostrap = this.getIconColorSizeBoostrap.bind(this)
@@ -120,11 +119,11 @@ class  ParticlesLayer extends React.Component {
         this.decreaseSize = this.decreaseSize.bind(this)
         this.updateAnimation = this.updateAnimation.bind(this)
         this.increaseTransparency = this.increaseTransparency.bind(this)
-        this.readOneZip = this.readOneZip.bind(this)
+        this.readZipStepOne = this.readZipStepOne.bind(this)
         this.decreaseTransparency = this.decreaseTransparency.bind(this)
         this.playPause = this.playPause.bind(this)
         this.changeDayRange = this.changeDayRange.bind(this)
-        this.readTwoUnzippedFile = this.readTwoUnzippedFile.bind(this)
+        this.readUnzippedFileStepTwo = this.readUnzippedFileStepTwo.bind(this)
         this.clearPreviousLoop = this.clearPreviousLoop.bind(this)
         this.nextDay = this.nextDay.bind(this)
         this.prevDay = this.prevDay.bind(this)
@@ -137,18 +136,17 @@ class  ParticlesLayer extends React.Component {
      * @param text
      * @param file_number
      */
-    readOneZip(text, file_number) {
-        /***
-         * Reads the header file (txt). Then it reads the corresponding zip file
-         */
+    readZipStepOne(text, file_number) {
+        // Reads the header file (txt)
         file_number = parseInt(file_number)
         let header_data = d3.csvParseRows(text, function(d) { // In ParticleViz it should only be one line
             return [parseInt(d[0]), parseInt(d[1])]
         });
 
+        // Then it reads the corresponding zip file
         let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
         let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.zip`
-        console.log("This is the url" + url)
+        console.log("This is the url: " + url)
         d3.blob(url).then((blob) => {
             let zip = new JSZip()
             zip.loadAsync(blob).then(function (zip) {
@@ -158,16 +156,18 @@ class  ParticlesLayer extends React.Component {
                     let zipobj = zip.files[file]
                     return zipobj.async("arraybuffer")
                 }
-            }).then((binarydata) => {
+            }).then((binarydata) => { // This function receives the binary data
                 let buf_off = 0
                 let data = {}
-                for(let line of header_data){
+                for(let line of header_data){ // Iterates each line from the header (should be only one for the moment)
                     let num_part = line[0]
                     let tot_timesteps = line[1]
                     // console.log(`Num particles: ${num_part} timesteps ${tot_timesteps}`)
                     data[data_key] = {}
+                    // All latitudes and longitudes in the file
                     let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
                     let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
+                    // Split locations by particles
                     let lats_by_part = []
                     let lons_by_part = []
                     for(let cur_part=0; cur_part < num_part; cur_part++){
@@ -176,10 +176,12 @@ class  ParticlesLayer extends React.Component {
                         lats_by_part.push(cur_part_lats)
                         lons_by_part.push(cur_part_lons)
                     }
+                    // Because we draw the particles by file (in order to be able to read files on-demand and async)
+                    // we need to repeat the
                     data[data_key]["lat_lon"] = [lats_by_part, lons_by_part]
                     buf_off += num_part*tot_timesteps*4
                 }
-                this.readTwoUnzippedFile(data, this.props.selected_model.file, file_number)
+                this.readUnzippedFileStepTwo(data, this.props.selected_model.file, file_number)
             })
         })
 
@@ -191,19 +193,18 @@ class  ParticlesLayer extends React.Component {
      * @param name
      * @param file_number
      */
-    readTwoUnzippedFile(data, name, file_number) {
+    readUnzippedFileStepTwo(data, name, file_number) {
         file_number = parseInt(file_number)
         if(name === this.props.selected_model.file) {
             // console.log(`Uncompressed file received, file number: ${file_number} ....`)
             let total_timesteps = data[data_key]["lat_lon"][0][0].length
-            let tot_part = data[data_key]["lat_lon"][0].length
             let cur_state = this.state.status
 
             // Decide if we have loaded enough files to start the animation
             let wait_for = 1 // We will wait for this percentage of files to be loaded
             let files_to_load = parseInt(this.state.selected_model.num_files) * wait_for
             if (this.state.loaded_files >= (files_to_load - 1)) {
-                console.log("Done reading and uncompressing all the files!!!!")
+                console.log("Done reading and uncompressing the minumum number of files!!!!")
                 cur_state = STATUS.playing
                 $(".btn").attr("disabled", false)  // Enable all the buttons
             }else{
@@ -224,11 +225,26 @@ class  ParticlesLayer extends React.Component {
             }else{
                 model_timesteps[model_id] += total_timesteps
             }
-            current_data[model_id][file_number] = data
-            if (this.state.loaded_files >= (files_to_load - 1)) {
-                console.log(current_data)
+            // Here we append a new location at the end of each file (if is still not there) to fix the
+            // problem of drawing a location a the last timestep of each file.
+            if(file_number < files_to_load){
+                // Be sure we have already loaded the next file
+                if(!_.isUndefined(current_data[model_id][file_number+1])) {
+                    let next_file_data = current_data[model_id][file_number+1]
+                    let num_part = data[data_key]['lat_lon'][0].length
+                    let time_steps = data[data_key]['lat_lon'][0][0].length
+                    if(time_steps == timesteps_per_file){// Check we haven't 'fixed' this file already
+                        for(let cur_part=0; cur_part < num_part; cur_part++) {
+                            // We add the first location of the next file as the last location of this file
+                            data[data_key]['lat_lon'][0][cur_part].push(next_file_data[data_key]['lat_lon'][0][cur_part][0])
+                            data[data_key]['lat_lon'][1][cur_part].push(next_file_data[data_key]['lat_lon'][1][cur_part][0])
+                        }
+                    }
+                }
             }
+            current_data[model_id][file_number] = data
 
+            // This is useful for doing things we want to do only once
             if(file_number === 0) {
                 let canv_lay = this.state.canvas_layer
                 if (canv_lay === -1) {
@@ -339,7 +355,7 @@ class  ParticlesLayer extends React.Component {
                 for(let file_number in _.range(0, this.props.selected_model.num_files)){
                     let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
                     let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
-                    d3.text(url).then( (blob) => this.readOneZip(blob, file_number))
+                    d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
                 }
                 $(".loading_perc").text("0 %")
                 $(".loading-div").show() // Show the loading
@@ -372,7 +388,6 @@ class  ParticlesLayer extends React.Component {
             }
         }
     }
-
 
     /**
      * Draws a single day of litter using D3
@@ -407,9 +422,9 @@ class  ParticlesLayer extends React.Component {
                 }
                 // Draw next frame
                 if (this.state.shape_type) {
-                    this.drawLines(cur_date)
+                    this.drawParticlesAsLines(cur_date)
                 } else {
-                    this.drawParticles(cur_date)
+                    this.drawParticlesAsSquares(cur_date)
                 }
             }// for
 
@@ -424,18 +439,17 @@ class  ParticlesLayer extends React.Component {
     }
 
     /**
-     * Draws the particles for a single day.
+     * Draws the particles for a single day as squares.
      * @param ctx Context of the canvas object to use
      */
-    drawParticles(cur_date) {
+    drawParticlesAsSquares(cur_date) {
         let square_size = parseInt(PARTICLE_SIZES[this.state.particle_size_index] + 1)
         this.ctx.lineWidth = square_size
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
-        let file_number = (Math.floor(this.time_step / particles_per_file)).toString()
-        let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
+        let file_number = (Math.floor(this.time_step / timesteps_per_file)).toString()
 
-        cur_date = cur_date % particles_per_file
+        cur_date = cur_date % timesteps_per_file
 
         // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
@@ -477,13 +491,12 @@ class  ParticlesLayer extends React.Component {
         this.props.map.render()
     }
 
-    drawLines(cur_date) {
+    drawParticlesAsLines(timestep_idx) {
         // console.log(`DrawLines: ${this.state.speed_hz}`)
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
-        let file_number = (Math.floor(this.time_step / particles_per_file)).toString()
-        let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
+        let file_number = (Math.floor(this.time_step / timesteps_per_file)).toString()
 
         let clon = 0
         let clat = 0
@@ -493,9 +506,9 @@ class  ParticlesLayer extends React.Component {
         let tlon = 0
         let tnlon = 0
 
-        cur_date = cur_date % particles_per_file
+        timestep_idx = timestep_idx % timesteps_per_file
 
-        // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
+        // console.log(`Drawing lines time step: ${timestep_idx} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
             this.ctx.beginPath()
             // Retreive all the information from the first available file
@@ -507,40 +520,40 @@ class  ParticlesLayer extends React.Component {
             let oldpos = [0, 0]
             let newpos = [0, 0]
 
+            // Iterates over all the particles to draw them.
             for (let part_id = 0; part_id < tot_part; part_id++) {
-                    clon = drawing_data["lat_lon"][1][part_id][cur_date]
-                    clat = drawing_data["lat_lon"][0][part_id][cur_date]
-                    nlon = drawing_data["lat_lon"][1][part_id][cur_date + 1]
-                    nlat = drawing_data["lat_lon"][0][part_id][cur_date + 1]
+                    clon = drawing_data["lat_lon"][1][part_id][timestep_idx]
+                    clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
+                    nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
+                    nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
 
-                    if ((clon !== timesteps_per_file) && (nlon !== timesteps_per_file)) {
-                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                            oldpos = this.geoToCanvas(clon, clat)
-                            newpos = this.geoToCanvas(nlon, nlat)
+                    // Here we draw the 'norma' particles, those inside the limits of the globe
+                    if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                        oldpos = this.geoToCanvas(clon, clat)
+                        newpos = this.geoToCanvas(nlon, nlat)
+                        this.ctx.moveTo(oldpos[0], oldpos[1])
+                        this.ctx.lineTo(newpos[0], newpos[1])
+                    }
+                    // Draw the particles on the additional map on the east
+                    if (this.show_east_map) {
+                        tlon = clon + 360
+                        tnlon = nlon + 360
+                        if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                            oldpos = this.geoToCanvas(tlon, clat)
+                            newpos = this.geoToCanvas(tnlon, nlat)
                             this.ctx.moveTo(oldpos[0], oldpos[1])
                             this.ctx.lineTo(newpos[0], newpos[1])
                         }
-                        // Draw the particles on the additional map on the east
-                        if (this.show_east_map) {
-                            tlon = clon + 360
-                            tnlon = nlon + 360
-                            if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(tlon, clat)
-                                newpos = this.geoToCanvas(tnlon, nlat)
-                                this.ctx.moveTo(oldpos[0], oldpos[1])
-                                this.ctx.lineTo(newpos[0], newpos[1])
-                            }
-                        }
-                        // Draw the particles on the additional map on the west
-                        if (this.show_west_map){
-                            tlon = clon - 360
-                            tnlon = nlon - 360
-                            if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(tlon, clat)
-                                newpos = this.geoToCanvas(tnlon, nlat)
-                                this.ctx.moveTo(oldpos[0], oldpos[1])
-                                this.ctx.lineTo(newpos[0], newpos[1])
-                            }
+                    }
+                    // Draw the particles on the additional map on the west
+                    if (this.show_west_map){
+                        tlon = clon - 360
+                        tnlon = nlon - 360
+                        if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                            oldpos = this.geoToCanvas(tlon, clat)
+                            newpos = this.geoToCanvas(tnlon, nlat)
+                            this.ctx.moveTo(oldpos[0], oldpos[1])
+                            this.ctx.lineTo(newpos[0], newpos[1])
                         }
                     }
                 }

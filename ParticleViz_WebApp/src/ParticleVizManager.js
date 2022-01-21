@@ -44,7 +44,7 @@ data_files.push({
     title: `Particle Viz Title`,
     speed: "",
     style:def_style,
-    start_date: new Date(2010, 1, 1),
+    start_date: new Date(2010, 0, 1),
     num_files: 4,
 })
 
