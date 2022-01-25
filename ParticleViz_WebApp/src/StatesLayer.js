@@ -6,11 +6,10 @@ import {Fill, Stroke, Style, Text} from "ol/style";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import './css/App.css';
-import { isMobile } from "react-device-detect";
 
 require('ol/ol.css');
 
-let country_color = `rgba(238, 238, 238)`;
+let country_color = `rgba(238, 238, 238, .3)`;
 
 class  StatesLayer extends React.Component{
     constructor(props){

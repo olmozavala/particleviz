@@ -35,7 +35,6 @@ class PreprocParticleViz:
         vecfmt = np.vectorize(myfmt)
 
         # ------- Home ---------
-        output_folder = "../ExampleOutput"
 
         # Reading the output from Ocean Parcles
         nc_file = Dataset(self._input_file, "r", format="NETCDF4")
@@ -60,7 +59,7 @@ class PreprocParticleViz:
         # Iterate over the options to reduce the number of particles
         for subsample_data in subsample_data_all:
 
-            final_ouput_folder = F"{output_folder}/{subsample_data}"
+            final_ouput_folder = F"{self._output_folder}/{subsample_data}"
             if not(os.path.exists(final_ouput_folder)):
                 os.makedirs(final_ouput_folder)
 

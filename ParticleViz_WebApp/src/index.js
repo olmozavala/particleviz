@@ -17,25 +17,22 @@ import {House, Check} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
 import {chardinJs} from "./chardinjsoz";
 
+const config_pviz = require("./Config.json")
+
+const config_webapp = config_pviz.webapp
+
+const ip_address = config_webapp["ip_address"]// This address indicates from where are we loading the binary files of the particles.
+const resolutions = config_webapp["zoom-levels"]
+
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
 
-// This address indicates from where are we loading the binary files of the particles.
-let ip_address = "http://localhost/"
-// let ip_address = 'https://ozavala.coaps.fsu.edu/'
-const tot_res = 9;
-let resolutions = Array(tot_res);
-for(let i=0; i < tot_res; i++){
-    resolutions[i] = .36/(2**i);
-}
-// console.log("Resolutions: ", resolutions);
-
 let map_view = new View({
         projection: 'EPSG:4326', //Equirectangular
-        center: [0, 0],
-        extent: [-180, -190, 180, 190],
+        center: config_webapp["map-center"],
+        extent: config_webapp["map-extent"],
         resolutions: resolutions,
-        zoom: 1,
+        zoom: config_webapp["def-zoom"],
         moveTolerance: 400,
         // maxZoom: 8,
         // minZoom: 2
@@ -105,7 +102,8 @@ ReactDOM.render(<span>
                     <div className="container-fluid wl-title">
                         <div className="row p-0 m-0">
                             <div className="col-12 text-center">
-                               <div id="main-title" className="display-4 mt-3"> ParticleViz </div>
+                               <div id="main-title" className="display-4 mt-3"> {config_webapp['title']} </div>
+
                             </div>
                         </div>
                         <div className="row p-0 m-0">

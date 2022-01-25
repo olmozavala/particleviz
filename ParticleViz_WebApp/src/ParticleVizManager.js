@@ -3,48 +3,29 @@ import coaps_logo from "./imgs/coaps_logo.png"
 import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
 import BackgroundLayerManager from "./BackgroundLayerManager"
-import * as d3 from "d3"
 import _ from "underscore"
 import $ from "jquery"
 import {QuestionCircle, House, List} from "react-bootstrap-icons"
 import {Collapse, Row, Col, Container, Button}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
-
-const wms_url = "http://localhost:8080/ncWMS2/wms"
-// const wms_url = "http://ozavala.coaps.fsu.edu/ncWMS2/wms"
-const def_alpha = "FF"
-
-let selected_color = `rgb(255, 0, 0)`
-
-const months = [
-    'January', 'February', 'March', 'April', 'May',
-    'June', 'July', 'August', 'September',
-    'October', 'November', 'December'
-]
-
-const def_style = "x-Sst"
-// const def_style = "x-Occam
-// const def_style = "seq-YlGnBu"
-// const def_style = "psu-viridis-inv"
-// const def_style = "div-Spectral-inv"
-// const def_style = "default-inv"
-// const def_style = "div-RdYlGn-inv"
+const config_pviz = require("./Config.json")
+const config_preproc = config_pviz.preprocessing
+const config_webapp = config_pviz.webapp
 
 let data_files = []
-let folder = "3"  // Indicates the subsampling of the particles
+// Indicates the subsampling level of the particles
+let folder = config_webapp["desktop-subsample"]
 if(isMobile){
-    folder = "6"
+    folder = config_webapp["mobile-subsample"]
 }
 
 data_files.push({
     id: 1,
-    file: `ParticleViz/${folder}/ParticleViz`,
-    wms: `merged_five_years/histo`,
-    title: `Particle Viz Title`,
-    speed: "",
-    style:def_style,
-    start_date: new Date(2010, 0, 1),
+    file: `${folder}/ParticleViz`,
+    // start_date: new Date(config_webapp['star-date']),
+    // start_date: new Date("2010-10-10"),
+    start_date: new Date(2010,10,10,5),
     num_files: 4,
 })
 
@@ -56,7 +37,7 @@ class  ParticleVizManager extends React.Component{
         this.toggleHelp= this.toggleHelp.bind(this)
         this.setOpen = this.setOpen.bind(this)
 
-        this.data_folder_url = this.props.url + "/data"
+        this.data_folder_url = this.props.url
 
         this.state = {
             countries: {},

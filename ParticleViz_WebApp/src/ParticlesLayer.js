@@ -18,10 +18,13 @@ import {
 } from 'react-bootstrap-icons'
 
 import JSZip from "jszip"
+const config_pviz = require("./Config.json")
+const config_preproc = config_pviz.preprocessing
+const config_webapp = config_pviz.webapp
 
 const data_key = 'def_part_viz'
-const timesteps_per_file = 20 // These MUST match with the number of particles per file
-const particle_color =  `rgba(4, 21, 98)`;
+const timesteps_per_file = config_preproc['timesteps_by_file'] // These MUST match with the number of particles per file
+const particle_color =  config_webapp['particles-color']
 const default_size = 15 // Font size
 const STATUS = {
     loading: 0,
@@ -59,7 +62,7 @@ const MODES={
     decrease:2
 }
 
-const DRAW_LAST_DAYS = 0
+const DRAW_LAST_TIMESTEPS = 10
 const MAX_ANIMATION_SPEED = 45
 
 class  ParticlesLayer extends React.Component {
@@ -146,7 +149,7 @@ class  ParticlesLayer extends React.Component {
         // Then it reads the corresponding zip file
         let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
         let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.zip`
-        console.log("This is the url: " + url)
+        // console.log("This is the url: " + url)
         d3.blob(url).then((blob) => {
             let zip = new JSZip()
             zip.loadAsync(blob).then(function (zip) {
@@ -204,7 +207,7 @@ class  ParticlesLayer extends React.Component {
             let wait_for = 1 // We will wait for this percentage of files to be loaded
             let files_to_load = parseInt(this.state.selected_model.num_files) * wait_for
             if (this.state.loaded_files >= (files_to_load - 1)) {
-                console.log("Done reading and uncompressing the minumum number of files!!!!")
+                // console.log("Done reading and uncompressed the minimum number of files!!!!")
                 cur_state = STATUS.playing
                 $(".btn").attr("disabled", false)  // Enable all the buttons
             }else{
@@ -233,7 +236,7 @@ class  ParticlesLayer extends React.Component {
                     let next_file_data = current_data[model_id][file_number+1]
                     let num_part = data[data_key]['lat_lon'][0].length
                     let time_steps = data[data_key]['lat_lon'][0][0].length
-                    if(time_steps == timesteps_per_file){// Check we haven't 'fixed' this file already
+                    if(time_steps === timesteps_per_file){// Check we haven't 'fixed' this file already
                         for(let cur_part=0; cur_part < num_part; cur_part++) {
                             // We add the first location of the next file as the last location of this file
                             data[data_key]['lat_lon'][0][cur_part].push(next_file_data[data_key]['lat_lon'][0][cur_part][0])
@@ -242,6 +245,7 @@ class  ParticlesLayer extends React.Component {
                     }
                 }
             }
+
             current_data[model_id][file_number] = data
 
             // This is useful for doing things we want to do only once
@@ -403,7 +407,7 @@ class  ParticlesLayer extends React.Component {
             let cur_date = this.time_step
             let to_date = this.time_step
             if (this.draw_until_day) {
-                cur_date = this.time_step = Math.max(this.time_step - DRAW_LAST_DAYS, 1)
+                cur_date = this.time_step = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 1)
                 this.draw_until_day = false
             }
             // Here we draw from the current date up to 'to_date'. Normally is should only be one day
