@@ -23,6 +23,7 @@
     "react": "^16.14.0",
     "react-bootstrap": "^1.6.4",
     "react-bootstrap-icons": "^1.7.2",
+    "react-color": "^2.19.3",
     "react-device-detect": "^1.17.0",
     "react-dom": "^16.14.0",
     "react-open-iconic-svg": "^3.0.1",
@@ -33,7 +34,7 @@
     "start": "npm run copy-config & react-scripts start",
     "build": "react-scripts build & npm run copy",
     "copy": "cp -r node_modules/lib build/lib",
-    "copy-config": "cpx ../Config.json ./src --watch & cpx ./data/**/*.{txt,bin,zip,json} ./public --watch & ",
+    "copy-config": "cpx ./data/**/*.{txt,bin,zip,json} ./public --watch ",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

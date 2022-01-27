@@ -63,3 +63,5 @@ can animate smoothly around **10k** particles per timestep
 in a high-end computer. Anything beyond that it may be
 a good idea to subsample your data. 
 
+## ParticleViz binary files
+These files 

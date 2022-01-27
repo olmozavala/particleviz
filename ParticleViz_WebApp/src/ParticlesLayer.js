@@ -9,22 +9,23 @@ import $ from 'jquery'
 import { isMobile } from "react-device-detect"
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import {Container, ButtonGroup, Row, Col, Form}  from "react-bootstrap";
+import { GithubPicker, CirclePicker, TwitterPicker } from 'react-color';
+
 
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill, Slash, SquareFill,
     SkipBackwardFill, SkipForwardFill,
     SkipEndFill, SkipStartFill,
+    Brush, BrushFill
 } from 'react-bootstrap-icons'
 
 import JSZip from "jszip"
 const config_pviz = require("./Config.json")
 const config_preproc = config_pviz.preprocessing
-const config_webapp = config_pviz.webapp
 
 const data_key = 'def_part_viz'
 const timesteps_per_file = config_preproc['timesteps_by_file'] // These MUST match with the number of particles per file
-const particle_color =  config_webapp['particles-color']
 const default_size = 15 // Font size
 const STATUS = {
     loading: 0,
@@ -36,10 +37,10 @@ const STATUS = {
 // How much transparency should we add
 const TRAIL_SIZE = {
     1: .01, // Longest trail
-    2: .02,
-    3: .04,
-    4: .15,
-    5: .35  // Shortest trail
+    2: .04,
+    3: .15,
+    4: .35,
+    5: .90  // Shortest trail
 }
 
 let PARTICLE_SIZES= {
@@ -86,7 +87,9 @@ class  ParticlesLayer extends React.Component {
             domain: null,
             ol_canvas_size: null,
             total_timesteps: {},
-            shape_type: true, // true for lines, false for dots
+            shape_type: false, // true for lines, false for dots
+            particle_color: this.props.particle_color,
+            display_picker: false
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -132,6 +135,7 @@ class  ParticlesLayer extends React.Component {
         this.prevDay = this.prevDay.bind(this)
         this.displayCurrentDay = this.displayCurrentDay.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
+        this.changeParticleColor = this.changeParticleColor.bind(this)
     }
 
     /**
@@ -338,6 +342,7 @@ class  ParticlesLayer extends React.Component {
         }
     }
 
+
     /**
      * Updates the animation with the current frame rate
      */
@@ -443,6 +448,18 @@ class  ParticlesLayer extends React.Component {
     }
 
     /**
+     * Changes the current particle color
+     * @param color
+     */
+    changeParticleColor(color){
+        let rgb = color.rgb
+        this.setState({
+            particle_color: "rgb("+rgb.r+","+rgb.g+","+rgb.b+","+rgb.a+")",
+            display_picker: false
+        })
+    }
+
+    /**
      * Draws the particles for a single day as squares.
      * @param ctx Context of the canvas object to use
      */
@@ -459,7 +476,7 @@ class  ParticlesLayer extends React.Component {
         if (available_files.includes(file_number)) {
             this.ctx.beginPath()
             // Retreive all the information from the first available file
-            this.ctx.fillStyle =  particle_color
+            this.ctx.fillStyle =  this.state.particle_color
             let drawing_data = this.state.data[model_id][file_number][data_key]
             let tot_part = drawing_data["lat_lon"][0].length
             let oldpos = [0, 0]
@@ -516,7 +533,7 @@ class  ParticlesLayer extends React.Component {
         if (available_files.includes(file_number)) {
             this.ctx.beginPath()
             // Retreive all the information from the first available file
-            this.ctx.strokeStyle = particle_color
+            this.ctx.strokeStyle = this.state.particle_color
             let drawing_data = this.state.data[model_id][file_number][data_key]
 
             let tot_part = drawing_data["lat_lon"][0].length
@@ -573,6 +590,12 @@ class  ParticlesLayer extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.updateAnimation()
+        let picker = $('.pv-pcolor')
+        if(this.state.display_picker){
+            picker.show()
+        }else{
+            picker.hide()
+        }
     }
 
     /**
@@ -947,8 +970,8 @@ class  ParticlesLayer extends React.Component {
             this.props.chardin.refresh()
             return (
                 <span className="mt-1">
-                                         {/*---- Transparency ---------*/}
-                    <span className="navbar-brand col-auto viz-control" data-intro={"Litter trail length"} data-position={"bottom"}>
+                     {/*---- Size of Streamline ---------*/}
+                    <span className="navbar-brand col-auto viz-control" data-intro={"Path length"} data-position={"bottom"}>
                                          <span style={{display: "inline-block", width: "25px"}}>
                                          <ArrowRight
                                              size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
@@ -968,7 +991,7 @@ class  ParticlesLayer extends React.Component {
                                          </button>
                                          </span>
                     {/*---- Particle size ---------*/}
-                    <span className="navbar-brand col-auto viz-control" data-intro={"Litter size"} data-position={"bottom"}>
+                    <span className="navbar-brand col-auto viz-control" data-intro={"Particle size"} data-position={"bottom"}>
                                          <span style={{display: "inline-block", width: "25px"}}>
                                          <CircleFill
                                              size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
@@ -986,20 +1009,51 @@ class  ParticlesLayer extends React.Component {
                                          </button>
                                          </span>
                     {/*---- Shape selection---------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Litter shape"} data-position={"bottom"}>
-                                         <button className={`btn btn-sm btn-info d-md-none d-lg-inline `}
-                                                 onClick={this.changeShapeType}
-                                                 title="Shape selection"
-                                                 disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                         {this.state.shape_type ?
-                                             <Slash size={default_size}/>
-                                             :
-                                             <SquareFill size={default_size}/>
-                                         }
-                                         </button>
-                                         </span>
+                    <span className="navbar-brand col-auto" data-intro={"Particle shape"} data-position={"bottom"}>
+                                 <button className={`btn btn-sm btn-info d-md-none d-lg-inline `}
+                                         onClick={this.changeShapeType}
+                                         title="Shape selection"
+                                         disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                 {this.state.shape_type ?
+                                     <Slash size={default_size}/>
+                                     :
+                                     <SquareFill size={default_size}/>
+                                 }
+                                 </button>
+                    </span>
+                    {/*---- Particle Color ------------*/}
+                    <span className="navbar-brand col-auto " data-intro={"Particle color"} data-position={"bottom"}>
+                            <button className={`btn btn-sm btn-info d-md-none d-lg-inline `}
+                                    onClick={() => this.setState({display_picker:!this.state.display_picker})}
+                                    title="Color selection"
+                                    disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                 {this.state.display_picker?
+                                     <Brush size={default_size}/>
+                                     :
+                                     <BrushFill size={default_size}/>
+                                 }
+                            </button>
+                    </span>
+                    <span className="position-fixed pv-pcolor">
+                        {/*<GithubPicker className="position-fixed"*/}
+                        {/*              color={this.state.particle_color}*/}
+                        {/*              onChange={this.changeParticleColor}*/}
+                        {/*              triangle="hide"*/}
+                        {/*/>*/}
+                        {/*<CirclePicker className="position-fixed bg-light rounded"*/}
+                        {/*              color={this.state.particle_color}*/}
+                        {/*              onChange={this.changeParticleColor}*/}
+                        {/*              circleSize={20}*/}
+                        {/*              circleSpacing={10}*/}
+                        {/*/>*/}
+                        <TwitterPicker className="position-fixed"
+                                      color={this.state.particle_color}
+                                      onChange={this.changeParticleColor}
+                                      triangle="hide"
+                        />
+                    </span>
                     {/*---- Range Current day ------------*/}
-                    <span id="date_range" className="navbar-brand m-1 range-ml" data-intro="Day selection" data-position="bottom">
+                    <span id="date_range" className="navbar-brand m-1 range-ml" data-intro="Time selection" data-position="bottom">
                         <span className={"mt-5"}>
                              <Form.Control type="range"
                                            title="Date selection"

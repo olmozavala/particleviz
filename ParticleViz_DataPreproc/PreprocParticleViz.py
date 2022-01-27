@@ -2,7 +2,7 @@ import struct
 __author__="Olmo S. Zavala Romero"
 
 import numpy as np
-# from netCDF4 import Dataset
+from netCDF4 import Dataset
 import xarray as xr
 import os
 import json
@@ -18,6 +18,7 @@ class PreprocParticleViz:
         self._output_folder = config["output_folder"]
         self._subsample_all = config["subsample"]  # If we want to subsample the number of particles in the file
         self._timesteps_by_file = config["timesteps_by_file"]  # How many timesteps do we want to store in each binary file
+        self._file_prefix = config["file_prefix"]  # Output file name to use by ParticleViz
 
     def createBinaryFileMultiple(self):
         """
@@ -36,6 +37,9 @@ class PreprocParticleViz:
 
         # Reading the output from Ocean Parcles
         nc_file = xr.load_dataset(self._input_file)
+        # This is only used to access time units string (TODO move everything to the NetCDF4 library)
+        ds = Dataset(self._input_file)
+
         tot_time_steps = nc_file.obs.size
         glob_num_particles = nc_file.traj.size
 
@@ -49,6 +53,10 @@ class PreprocParticleViz:
 
         lat_all = all_vars['lat']
         lon_all = all_vars['lon']
+
+        time_units_str = ds.variables['time'].units.split(" ")
+        start_date = time_units_str[2]
+        delta_t = time_units_str[0]
 
         # Iterate over the options to reduce the number of particles
         for subsample_data in subsample_data_all:
@@ -70,23 +78,22 @@ class PreprocParticleViz:
                                          vecfmt(lon[:, cur_chunk:next_time_step])]}
 
                 # # ------------- Writing the binary file form the countries object --------------
-                txt = ''
                 bindata = b''
-                # name, continent, num_particles, num_timesteps
-                txt += F"{len(this_file['lat_lon'][0])}, {len(this_file['lat_lon'][0][0])}\n"
+                # num_particles, num_timesteps, start_date, delta_t
+                header_txt = F"{len(this_file['lat_lon'][0])}, {len(this_file['lat_lon'][0][0])}, {start_date}, {delta_t}\n"
                 # Here we reduce transform to 16 bit integer
                 # Limits for int16 are -32768 to 32767
                 bindata += (np.array(this_file['lat_lon'][0])*100).astype(np.int16).tobytes()
                 bindata += (np.array(this_file['lat_lon'][1])*100).astype(np.int16).tobytes()
 
-                output_file_name = "ParticleViz"
+                output_file_name = self._file_prefix
                 print(F" Saving binary file {final_ouput_folder}.....")
                 header_output_file = F"{final_ouput_folder}/{output_file_name}_{ichunk:02d}.txt"
                 binary_file = F"{final_ouput_folder}/{output_file_name}_{ichunk:02d}.bin"
                 zip_output_file = F"{final_ouput_folder}/{output_file_name}_{ichunk:02d}.zip"
                 # -------- Writing header file ---------------
                 f = open(header_output_file,'w')
-                f.write(txt)
+                f.write(header_txt)
                 f.close()
                 # -------- Writing binary file---------------
                 f = open(binary_file,'wb')
@@ -97,6 +104,8 @@ class PreprocParticleViz:
                 with zipfile.ZipFile(zip_output_file, 'w') as zip_file:
                     zip_file.write(binary_file)
                 zip_file.close()
+                # -----  Remove binary file, ParticleViz reads the zip file directly
+                os.remove(binary_file)
 
         nc_file.close()
 

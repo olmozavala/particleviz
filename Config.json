@@ -3,7 +3,8 @@
     "input_file": "../ExampleData/Global_Marine_Debris.nc",
     "output_folder": "../ParticleViz_WebApp/data/",
     "subsample": [2, 4],
-    "timesteps_by_file": 20
+    "timesteps_by_file": 20,
+    "file_prefix": "ParticleViz"
   },
   "webapp": {
     "title": "YOUR MAP TITLE",

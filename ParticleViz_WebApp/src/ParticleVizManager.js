@@ -11,6 +11,7 @@ import { isMobile } from "react-device-detect";
 import './css/App.css'
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
+const config_preproc = config_pviz.preprocessing
 
 let data_files = []
 // Indicates the subsampling level of the particles
@@ -21,9 +22,7 @@ if(isMobile){
 
 data_files.push({
     id: 1,
-    file: `${folder}/ParticleViz`,
-    // start_date: new Date(config_webapp['star-date']),
-    // start_date: new Date("2010-10-10"),
+    file: `${folder}/${config_preproc["file_prefix"]}`,
     start_date: new Date(2010,10,10,5),
     num_files: 4,
 })
@@ -42,6 +41,7 @@ class  ParticleVizManager extends React.Component{
             countries: {},
             selected_model: data_files[0],
             chardin: this.props.chardin,
+            particle_color:  config_webapp['particles-color'],
             open: false
         }
     }
@@ -60,10 +60,10 @@ class  ParticleVizManager extends React.Component{
 
         //TODO this is a patch for the collapse nabvar to hide the titles
         $('#collapseNavMain').on('show.bs.collapse', function() {
-            $('.wl-title').hide()
+            $('.pv-title').hide()
         });
         $('#collapseNavMain').on('hidden.bs.collapse', function() {
-            $('.wl-title').show()
+            $('.pv-title').show()
         });
     }
 
@@ -153,6 +153,7 @@ class  ParticleVizManager extends React.Component{
                                     <ParticlesLayer map={this.props.map}
                                                     url={this.data_folder_url}
                                                     chardin={this.state.chardin}
+                                                    particle_color={this.state.particle_color}
                                                     selected_model={this.state.selected_model}/>
                                 </Col>
                             </Row>
@@ -195,6 +196,7 @@ class  ParticleVizManager extends React.Component{
                             <ParticlesLayer map={this.props.map}
                                             url={this.data_folder_url}
                                             chardin={this.state.chardin}
+                                            particle_color={this.state.particle_color}
                                             selected_model={this.state.selected_model}/>
                             {/* ---------- Background selection ------------*/}
                             <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">

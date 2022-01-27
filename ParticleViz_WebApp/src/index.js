@@ -99,7 +99,7 @@ function PageSummary(){
 
 ReactDOM.render(<span>
                     <ParticleVizManager map={map} background_layer={background_layer} url={ip_address} chardin={intro_chardin}/>
-                    <div className="container-fluid wl-title">
+                    <div className="container-fluid pv-title">
                         <div className="row p-0 m-0">
                             <div className="col-12 text-center">
                                <div id="main-title" className="display-4 mt-3"> {config_webapp['title']} </div>
