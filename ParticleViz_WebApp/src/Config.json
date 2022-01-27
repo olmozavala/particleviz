@@ -2,15 +2,15 @@
   "preprocessing": {
     "input_file": "../ExampleData/Global_Marine_Debris.nc",
     "output_folder": "../ParticleViz_WebApp/data/",
-    "subsample": [3, 4, 6],
+    "subsample": [2, 4],
     "timesteps_by_file": 20
   },
   "webapp": {
     "title": "YOUR MAP TITLE",
     "particles-color": "rgba(82,21,98)",
     "start-date": "2021-10-10T00:00:00",
-    "desktop-subsample": "4",
-    "mobile-subsample": "6",
+    "desktop-subsample": "2",
+    "mobile-subsample": "4",
     "ip_address": "http://localhost:3000/particleviz",
     "zoom-levels": [0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625],
     "def-zoom": 1,

@@ -1,11 +1,9 @@
-from __future__ import division
-# https://docs.python.org/2/library/struct.html
 import struct
-import numpy as np
 __author__="Olmo S. Zavala Romero"
 
 import numpy as np
-from netCDF4 import Dataset
+# from netCDF4 import Dataset
+import xarray as xr
 import os
 import json
 import zipfile
@@ -37,16 +35,12 @@ class PreprocParticleViz:
         # ------- Home ---------
 
         # Reading the output from Ocean Parcles
-        nc_file = Dataset(self._input_file, "r", format="NETCDF4")
-        tot_time_steps = nc_file.dimensions['obs'].size
-        glob_num_particles = nc_file.dimensions['traj'].size
+        nc_file = xr.load_dataset(self._input_file)
+        tot_time_steps = nc_file.obs.size
+        glob_num_particles = nc_file.traj.size
 
         print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions) ")
 
-        print("----- Attributes ----")
-        for name in nc_file.ncattrs():
-            print(name, "=", getattr(nc_file, name))
-        # plt.imshow(nc_file['beached'])
         # Print variables
         print("----- Variables Inside file ----")
         all_vars = nc_file.variables
@@ -145,7 +139,7 @@ class PreprocParticleViz:
 
 if __name__ == "__main__":
     config_file = "../Config.json"
-    test_file = "../ExampleOutput/3/ParticleViz_01"
+    # test_file = "../ExampleOutput/3/ParticleViz_01"
     mypreproc = PreprocParticleViz(config_file)
     mypreproc.createBinaryFileMultiple()
-    mypreproc.testBinaryAndHeaderFiles(test_file)
+    # mypreproc.testBinaryAndHeaderFiles(test_file)

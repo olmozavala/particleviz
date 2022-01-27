@@ -10,7 +10,6 @@ import {Collapse, Row, Col, Container, Button}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
 const config_pviz = require("./Config.json")
-const config_preproc = config_pviz.preprocessing
 const config_webapp = config_pviz.webapp
 
 let data_files = []
