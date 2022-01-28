@@ -1,11 +1,11 @@
 {
     "preprocessing": {
-        "input_file": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc",
+        "input_file": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc",
+        "_input_file": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Global_Marine_Debris.nc",
         "output_folder": "./ParticleViz_WebApp/data/",
         "subsample": [
             2,
-            5,
-            10
+            4
         ]
     },
     "webapp": {
@@ -13,7 +13,7 @@
         "particles-color": "rgba(255,105,0)",
         "start-date": "2021-10-10T00:00:00",
         "desktop-subsample": "2",
-        "mobile-subsample": "10",
+        "mobile-subsample": "4",
         "zoom-levels": [
             0.36,
             0.18,
@@ -38,8 +38,8 @@
         ]
     },
     "advanced": {
-        "file_prefix": "Laura",
-        "timesteps_by_file": 50,
-        "total_files": 4
+        "file_prefix": "GlobalLitter",
+        "timesteps_by_file": 100,
+        "total_files": 41
     }
 }

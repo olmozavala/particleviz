@@ -22,6 +22,11 @@
   display: none;
 }
 
+.pv-title{
+  z-index: 100;
+  position: absolute;
+  width: 100%;
+}
 
 @media(max-width: 767px){
   h5 {
@@ -35,11 +40,6 @@
   }
 }
 
-.pv-title{
-  z-index: 100;
-  position: absolute;
-  width: 100%;
-}
 
 
 @media(max-width: 768px){
@@ -104,7 +104,6 @@
   }
 }
 
-
 @media(max-width: 1300px) and (min-width: 992px){
     .logos{
        min-width: 160px;
@@ -119,13 +118,6 @@
         max-width: 50px;
   }
 }
-
-/*@media(max-width: 1400px) and (min-width: 769px){*/
-/*  .range-ml{*/
-/*    max-width: 50px;*/
-/*  }*/
-/*}*/
-
 
 @media(min-width: 1400px){
   .range-ml{

@@ -11,7 +11,7 @@ import { isMobile } from "react-device-detect";
 import './css/App.css'
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
-const config_preproc = config_pviz.preprocessing
+const config_adv = config_pviz.advanced
 
 let data_files = []
 // Indicates the subsampling level of the particles
@@ -22,9 +22,8 @@ if(isMobile){
 
 data_files.push({
     id: 1,
-    file: `${folder}/${config_preproc["file_prefix"]}`,
-    start_date: new Date(2010,10,10,5),
-    num_files: 4,
+    file: `${folder}/${config_adv["file_prefix"]}`,
+    num_files: config_adv["total_files"],
 })
 
 class  ParticleVizManager extends React.Component{
@@ -108,7 +107,7 @@ class  ParticleVizManager extends React.Component{
         if(isMobile ||  window.innerWidth <= 1200){
             // --------------------- MOBILE  or < 1200---------------------------------
             return (
-                <Container fluid>
+                <Container fluid >
                     <Row className={`bg-light py-1`}>
                         <Col xs={5}>
                             {/*------------ Logos ------------------*/}
@@ -118,7 +117,7 @@ class  ParticleVizManager extends React.Component{
                         </Col>
                         <Col>
                         {/* ---------- Home ------------*/}
-                            <Button variant="info" size={"sm"} className={"m-1"}
+                        <Button variant="info" size={"sm"} className={"m-1"}
                                     href="https://github.com/olmozavala/particle_viz">
                                 <House/>
                             </Button>

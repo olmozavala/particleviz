@@ -37,12 +37,16 @@ if __name__ == '__main__':
 
     # ------------- Preprocessing steps ---------------
     if all or preproc:
+        print("Doing preprocessing...")
         mypreproc = PreprocParticleViz(config_file)
         mypreproc.createBinaryFileMultiple()
+        print("Done!")
 
     if all or webapp:
+        print("Initializing webapp...")
         # Copy correct Config.json to the src folder
         shutil.copyfile(config_file, join("ParticleViz_WebApp","src","Config.json"))
         # Initilize the server
         subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)
+        print("Done!")
 

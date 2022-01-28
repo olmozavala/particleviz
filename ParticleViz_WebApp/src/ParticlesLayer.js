@@ -1,5 +1,4 @@
 import React from 'react'
-import './css/App.css'
 import './css/Animations.css'
 import * as d3 from "d3"
 import ImageLayer from "ol/layer/Image"
@@ -11,7 +10,6 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import {Container, ButtonGroup, Row, Col, Form}  from "react-bootstrap";
 import { GithubPicker, CirclePicker, TwitterPicker } from 'react-color';
 
-
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill, Slash, SquareFill,
@@ -22,10 +20,10 @@ import {
 
 import JSZip from "jszip"
 const config_pviz = require("./Config.json")
-const config_preproc = config_pviz.preprocessing
+const config_adv = config_pviz.advanced
 
 const data_key = 'def_part_viz'
-const timesteps_per_file = config_preproc['timesteps_by_file'] // These MUST match with the number of particles per file
+const timesteps_per_file = config_adv['timesteps_by_file'] // These MUST match with the number of particles per file
 const default_size = 15 // Font size
 const STATUS = {
     loading: 0,
@@ -66,6 +64,7 @@ const MODES={
 const DRAW_LAST_TIMESTEPS = 10
 const MAX_ANIMATION_SPEED = 45
 
+
 class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props)
@@ -89,7 +88,10 @@ class  ParticlesLayer extends React.Component {
             total_timesteps: {},
             shape_type: false, // true for lines, false for dots
             particle_color: this.props.particle_color,
-            display_picker: false
+            display_picker: false,
+            delta_t: -1,
+            start_date: Date.now(),
+            date_format: d3.timeFormat("%B %e, %Y ")
         }
         this.canvasWidth = 0
         this.canvasHeight = 0
@@ -116,7 +118,7 @@ class  ParticlesLayer extends React.Component {
         this.canvasFunction = this.canvasFunction.bind(this)
         this.getIconColorSize = this.getIconColorSize.bind(this)
         this.getIconColorSizeBoostrap = this.getIconColorSizeBoostrap.bind(this)
-        this.drawNextDay = this.drawNextDay.bind(this)
+        this.drawAnimationFrame = this.drawAnimationFrame.bind(this)
         this.changeShapeType = this.changeShapeType.bind(this)
         this.increaseSpeed = this.increaseSpeed.bind(this)
         this.decreaseSpeed = this.decreaseSpeed.bind(this)
@@ -133,9 +135,34 @@ class  ParticlesLayer extends React.Component {
         this.clearPreviousLoop = this.clearPreviousLoop.bind(this)
         this.nextDay = this.nextDay.bind(this)
         this.prevDay = this.prevDay.bind(this)
-        this.displayCurrentDay = this.displayCurrentDay.bind(this)
+        this.updateDateTxt = this.updateDateTxt.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
         this.changeParticleColor = this.changeParticleColor.bind(this)
+        this.strDeltaTimeToMiliseconds = this.strDeltaTimeToMiliseconds.bind(this)
+    }
+
+    /**
+     * It returns the number of miliseconds to increase in each time step. Based on the string stored in the header files
+     * @param str_deltat
+     */
+    strDeltaTimeToMiliseconds(str_deltat){
+        switch(String(str_deltat).trim().toLowerCase()){
+            case "miliseconds":
+                return [1, d3.timeFormat("%H:%M:%S.%L  %B %e, %Y")]
+            case "seconds":
+                return [1000, d3.timeFormat("%H:%M:%S  %B %e, %Y ")]
+            case "hours":
+                return [1000 * 3600, d3.timeFormat("%H:%M:%S %B %e, %Y")]
+            case "days":
+                return [1000 * 24 * 3600, d3.timeFormat("%B %e, %Y ")]
+            case "weeks":
+                return [7 * 1000 * 24 * 3600, d3.timeFormat("%B %e, %Y ")]
+            case "years":
+                return [365 * 1000 * 24 * 3600, d3.timeFormat("%Y ")]
+            default:
+                return -1, d3.timeFormat("%Y ")
+        }
+
     }
 
     /**
@@ -147,7 +174,7 @@ class  ParticlesLayer extends React.Component {
         // Reads the header file (txt)
         file_number = parseInt(file_number)
         let header_data = d3.csvParseRows(text, function(d) { // In ParticleViz it should only be one line
-            return [parseInt(d[0]), parseInt(d[1])]
+            return [parseInt(d[0]), parseInt(d[1]), d[2], d[3]]
         });
 
         // Then it reads the corresponding zip file
@@ -165,29 +192,39 @@ class  ParticlesLayer extends React.Component {
                 }
             }).then((binarydata) => { // This function receives the binary data
                 let buf_off = 0
-                let data = {}
-                for(let line of header_data){ // Iterates each line from the header (should be only one for the moment)
-                    let num_part = line[0]
-                    let tot_timesteps = line[1]
-                    // console.log(`Num particles: ${num_part} timesteps ${tot_timesteps}`)
-                    data[data_key] = {}
-                    // All latitudes and longitudes in the file
-                    let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
-                    let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
-                    // Split locations by particles
-                    let lats_by_part = []
-                    let lons_by_part = []
-                    for(let cur_part=0; cur_part < num_part; cur_part++){
-                        let cur_part_lats = _.range(tot_timesteps).map((i) =>  all_lat[cur_part*tot_timesteps + i]/100)
-                        let cur_part_lons = _.range(tot_timesteps).map((i) =>  all_lon[cur_part*tot_timesteps + i]/100)
-                        lats_by_part.push(cur_part_lats)
-                        lons_by_part.push(cur_part_lons)
-                    }
-                    // Because we draw the particles by file (in order to be able to read files on-demand and async)
-                    // we need to repeat the
-                    data[data_key]["lat_lon"] = [lats_by_part, lons_by_part]
-                    buf_off += num_part*tot_timesteps*4
+                let line = header_data[0]
+                let num_part = line[0]
+                let tot_timesteps = line[1]
+                // We only update these state variables if it is the first file we receive
+                if(this.state.delta_t === -1){
+                    let start_date = new Date(Date.parse(line[2].trim()))
+                    let [delta_t, date_format] = this.strDeltaTimeToMiliseconds(line[3])
+                    this.setState({
+                        delta_t:delta_t,
+                        start_date:start_date,
+                        date_format: date_format
+                    })
                 }
+
+                // console.log(`Num particles: ${num_part} timesteps ${tot_timesteps}`)
+                let data = {}
+                data[data_key] = {}
+                // All latitudes and longitudes in the file
+                let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
+                let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
+                // Split locations by particles
+                let lats_by_part = []
+                let lons_by_part = []
+                for(let cur_part=0; cur_part < num_part; cur_part++){
+                    let cur_part_lats = _.range(tot_timesteps).map((i) =>  all_lat[cur_part*tot_timesteps + i]/100)
+                    let cur_part_lons = _.range(tot_timesteps).map((i) =>  all_lon[cur_part*tot_timesteps + i]/100)
+                    lats_by_part.push(cur_part_lats)
+                    lons_by_part.push(cur_part_lons)
+                }
+                // Because we draw the particles by file (in order to be able to read files on-demand and async)
+                // we need to repeat the
+                data[data_key]["lat_lon"] = [lats_by_part, lons_by_part]
+                // buf_off += num_part*tot_timesteps*4
                 this.readUnzippedFileStepTwo(data, this.props.selected_model.file, file_number)
             })
         })
@@ -384,31 +421,44 @@ class  ParticlesLayer extends React.Component {
                 let canvas = this.d3canvas.node()
                 if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {
-                        // this.interval = setInterval(() => this.drawNextDay(), (1.0 / this.state.speed_hz) * 1000)
+                        // this.interval = setInterval(() => this.drawAnimationFrame(), (1.0 / this.state.speed_hz) * 1000)
                         this.time = Date.now()
-                        this.interval = requestAnimationFrame( this.drawNextDay )
+                        this.interval = requestAnimationFrame( this.drawAnimationFrame )
                     }
                 }
                 if (this.state.status === STATUS.paused) {
                     if (!_.isNull(canvas)) {
-                        this.drawNextDay()
+                        this.drawAnimationFrame()
                     }
                 }
             }
         }
     }
 
+
     /**
-     * Draws a single day of litter using D3
+     * Changes the current particle color
+     * @param color
      */
-    drawNextDay() {
+    changeParticleColor(color){
+        let rgb = color.rgb
+        this.setState({
+            particle_color: "rgb("+rgb.r+","+rgb.g+","+rgb.b+","+rgb.a+")",
+            display_picker: false
+        })
+    }
+
+    /**
+     * Draws a single frame (timestep) using D3
+     */
+    drawAnimationFrame() {
         let ctime = Date.now()
         // Verify is time to draw the next frame
         if( (ctime - this.time) > (1000/this.state.speed_hz)) {
             // console.log(`${(ctime - this.time)}  ${(1000/this.state.speed_hz)}`)
             this.time = ctime
             let canvas = this.d3canvas.node()
-            this.displayCurrentDay()
+            this.updateDateTxt()
             let cur_date = this.time_step
             let to_date = this.time_step
             if (this.draw_until_day) {
@@ -443,20 +493,8 @@ class  ParticlesLayer extends React.Component {
         }
         cancelAnimationFrame(this.interval)
         if (this.state.status === STATUS.playing) {
-            this.interval =  requestAnimationFrame( this.drawNextDay )
+            this.interval =  requestAnimationFrame( this.drawAnimationFrame )
         }
-    }
-
-    /**
-     * Changes the current particle color
-     * @param color
-     */
-    changeParticleColor(color){
-        let rgb = color.rgb
-        this.setState({
-            particle_color: "rgb("+rgb.r+","+rgb.g+","+rgb.b+","+rgb.a+")",
-            display_picker: false
-        })
     }
 
     /**
@@ -472,7 +510,7 @@ class  ParticlesLayer extends React.Component {
 
         cur_date = cur_date % timesteps_per_file
 
-        // console.log(`Drawing lines time step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
+        // console.log(`Drawing squarestime step: ${cur_date} file number: ${file_number}   (global ${this.state.time_step})`)
         if (available_files.includes(file_number)) {
             this.ctx.beginPath()
             // Retreive all the information from the first available file
@@ -698,7 +736,7 @@ class  ParticlesLayer extends React.Component {
         console.log(this.time_step)
         let canvas = this.d3canvas.node()
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.drawNextDay()
+        this.drawAnimationFrame()
         this.updateRange()
     }
 
@@ -711,7 +749,7 @@ class  ParticlesLayer extends React.Component {
     nextDay(e) {
         e.preventDefault()
         this.time_step = Math.min(this.time_step + 1, this.state.total_timesteps[this.state.selected_model.id])
-        this.drawNextDay(this.d3canvas.node())
+        this.drawAnimationFrame(this.d3canvas.node())
         this.updateRange()
     }
 
@@ -721,7 +759,7 @@ class  ParticlesLayer extends React.Component {
         this.time_step = Math.max(this.time_step - 1, 1)
         let canvas = this.d3canvas.node()
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.drawNextDay()
+        this.drawAnimationFrame()
         this.updateRange()
     }
 
@@ -797,11 +835,12 @@ class  ParticlesLayer extends React.Component {
     /**
      * Draws the date in the 'title' div. Everytime
      */
-    displayCurrentDay() {
-        let start_date = this.state.selected_model.start_date
+    updateDateTxt() {
+        let start_date = this.state.start_date
         let title = d3.select("#dates-title")
-        let cur_date = new Date(start_date.getTime() + this.time_step * 24 * 3600000)
-        title.text(this.dateFormat(cur_date))
+        let cur_date = new Date(start_date.getTime() + this.time_step * this.state.delta_t)
+        // let cur_date = Date.now()
+        title.text(this.state.date_format(cur_date))
     }
 
     changeShapeType(){

@@ -13,12 +13,16 @@ import matplotlib.pyplot as plt
 class PreprocParticleViz:
     def __init__(self, config_file):
         f = open(config_file)
-        config = json.load(f)["preprocessing"]
+        config_json = json.load(f)
+        config = config_json["preprocessing"]
+        config_adv = config_json["advanced"]
+        self._config_file = config_file
+        self._config_json = config_json
         self._input_file = config["input_file"]  # This is the OceanParcel file
         self._output_folder = config["output_folder"]
         self._subsample_all = config["subsample"]  # If we want to subsample the number of particles in the file
-        self._timesteps_by_file = config["timesteps_by_file"]  # How many timesteps do we want to store in each binary file
-        self._file_prefix = config["file_prefix"]  # Output file name to use by ParticleViz
+        self._timesteps_by_file = config_adv["timesteps_by_file"]  # How many timesteps do we want to store in each binary file
+        self._file_prefix = config_adv["file_prefix"]  # Output file name to use by ParticleViz
 
     def createBinaryFileMultiple(self):
         """
@@ -33,17 +37,22 @@ class PreprocParticleViz:
 
         vecfmt = np.vectorize(myfmt)
 
-        # ------- Home ---------
-
+        print("Reading data...")
         # Reading the output from Ocean Parcles
-        nc_file = xr.load_dataset(self._input_file)
+        nc_file = xr.open_dataset(self._input_file)
         # This is only used to access time units string (TODO move everything to the NetCDF4 library)
         ds = Dataset(self._input_file)
 
         tot_time_steps = nc_file.obs.size
         glob_num_particles = nc_file.traj.size
+        tot_files = tot_time_steps//timesteps_by_file + 1
 
-        print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions) ")
+        # Here we update the total number of files generated for this
+        self._config_json["advanced"]["total_files"] = tot_files
+        with open(self._config_file, 'w') as f:
+            json.dump(self._config_json, f, indent=4)
+
+        print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions, Number of files: {tot_files}) ")
 
         # Print variables
         print("----- Variables Inside file ----")

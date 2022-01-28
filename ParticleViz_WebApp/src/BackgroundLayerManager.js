@@ -28,6 +28,8 @@ const BACKGROUND_MAPS = {
     empty: 5
 };
 
+const def_background = BACKGROUND_MAPS.nature
+
 class  BackgroundLayerManager extends React.Component{
     constructor(props){
         super(props)
@@ -40,7 +42,7 @@ class  BackgroundLayerManager extends React.Component{
 
     componentDidMount() {
         // Here we set the default background map
-        this.updateBackgroundLayer(BACKGROUND_MAPS.empty)
+        this.updateBackgroundLayer(def_background)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

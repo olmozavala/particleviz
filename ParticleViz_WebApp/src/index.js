@@ -21,8 +21,9 @@ const config_pviz = require("./Config.json")
 
 const config_webapp = config_pviz.webapp
 
-const ip_address = config_webapp["ip_address"]// This address indicates from where are we loading the binary files of the particles.
+const ip_address = window.location.href
 const resolutions = config_webapp["zoom-levels"]
+console.log(ip_address)
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
