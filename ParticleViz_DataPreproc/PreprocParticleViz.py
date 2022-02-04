@@ -65,7 +65,9 @@ class PreprocParticleViz:
 
         time_units_str = ds.variables['time'].units.split(" ")
         start_date = time_units_str[2]
-        delta_t = time_units_str[0]
+        delta_t_str = time_units_str[0]
+        delta_t = ds['time'][0,1] - ds['time'][0,0]# TODO here we assume we have at least 2 particles and the delta_t is constant
+
 
         # Iterate over the options to reduce the number of particles
         for subsample_data in subsample_data_all:
@@ -88,8 +90,8 @@ class PreprocParticleViz:
 
                 # # ------------- Writing the binary file form the countries object --------------
                 bindata = b''
-                # num_particles, num_timesteps, start_date, delta_t
-                header_txt = F"{len(this_file['lat_lon'][0])}, {len(this_file['lat_lon'][0][0])}, {start_date}, {delta_t}\n"
+                # num_particles, num_timesteps, start_date, delta_t_str
+                header_txt = F"{len(this_file['lat_lon'][0])}, {len(this_file['lat_lon'][0][0])}, {start_date}, {delta_t_str}, {delta_t}\n"
                 # Here we reduce transform to 16 bit integer
                 # Limits for int16 are -32768 to 32767
                 bindata += (np.array(this_file['lat_lon'][0])*100).astype(np.int16).tobytes()
@@ -160,4 +162,4 @@ if __name__ == "__main__":
     # test_file = "../ExampleOutput/3/ParticleViz_01"
     mypreproc = PreprocParticleViz(config_file)
     mypreproc.createBinaryFileMultiple()
-    # mypreproc.testBinaryAndHeaderFiles(test_file)
+    mypreproc.testBinaryAndHeaderFiles(test_file)

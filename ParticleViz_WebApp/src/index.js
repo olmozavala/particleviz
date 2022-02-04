@@ -72,9 +72,10 @@ function PageSummary(){
                     <Card style={{ width: '100%' }}>
                         <Card.Img variant="top" src={introjpg} />
                         <Card.Body>
-                            <Card.Title>ParticleViz</Card.Title>
+                            <Card.Title>{config_webapp['title']}</Card.Title>
                             <Card.Text>
-                                ENTRY TEXT
+                                {config_webapp['intro']}.
+                                Click
                                 <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  {
                                     intro_chardin.stop()}
                                 }>
@@ -83,7 +84,7 @@ function PageSummary(){
                                 to continue and please wait for the site to load.
                                 For details on the model go to
                                 <a title="Home" className="btn ml-2 btn-info btn-sm"
-                                   href="https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter">
+                                   href={config_webapp['url']}>
                                     <House/>
                                 </a>.
                             </Card.Text>

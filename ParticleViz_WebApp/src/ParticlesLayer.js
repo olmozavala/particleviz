@@ -145,24 +145,43 @@ class  ParticlesLayer extends React.Component {
      * It returns the number of miliseconds to increase in each time step. Based on the string stored in the header files
      * @param str_deltat
      */
-    strDeltaTimeToMiliseconds(str_deltat){
-        switch(String(str_deltat).trim().toLowerCase()){
-            case "miliseconds":
-                return [1, d3.timeFormat("%H:%M:%S.%L  %B %e, %Y")]
+    strDeltaTimeToMiliseconds(str_delta_t, dt){
+        let base_unit = 0
+        switch(String(str_delta_t).trim().toLowerCase()){
+            case "milliseconds":
+                base_unit = 1
+                break
             case "seconds":
-                return [1000, d3.timeFormat("%H:%M:%S  %B %e, %Y ")]
+                base_unit = 1000
+                break
             case "hours":
-                return [1000 * 3600, d3.timeFormat("%H:%M:%S %B %e, %Y")]
+                base_unit = 1000 * 3600
+                break
             case "days":
-                return [1000 * 24 * 3600, d3.timeFormat("%B %e, %Y ")]
+                base_unit = 1000 * 24 * 3600
+                break
             case "weeks":
-                return [7 * 1000 * 24 * 3600, d3.timeFormat("%B %e, %Y ")]
+                base_unit = 7 * 1000 * 24 * 3600
+                break
             case "years":
-                return [365 * 1000 * 24 * 3600, d3.timeFormat("%Y ")]
-            default:
-                return -1, d3.timeFormat("%Y ")
+                base_unit = 365 * 1000 * 24 * 3600
+                break
         }
 
+        let delta_t = base_unit * dt
+        let str_format = "%B %e, %Y "
+        if(delta_t < 1.1){ // Milliseconds
+            str_format = d3.timeFormat("%H:%M:%S.%L  %B %e, %Y")
+        } else if(delta_t < 1001) { // seconds
+            str_format = d3.timeFormat("%H:%M:%S  %B %e, %Y ")
+        } else if(delta_t < 3600001) { // hours
+            str_format = d3.timeFormat("%H:%M:%S %B %e, %Y")
+        } else if(delta_t <  7 * 1000 * 24 * 3600 + 1) { //days or weeks
+            str_format = d3.timeFormat("%B %e, %Y ")
+        } else { // Years
+            str_format = d3.timeFormat("%Y ")
+        }
+        return [delta_t, str_format]
     }
 
     /**
@@ -174,7 +193,7 @@ class  ParticlesLayer extends React.Component {
         // Reads the header file (txt)
         file_number = parseInt(file_number)
         let header_data = d3.csvParseRows(text, function(d) { // In ParticleViz it should only be one line
-            return [parseInt(d[0]), parseInt(d[1]), d[2], d[3]]
+            return [parseInt(d[0]), parseInt(d[1]), d[2], d[3], parseInt(d[4])]
         });
 
         // Then it reads the corresponding zip file
@@ -198,7 +217,7 @@ class  ParticlesLayer extends React.Component {
                 // We only update these state variables if it is the first file we receive
                 if(this.state.delta_t === -1){
                     let start_date = new Date(Date.parse(line[2].trim()))
-                    let [delta_t, date_format] = this.strDeltaTimeToMiliseconds(line[3])
+                    let [delta_t, date_format] = this.strDeltaTimeToMiliseconds(line[3], line[4])
                     this.setState({
                         delta_t:delta_t,
                         start_date:start_date,
