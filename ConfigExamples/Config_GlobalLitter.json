@@ -1,7 +1,11 @@
 {
     "preprocessing": {
-        "input_file": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc",
-        "_input_file": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Global_Marine_Debris.nc",
+        "models": [
+            {
+                "name": "Global MPW",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc"
+            }
+        ],
         "output_folder": "./ParticleViz_WebApp/data/",
         "subsample": [
             2,
@@ -9,9 +13,14 @@
         ]
     },
     "webapp": {
-        "title": "YOUR MAP TITLE",
+        "data_folder": "./data",
+        "title": "Marine Plastic Debris",
         "particles-color": "rgba(255,105,0)",
         "start-date": "2021-10-10T00:00:00",
+        "intro_image": "",
+        "_url": "http://marinelitter.coaps.fsu.edu/",
+        "url": "https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter",
+        "intro": "This is an example of a ParticleViz visualization of Marine Debris. Try other configuration files and then try with your own data!!!! ",
         "desktop-subsample": "2",
         "mobile-subsample": "4",
         "zoom-levels": [
@@ -40,6 +49,13 @@
     "advanced": {
         "file_prefix": "GlobalLitter",
         "timesteps_by_file": 100,
-        "total_files": 41
+        "total_files": 41,
+        "datasets": {
+            "Global MPW": {
+                "total_files": 41,
+                "name": "Global MPW",
+                "file_name": "GlobalLitter_global mpw"
+            }
+        }
     }
 }

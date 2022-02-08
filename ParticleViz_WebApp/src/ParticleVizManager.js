@@ -1,30 +1,39 @@
 import React from 'react'
-import coaps_logo from "./imgs/coaps_logo.png"
-import StatesLayer from "./StatesLayer"
 import ParticlesLayer from "./ParticlesLayer"
 import BackgroundLayerManager from "./BackgroundLayerManager"
+import Logos from "./Logos";
 import _ from "underscore"
 import $ from "jquery"
-import {QuestionCircle, House, List} from "react-bootstrap-icons"
-import {Collapse, Row, Col, Container, Button}  from "react-bootstrap";
+import {QuestionCircle, House, List, Activity} from "react-bootstrap-icons"
+import {Collapse, Row, Col, Container, Button, Dropdown}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
+
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
 const config_adv = config_pviz.advanced
+const datasets = config_adv["datasets"]
 
-let data_files = []
+let models = []
 // Indicates the subsampling level of the particles
 let folder = config_webapp["desktop-subsample"]
 if(isMobile){
     folder = config_webapp["mobile-subsample"]
 }
 
-data_files.push({
-    id: 1,
-    file: `${folder}/${config_adv["file_prefix"]}`,
-    num_files: config_adv["total_files"],
-})
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+
+// console.log(datasets)
+for (const [key, c_dataset] of Object.entries(datasets)) {
+    models.push({
+        id: key,
+        name: capitalize(c_dataset["name"]),
+        file: `${folder}/${c_dataset["file_name"]}`,
+        num_files: c_dataset["total_files"],
+        time_steps : config_adv["timesteps_by_file"],
+    })
+}
+
 
 class  ParticleVizManager extends React.Component{
     constructor(props){
@@ -33,12 +42,11 @@ class  ParticleVizManager extends React.Component{
         this.updateMapLocation = this.updateMapLocation.bind(this)
         this.toggleHelp= this.toggleHelp.bind(this)
         this.setOpen = this.setOpen.bind(this)
-
-        this.data_folder_url = this.props.url
+        this.updateSelectedModel = this.updateSelectedModel.bind(this)
 
         this.state = {
             countries: {},
-            selected_model: data_files[0],
+            selected_model: models[0],
             chardin: this.props.chardin,
             particle_color:  config_webapp['particles-color'],
             open: false
@@ -92,6 +100,25 @@ class  ParticleVizManager extends React.Component{
         return countries
     }
 
+    updateSelectedModel(e){
+        /**
+         * Selects a new monthly release
+         * @type {*[]}
+         */
+        let new_selected_model = []
+        for(let i = 0; i < models.length; i++){
+            if(models[i].name.toLowerCase().trim() === e.target.text.toLowerCase().trim()){
+                new_selected_model = models[i]
+                break
+            }
+        }
+        console.log("New model",new_selected_model)
+        this.setState({
+            selected_model: new_selected_model,
+        })
+        e.preventDefault()
+    }
+
     setOpen(){
         this.setState({
             open: !this.state.open
@@ -105,33 +132,28 @@ class  ParticleVizManager extends React.Component{
 
     render(){
         if(isMobile ||  window.innerWidth <= 1200){
+        // if(true){
             // --------------------- MOBILE  or < 1200---------------------------------
             return (
                 <Container fluid >
                     <Row className={`bg-light py-1`}>
-                        <Col xs={5}>
-                            {/*------------ Logos ------------------*/}
-                            <a href="https://www.coaps.fsu.edu/">
-                                <img src={coaps_logo} className="rounded" width="35px" alt="COAPS"/>
-                            </a>
-                        </Col>
-                        <Col>
-                        {/* ---------- Home ------------*/}
-                        <Button variant="info" size={"sm"} className={"m-1"}
-                                    href="https://github.com/olmozavala/particle_viz">
+                        <Col xs={10} >
+                            <Logos url={this.props.url}/>
+                            {/* ---------- Home ------------*/}
+                             <Button variant="info" size={"sm"} className={"ml-auto"}
+                                     href={config_webapp['url']}>
                                 <House/>
                             </Button>
                         </Col>
                         {/* ---------- Info ------------*/}
-                        <Col xs={2}>
+                        <Col xs={2} >
                             <Button
                                 className={"m-1"}
                                 size={"sm"}
                                 variant={"info"}
                                 onClick={() => this.setOpen()}
                                 aria-controls="col_content"
-                                aria-expanded={this.state.open}
-                            >
+                                aria-expanded={this.state.open} >
                                 <List />
                             </Button>
                         </Col>
@@ -143,14 +165,32 @@ class  ParticleVizManager extends React.Component{
                                 <Col xs={6}> <span className={"m-1"}>Background</span> </Col>
                                 <Col xs={{span:5, offset:1}}>
                                     <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                            map={this.props.map}/>
+                                                            map={this.props.map}
+                                                            url={this.props.url}/>
+                                </Col>
+                            </Row>
+                            <Row className={`bg-light p-2`} >
+                                {/* ---------- Model selection ------------*/}
+                                <Col xs={6}> <span className={"m-1"}>Model</span> </Col>
+                                <Col xs={{span:5, offset:1}}>
+                                    <Dropdown className="mt-2 d-inline" title="Release month">
+                                        <Dropdown.Toggle variant="info" size="sm">
+                                            {this.state.selected_model.name}
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu onClick={this.updateSelectedModel}>
+                                            {models.map((item, index) => (
+                                                <Dropdown.Item eventKey={item.name}
+                                                               key={index}>{item.name} </Dropdown.Item>
+                                            ))}
+                                        </Dropdown.Menu>
+                                    </Dropdown>
                                 </Col>
                             </Row>
                             <Row className={`bg-light`} >
                                 <Col xs={12}>
                                     {/*---------- All options from particles ------------*/}
                                     <ParticlesLayer map={this.props.map}
-                                                    url={this.data_folder_url}
+                                                    url={this.props.url}
                                                     chardin={this.state.chardin}
                                                     particle_color={this.state.particle_color}
                                                     selected_model={this.state.selected_model}/>
@@ -158,25 +198,19 @@ class  ParticleVizManager extends React.Component{
                             </Row>
                         </Container>
                     </Collapse >
-                    <StatesLayer map={this.props.map}
-                                 url={this.data_folder_url}/>
                 </Container>
             )
         }else {
             // --------------------- DESKTOP ---------------------------------
             return (
                 <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0">
-                    {/*------------ Logos ------------------*/}
-                    <div data-intro="Logos" data-position="bottom" className="logos">
-                        <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
-                            <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
-                        </a>
-                    </div>
+                    {/* ---------- Logos ------------*/}
+                    <Logos url={this.props.url}/>
                     {/* ---------- Home ------------*/}
                     <span className="m-2" data-intro="Main site" data-position="bottom">
                             <div className="m-1 d-inline">
                                 <a title="Home" className="btn  btn-info btn-sm"
-                                   href="https://github.com/olmozavala/particle_viz">
+                                   href={config_webapp['url']}>
                                     <House/>
                                 </a>
                             </div>
@@ -193,14 +227,37 @@ class  ParticleVizManager extends React.Component{
                         <div className="navbar-nav">
                             {/* ---------- All options from particles ------------*/}
                             <ParticlesLayer map={this.props.map}
-                                            url={this.data_folder_url}
+                                            url={this.props.url}
                                             chardin={this.state.chardin}
                                             particle_color={this.state.particle_color}
                                             selected_model={this.state.selected_model}/>
                             {/* ---------- Background selection ------------*/}
                             <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
                                 <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                        map={this.props.map}/>
+                                                        map={this.props.map}
+                                                        url={this.props.url}/>
+                            </span>
+                            {/*/!* ---------- Stats button ------------*!/*/}
+                            {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
+                            {/*        <div className="m-1 d-inline">*/}
+                            {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
+                            {/*                <Activity/>*/}
+                            {/*            </button>*/}
+                            {/*        </div>*/}
+                            {/*    </span>*/}
+                            {/* ---------- Model selection ------------*/}
+                            <span className="navbar-brand mt-2" data-intro="Model Selection" data-position="bottom">
+                                    <Dropdown className="mt-2 d-inline" title="Release month">
+                                    <Dropdown.Toggle variant="info" size="sm">
+                                        {this.state.selected_model.name}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu onClick={this.updateSelectedModel}>
+                                        {models.map((item, index) => (
+                                            <Dropdown.Item eventKey={item.name}
+                                                           key={index}>{item.name} </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </span>
                             {/* ---------- Help toggle ------------*/}
                             <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
@@ -212,8 +269,6 @@ class  ParticleVizManager extends React.Component{
                                 </span>
                         </div>
                     </div>
-                    <StatesLayer map={this.props.map}
-                                 url={this.data_folder_url} />
                 </nav>
             )
         }

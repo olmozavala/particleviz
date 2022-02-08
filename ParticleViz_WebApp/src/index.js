@@ -5,7 +5,7 @@ import './css/chardinjs.css'
 import ParticleVizManager from './ParticleVizManager';
 import * as serviceWorker from './serviceWorker';
 import Card from "react-bootstrap/Card"
-import introjpg from "./imgs/i2.jpg"
+import intro_image from "./imgs/pviz_logo_md.png"
 
 import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
@@ -16,6 +16,11 @@ import OSM from "ol/source/OSM";
 import {House, Check} from "react-bootstrap-icons";
 import {Spinner} from "react-bootstrap";
 import {chardinJs} from "./chardinjsoz";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import CircleStyle from "ol/style/Circle";
+import {GeoJSON} from "ol/format";
+import {Fill, Stroke, Style, Text} from "ol/style";
 
 const config_pviz = require("./Config.json")
 
@@ -23,7 +28,7 @@ const config_webapp = config_pviz.webapp
 
 const ip_address = window.location.href
 const resolutions = config_webapp["zoom-levels"]
-console.log(ip_address)
+const extra_layers = config_webapp["extra_layers"]
 
 // /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
 let background_layer = new TileLayer({ source: new OSM() });
@@ -44,18 +49,41 @@ let map_view = new View({
         // minZoom: 2
     })
 
-// let ol_controls = [new Zoom(),
-    // new FullScreen(),
-    //                 ]
 
 let ol_controls = []
 
+// let color= "rgb(134,229,56)"
 let map = new Map({
-    layers: [ background_layer ],
+    layers: [background_layer],
     target: 'map',
     view: map_view,
     controls: ol_controls
 })
+
+if (typeof extra_layers !== 'undefined'){
+    // console.log(ip_address+"/"+extra_layers[0].file)
+    for (const [key, value] of Object.entries(extra_layers)) {
+        console.log("Adding layer: ", value.name)
+        let color = value.color
+        let extra_layer = new VectorLayer({
+            source: new VectorSource({
+                url: `${ip_address}/data/${value.file}`,
+                format: new GeoJSON(),
+                overlaps: false
+            }),
+            style: function (feature) {
+                return new Style({
+                    image: new CircleStyle({
+                        radius: 5,
+                        fill: new Stroke({color: color, width: 1}),
+                        stroke: new Stroke({color: color, width: 1}),
+                    })
+                })
+            }
+        })
+        map.addLayer(extra_layer)
+    }
+}
 
 var intro_chardin = new chardinJs("body")
 
@@ -70,19 +98,23 @@ function PageSummary(){
             <div className="col-xs-6 col-sm-4 col-md-3 col-lg-3  offset-sm-4 offset-md-4 offset-lg-4">
                 <div id="intro_text" className=" mt-3" >
                     <Card style={{ width: '100%' }}>
-                        <Card.Img variant="top" src={introjpg} />
+                        {config_webapp['intro_image'] === ""?
+                            <Card.Img variant="top" src={intro_image}/>
+                            :
+                            <Card.Img variant="top" src={ip_address+"//"+"data/"+config_webapp['intro_image']}/>
+                        }
                         <Card.Body>
                             <Card.Title>{config_webapp['title']}</Card.Title>
-                            <Card.Text>
-                                {config_webapp['intro']}.
+                            <Card.Text  style={{ textAlign: 'justify' }} className="">
+                                {config_webapp['intro']}
                                 Click
-                                <button title="Help" className="m-1 btn btn-info btn-sm" onClick={() =>  {
+                                <button title="Continue" className="m-1 btn btn-info btn-sm" onClick={() =>  {
                                     intro_chardin.stop()}
                                 }>
                                     <Check/>
                                 </button>
                                 to continue and please wait for the site to load.
-                                For details on the model go to
+                                For more information go to
                                 <a title="Home" className="btn ml-2 btn-info btn-sm"
                                    href={config_webapp['url']}>
                                     <House/>

@@ -18,6 +18,7 @@ import DropdownMenu from "react-bootstrap/DropdownMenu";
 import BingMaps from "ol/source/BingMaps";
 import OSM from "ol/source/OSM";
 import TileWMS from "ol/source/TileWMS";
+import StatesLayer from "./StatesLayer";
 
 const BACKGROUND_MAPS = {
     dark: 0,
@@ -28,13 +29,13 @@ const BACKGROUND_MAPS = {
     empty: 5
 };
 
-const def_background = BACKGROUND_MAPS.nature
-
 class  BackgroundLayerManager extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            bk_layer: this.props.background_layer
+            bk_layer: this.props.background_layer,
+            selected_bk: BACKGROUND_MAPS.nature,
+            draw_states: true
         };
 
         this.updateBackgroundLayer= this.updateBackgroundLayer.bind(this)
@@ -42,7 +43,7 @@ class  BackgroundLayerManager extends React.Component{
 
     componentDidMount() {
         // Here we set the default background map
-        this.updateBackgroundLayer(def_background)
+        this.updateBackgroundLayer(this.state.selected_bk)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -57,11 +58,14 @@ class  BackgroundLayerManager extends React.Component{
     updateBackgroundLayer(e){
         // console.log("Updating background layer...")
         let bk_layer = this.state.bk_layer;
-        switch(parseInt(e)) {
+        let selected_bk = parseInt(e)
+        let draw_states = true;
+        switch(selected_bk) {
             case BACKGROUND_MAPS.empty:
                 this.updateTitlesColors("#212529")
                 d3.select("#map").style("background-color", "white")
                 bk_layer.setSource()
+                draw_states = true
                 break;
             case BACKGROUND_MAPS.un:
                 d3.select("#dates-title").style("color", "#212529")
@@ -75,11 +79,13 @@ class  BackgroundLayerManager extends React.Component{
                         }
                     })
                 )
+                draw_states = false
                 break;
             case BACKGROUND_MAPS.osm:
                 this.updateTitlesColors("#212529")
                 d3.select("#map").style("background-color", "white")
                 bk_layer.setSource(new OSM())
+                draw_states = false
                 break;
             case BACKGROUND_MAPS.stamen:
                 this.updateTitlesColors("#212529")
@@ -89,6 +95,7 @@ class  BackgroundLayerManager extends React.Component{
                         layer: 'watercolor'
                     })
                 )
+                draw_states = true
                 break;
             case BACKGROUND_MAPS.dark:
                 this.updateTitlesColors("#d1d1e0")
@@ -99,6 +106,7 @@ class  BackgroundLayerManager extends React.Component{
                         imagerySet: 'CanvasDark'
                     })
                 )
+                draw_states = false
                 break;
             case BACKGROUND_MAPS.nature:
                 this.updateTitlesColors("#d1d1e0")
@@ -109,6 +117,7 @@ class  BackgroundLayerManager extends React.Component{
                         imagerySet: 'Aerial'
                     })
                 )
+                draw_states = true
                 break;
             default:
                 this.updateTitlesColors( "#212529")
@@ -118,7 +127,9 @@ class  BackgroundLayerManager extends React.Component{
         }
 
         this.setState({
-            bk_layer: bk_layer
+            bk_layer: bk_layer,
+            selected_bk: selected_bk,
+            draw_states: draw_states
         })
     }
 
@@ -150,6 +161,9 @@ class  BackgroundLayerManager extends React.Component{
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
+                <StatesLayer map={this.props.map}
+                             url={this.props.url}
+                             drawstates={this.state.draw_states}/>
             </span>
             )
     }

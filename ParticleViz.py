@@ -20,6 +20,7 @@ from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz
 from docopt import docopt
 import os
 import shutil
+import json
 from os.path import join
 import subprocess
 
@@ -35,6 +36,8 @@ if __name__ == '__main__':
     if config_file == "Config.json":
         config_file = join(os.getcwd(), config_file)
 
+    f = open(config_file)
+    config_json = json.load(f)
     # ------------- Preprocessing steps ---------------
     if all or preproc:
         print("Doing preprocessing...")
@@ -46,6 +49,8 @@ if __name__ == '__main__':
         print("Initializing webapp...")
         # Copy correct Config.json to the src folder
         shutil.copyfile(config_file, join("ParticleViz_WebApp","src","Config.json"))
+        shutil.rmtree(join("ParticleViz_WebApp","public","data"))
+        shutil.copytree(config_json["webapp"]["data_folder"], join("ParticleViz_WebApp","public","data"))
         # Initilize the server
         subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)
         print("Done!")

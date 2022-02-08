@@ -9,7 +9,7 @@ import './css/App.css';
 
 require('ol/ol.css');
 
-let country_color = `rgba(238, 238, 238, .3)`;
+let country_color = `rgba(212, 212, 213, 0.4)`;
 
 class  StatesLayer extends React.Component{
     constructor(props){
@@ -24,6 +24,9 @@ class  StatesLayer extends React.Component{
             style: this.setCountriesStyle.bind(this)
         });
 
+        this.state = {
+            states_layer: states_layer
+        }
         this.props.map.addLayer(states_layer);
     }
 
@@ -62,7 +65,9 @@ class  StatesLayer extends React.Component{
         return this.getDefaultStyle(feature.get(['name']));
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) { }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.state.states_layer.set('visible', this.props.drawstates)
+    }
 
     componentDidMount() { }
 

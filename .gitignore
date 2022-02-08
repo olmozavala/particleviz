@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+__pycache__/
+
 ParticleViz_WebApp/node_modules/
 ParticleViz_WebApp/particleviz/
 /.pnp
@@ -28,13 +30,7 @@ yarn-error.log*
 .idea
 *.swp
 lib
-ParticleViz_WebApp/data/1
-ParticleViz_WebApp/data/2
-ParticleViz_WebApp/data/3
-ParticleViz_WebApp/data/4
-ParticleViz_WebApp/data/5
-ParticleViz_WebApp/data/6
-ParticleViz_WebApp/data/7
+ParticleViz_WebApp/data/
 ParticleViz_WebApp/public/1
 ParticleViz_WebApp/public/2
 ParticleViz_WebApp/public/3
@@ -42,3 +38,6 @@ ParticleViz_WebApp/public/4
 ParticleViz_WebApp/public/5
 ParticleViz_WebApp/public/6
 ParticleViz_WebApp/public/7
+ParticleViz_WebApp/public/8
+ParticleViz_WebApp/public/data
+ParticleViz_WebApp/build
