@@ -1,12 +1,13 @@
-"""OZ example.
+"""ParticleViz Options
 
 Usage:
+  ParticleViz.py  --input_file MyNetcd.nc
   ParticleViz.py  all
-  ParticleViz.py  all --config <config_file>
+  ParticleViz.py  all --config_file <config_file>
   ParticleViz.py  preproc
-  ParticleViz.py  preproc --config <config_file>
+  ParticleViz.py  preproc --config_file <config_file>
   ParticleViz.py  webapp
-  ParticleViz.py  webapp --config <config_file>
+  ParticleViz.py  webapp --config_file <config_file>
   ParticleViz.py (-h | --help)
   ParticleViz.py --version
 
@@ -49,7 +50,8 @@ if __name__ == '__main__':
         print("Initializing webapp...")
         # Copy correct Config.json to the src folder
         shutil.copyfile(config_file, join("ParticleViz_WebApp","src","Config.json"))
-        shutil.rmtree(join("ParticleViz_WebApp","public","data"))
+        if(os.path.exists(join("ParticleViz_WebApp","public","data"))):
+            shutil.rmtree(join("ParticleViz_WebApp","public","data"))
         shutil.copytree(config_json["webapp"]["data_folder"], join("ParticleViz_WebApp","public","data"))
         # Initilize the server
         subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)

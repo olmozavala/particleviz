@@ -873,6 +873,7 @@ class  ParticlesLayer extends React.Component {
 
     render() {
         if(isMobile ||  window.innerWidth <= 1200){
+        // if(true){
             return (
                 <Container fluid>
                     <Row>

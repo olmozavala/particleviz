@@ -1,0 +1,26 @@
+{
+  "preprocessing": {
+    "models": [
+      {
+        "name": "Dataset1",
+        "file_name": "MyNetCDF1.nc"
+      },
+      {
+        "name": "Dataset2",
+        "file_name": "MyNetCDF2.nc"
+      }
+    ],
+    "subsample": {
+      "desktop": 2,
+      "mobile": 4
+    }
+  },
+  "webapp": {
+    "title": "Marine Plastic Debris",
+    "particles-color": "rgba(255,105,0)",
+    "intro": "Intro text",
+    "def-zoom": 1,
+    "map-extent": [ -100, -30, 100, 30 ],
+    "map-center": [ -10, 30 ]
+  }
+}

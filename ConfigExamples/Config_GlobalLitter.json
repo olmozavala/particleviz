@@ -2,8 +2,52 @@
     "preprocessing": {
         "models": [
             {
-                "name": "Global MPW",
+                "name": "January 2010",
                 "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc"
+            },
+            {
+                "name": "February 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_02.nc"
+            },
+            {
+                "name": "March 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_03.nc"
+            },
+            {
+                "name": "April 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_04.nc"
+            },
+            {
+                "name": "May 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_05.nc"
+            },
+            {
+                "name": "June 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_06.nc"
+            },
+            {
+                "name": "July 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_07.nc"
+            },
+            {
+                "name": "August 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_08.nc"
+            },
+            {
+                "name": "September 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_09.nc"
+            },
+            {
+                "name": "October 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_10.nc"
+            },
+            {
+                "name": "November 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_11.nc"
+            },
+            {
+                "name": "December 2010",
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2020_Eleven_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_12.nc"
             }
         ],
         "output_folder": "./ParticleViz_WebApp/data/",
@@ -16,16 +60,22 @@
         "data_folder": "./data",
         "title": "Marine Plastic Debris",
         "particles-color": "rgba(255,105,0)",
-        "start-date": "2021-10-10T00:00:00",
         "intro_image": "",
         "_url": "http://marinelitter.coaps.fsu.edu/",
         "url": "https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter",
-        "intro": "This is an example of a ParticleViz visualization of Marine Debris. Try other configuration files and then try with your own data!!!! ",
+        "intro": "This is an example of a ParticleViz visualization of Marine Debris. Try other example configuration files and then with your own data!!!! ",
         "desktop-subsample": "2",
         "mobile-subsample": "4",
         "zoom-levels": [
             0.36,
+            0.32,
+            0.3,
+            0.28,
+            0.24,
+            0.2,
             0.18,
+            0.14,
+            0.12,
             0.09,
             0.045,
             0.0225,
@@ -44,17 +94,79 @@
         "map-center": [
             0,
             0
+        ],
+        "extra_layers": [
+            {
+                "name": "World Cities",
+                "file": "extra_layers/E1.geojson",
+                "color": "rgb(255,237,0)"
+            }
         ]
     },
     "advanced": {
         "file_prefix": "GlobalLitter",
-        "timesteps_by_file": 100,
+        "timesteps_by_file": 200,
         "total_files": 41,
         "datasets": {
-            "Global MPW": {
-                "total_files": 41,
-                "name": "Global MPW",
-                "file_name": "GlobalLitter_global mpw"
+            "January 2010": {
+                "total_files": 21,
+                "name": "January 2010",
+                "file_name": "GlobalLitter_january 2010"
+            },
+            "February 2010": {
+                "total_files": 20,
+                "name": "February 2010",
+                "file_name": "GlobalLitter_february 2010"
+            },
+            "March 2010": {
+                "total_files": 20,
+                "name": "March 2010",
+                "file_name": "GlobalLitter_march 2010"
+            },
+            "April 2010": {
+                "total_files": 20,
+                "name": "April 2010",
+                "file_name": "GlobalLitter_april 2010"
+            },
+            "May 2010": {
+                "total_files": 20,
+                "name": "May 2010",
+                "file_name": "GlobalLitter_may 2010"
+            },
+            "June 2010": {
+                "total_files": 20,
+                "name": "June 2010",
+                "file_name": "GlobalLitter_june 2010"
+            },
+            "July 2010": {
+                "total_files": 20,
+                "name": "July 2010",
+                "file_name": "GlobalLitter_july 2010"
+            },
+            "August 2010": {
+                "total_files": 20,
+                "name": "August 2010",
+                "file_name": "GlobalLitter_august 2010"
+            },
+            "September 2010": {
+                "total_files": 19,
+                "name": "September 2010",
+                "file_name": "GlobalLitter_september 2010"
+            },
+            "October 2010": {
+                "total_files": 19,
+                "name": "October 2010",
+                "file_name": "GlobalLitter_october 2010"
+            },
+            "November 2010": {
+                "total_files": 19,
+                "name": "November 2010",
+                "file_name": "GlobalLitter_november 2010"
+            },
+            "December 2010": {
+                "total_files": 19,
+                "name": "December 2010",
+                "file_name": "GlobalLitter_december 2010"
             }
         }
     }

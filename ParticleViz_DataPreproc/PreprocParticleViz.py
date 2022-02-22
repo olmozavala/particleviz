@@ -77,7 +77,13 @@ class PreprocParticleViz:
             time_units_str = ds.variables['time'].units.split(" ")
             start_date = time_units_str[2]
             delta_t_str = time_units_str[0]
-            delta_t = ds['time'][0,1] - ds['time'][0,0]# TODO here we assume we have at least 2 particles and the delta_t is constant
+            # TODO here we assume we have at least 2 particles and the delta_t is constant
+            delta_t = 0.0
+            i_part = 0
+            # We look for a time delta within the particles first couple of times.
+            while delta_t == 0.0:
+                delta_t = ds['time'][i_part,1] - ds['time'][i_part,0]
+                i_part += 1
 
             # Iterate over the options to reduce the number of particles
             for subsample_data in subsample_data_all:
