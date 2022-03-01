@@ -5,16 +5,16 @@
                 "name": "With Tides",
                 "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc",
                 "subsample": {
-                    "desktop": 2,
-                    "mobile": 4
+                    "desktop": 3,
+                    "mobile": 5
                 }
             },
             {
                 "name": "Without Tides",
                 "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_ntides_0615_hourly.nc",
                 "subsample": {
-                    "desktop": 2,
-                    "mobile": 4
+                    "desktop": 3,
+                    "mobile": 5
                 }
             }
         ],
@@ -65,8 +65,8 @@
                 "name": "With Tides",
                 "file_name": "Laura_with tides",
                 "subsample": {
-                    "desktop": 2,
-                    "mobile": 4
+                    "desktop": 3,
+                    "mobile": 5
                 }
             },
             "Without Tides": {
@@ -74,8 +74,8 @@
                 "name": "Without Tides",
                 "file_name": "Laura_without tides",
                 "subsample": {
-                    "desktop": 2,
-                    "mobile": 4
+                    "desktop": 3,
+                    "mobile": 5
                 }
             }
         }

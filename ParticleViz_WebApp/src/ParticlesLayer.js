@@ -568,39 +568,79 @@ class  ParticlesLayer extends React.Component {
         cur_date = cur_date % this.state.timesteps_per_file
 
         if (available_files.includes(file_number)) {
+            let clat = 0
+            let clon = 0
             this.ctx.beginPath()
             // Retreive all the information from the first available file
             this.ctx.fillStyle =  this.state.particle_color
             let drawing_data = this.state.data[model_id][file_number][data_key]
             let tot_part = drawing_data["lat_lon"][0].length
             let oldpos = [0, 0]
-            for (let part_id = 0; part_id < tot_part; part_id++) {
-                let clon = drawing_data["lat_lon"][1][part_id][cur_date]
-                let clat = drawing_data["lat_lon"][0][part_id][cur_date]
-                if (clon !== this.state.timesteps_per_file) {
-                    if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                        oldpos = this.geoToCanvas(clon, clat)
-                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                    }
-                    // Draw the particles on the additional map on the east
-                    if (this.show_east_map) {
-                        let tlon = clon + 360
-                        if (tlon >= this.state.extent[0]) {
-                            oldpos = this.geoToCanvas(tlon, clat)
-                            this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+
+            let has_nans = drawing_data['disp_info'] != undefined? true: false
+            if(has_nans){
+                let disp_part = 0
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    clon = drawing_data["lat_lon"][1][part_id][cur_date]
+                    clat = drawing_data["lat_lon"][0][part_id][cur_date]
+                    disp_part = drawing_data["disp_info"][part_id][cur_date]
+                    if(disp_part){
+                        if (clon !== this.state.timesteps_per_file) {
+                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(clon, clat)
+                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                            }
+                            // Draw the particles on the additional map on the east
+                            if (this.show_east_map) {
+                                let tlon = clon + 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                }
+                            }
+                            // Draw the particles on the additional map on the west
+                            if (this.show_west_map){
+                                let tlon = clon - 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                }
+                            }
                         }
                     }
-                    // Draw the particles on the additional map on the west
-                    if (this.show_west_map){
-                        let tlon = clon - 360
-                        if (tlon >= this.state.extent[0]) {
-                            oldpos = this.geoToCanvas(tlon, clat)
-                            this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                        }
-                    }
+                    this.ctx.stroke()
+                    this.ctx.closePath()
                 }
-                this.ctx.stroke()
-                this.ctx.closePath()
+            }else{
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    let clon = drawing_data["lat_lon"][1][part_id][cur_date]
+                    let clat = drawing_data["lat_lon"][0][part_id][cur_date]
+                    if (clon !== this.state.timesteps_per_file) {
+                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                            oldpos = this.geoToCanvas(clon, clat)
+                            this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                        }
+                        // Draw the particles on the additional map on the east
+                        if (this.show_east_map) {
+                            let tlon = clon + 360
+                            if (tlon >= this.state.extent[0]) {
+                                oldpos = this.geoToCanvas(tlon, clat)
+                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                            }
+                        }
+                        // Draw the particles on the additional map on the west
+                        if (this.show_west_map){
+                            let tlon = clon - 360
+                            if (tlon >= this.state.extent[0]) {
+                                oldpos = this.geoToCanvas(tlon, clat)
+                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                            }
+                        }
+                    }
+                    this.ctx.stroke()
+                    this.ctx.closePath()
+                }
+
             }
         }
         this.props.map.render()
@@ -635,15 +675,56 @@ class  ParticlesLayer extends React.Component {
             let oldpos = [0, 0]
             let newpos = [0, 0]
 
-            // Iterates over all the particles to draw them.
-            for (let part_id = 0; part_id < tot_part; part_id++) {
-                clon = drawing_data["lat_lon"][1][part_id][timestep_idx]
-                clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
-                nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
-                nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
-                disp_part = drawing_data["disp_info"][part_id][timestep_idx] && drawing_data["disp_info"][part_id][timestep_idx + 1]
+            let has_nans = drawing_data['disp_info'] != undefined? true: false
+            if(has_nans){
+                // Iterates over all the particles to draw them.
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    clon = drawing_data["lat_lon"][1][part_id][timestep_idx]
+                    clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
+                    nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
+                    nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
+                    disp_part = drawing_data["disp_info"][part_id][timestep_idx] && drawing_data["disp_info"][part_id][timestep_idx + 1]
 
-                if(disp_part){
+                    if(disp_part){
+                        // Here we draw the 'normal' particles, those inside the limits of the globe
+                        if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                            oldpos = this.geoToCanvas(clon, clat)
+                            newpos = this.geoToCanvas(nlon, nlat)
+                            this.ctx.moveTo(oldpos[0], oldpos[1])
+                            this.ctx.lineTo(newpos[0], newpos[1])
+                        }
+                        // Draw the particles on the additional map on the east
+                        if (this.show_east_map) {
+                            tlon = clon + 360
+                            tnlon = nlon + 360
+                            if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(tlon, clat)
+                                newpos = this.geoToCanvas(tnlon, nlat)
+                                this.ctx.moveTo(oldpos[0], oldpos[1])
+                                this.ctx.lineTo(newpos[0], newpos[1])
+                            }
+                        }
+                        // Draw the particles on the additional map on the west
+                        if (this.show_west_map){
+                            tlon = clon - 360
+                            tnlon = nlon - 360
+                            if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(tlon, clat)
+                                newpos = this.geoToCanvas(tnlon, nlat)
+                                this.ctx.moveTo(oldpos[0], oldpos[1])
+                                this.ctx.lineTo(newpos[0], newpos[1])
+                            }
+                        }
+                    }
+                }
+            }else{
+                // Iterates over all the particles to draw them.
+                for (let part_id = 0; part_id < tot_part; part_id++) {
+                    clon = drawing_data["lat_lon"][1][part_id][timestep_idx]
+                    clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
+                    nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
+                    nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
+
                     // Here we draw the 'normal' particles, those inside the limits of the globe
                     if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
                         oldpos = this.geoToCanvas(clon, clat)
@@ -673,10 +754,9 @@ class  ParticlesLayer extends React.Component {
                             this.ctx.lineTo(newpos[0], newpos[1])
                         }
                     }
-                }else{
-                    // console.log("NOT DISPLAYING PARTICLE")
                 }
             }
+
             this.ctx.stroke()
             this.ctx.closePath()
         }

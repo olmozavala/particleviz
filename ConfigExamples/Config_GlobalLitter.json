@@ -3,18 +3,16 @@
         "models": [
             {
                 "name": "January 2010",
-                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc"
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc",
+                "subsample": { "desktop":2, "mobile":4 }
             },
             {
                 "name": "February 2010",
-                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_02.nc"
+                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_02.nc",
+                "subsample": { "desktop":2, "mobile":4 }
             }
         ],
-        "output_folder": "./ParticleViz_WebApp/data/",
-        "subsample": {
-            "desktop":2,
-            "mobile":4
-        }
+        "output_folder": "./ParticleViz_WebApp/data/"
     },
     "webapp": {
         "data_folder": "./data",

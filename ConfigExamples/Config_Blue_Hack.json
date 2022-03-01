@@ -10,16 +10,16 @@
                 }
             },
             {
-                "name": "Forward",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data_victor.nc",
+                "name": "Backward 2",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data3.nc",
                 "subsample": {
                     "desktop": 4,
                     "mobile": 8
                 }
             },
             {
-                "name": "Backward 2",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data3.nc",
+                "name": "Forward",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data_victor.nc",
                 "subsample": {
                     "desktop": 4,
                     "mobile": 8
