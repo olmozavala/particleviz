@@ -2,30 +2,36 @@
     "preprocessing": {
         "models": [
             {
-                "name": "Forward",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data_victor.nc"
+                "name": "Backward 1",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data2.nc",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
             },
             {
-                "name": "Backward 1",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data2.nc"
+                "name": "Forward",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data_victor.nc",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
             },
             {
                 "name": "Backward 2",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data3.nc"
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/Data/data3.nc",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
             }
         ],
-        "output_folder": "./ParticleViz_WebApp/data/",
-        "subsample": [
-            4,
-            8
-        ]
+        "output_folder": "./ParticleViz_WebApp/data/"
     },
     "webapp": {
         "data_folder": "./data",
         "title": "Sea Clearly",
         "particles-color": "rgba(255,105,0)",
-        "desktop-subsample": "4",
-        "mobile-subsample": "8",
         "intro_image": "logos/seaclearly.png",
         "url": "https://github.com/VictorOnink/Blue-Cloud-Sea-Clearly",
         "intro": "Back-tracking the pathways of anthropogenic (innate) pollutants from aquaculture cages to beaches or rivers in the Mediterranean. ",
@@ -52,43 +58,70 @@
             36.5
         ],
         "logos": [
-            {"img": "logos/seaclearly_sm.png",
-             "url": "https://eventornado.com/event/bluecloudhackathon#home" },
-            {"img": "logos/uu-logo_sm.png",
-             "url": "https://www.uu.nl/en"},
-            {"img": "logos/ubern_sm.png",
-             "url": "https://www.unibe.ch/index_eng.html" },
-            {"img": "logos/impcol_sm.png",
-                "url": "https://www.imperial.ac.uk/" }
+            {
+                "img": "logos/seaclearly_sm.png",
+                "url": "https://eventornado.com/event/bluecloudhackathon#home"
+            },
+            {
+                "img": "logos/uu-logo_sm.png",
+                "url": "https://www.uu.nl/en"
+            },
+            {
+                "img": "logos/ubern_sm.png",
+                "url": "https://www.unibe.ch/index_eng.html"
+            },
+            {
+                "img": "logos/impcol_sm.png",
+                "url": "https://www.imperial.ac.uk/"
+            }
         ],
-        "delete": {"img": "logos/seaclearly_sm.png",
-            "url": "https://eventornado.com/event/bluecloudhackathon#home" },
+        "delete": {
+            "img": "logos/seaclearly_sm.png",
+            "url": "https://eventornado.com/event/bluecloudhackathon#home"
+        },
         "extra_layers_": [
-            {"name": "FinFish",
+            {
+                "name": "FinFish",
                 "file": "extra_layers/geodata.geojson",
-                "color": "rgb(134,229,56)"},
-            {"name": "ShellFish",
+                "color": "rgb(134,229,56)"
+            },
+            {
+                "name": "ShellFish",
                 "file": "extra_layers/shellfish.geojson",
-                "color": "rgb(56,223,229)"} ]
+                "color": "rgb(56,223,229)"
+            }
+        ]
     },
     "advanced": {
         "timesteps_by_file": 50,
         "file_prefix": "pviz",
         "datasets": {
-            "Foreward": {
-                "total_files": 15,
-                "name": "Forward",
-                "file_name": "pviz_foreward"
-            },
             "Backward 1": {
                 "total_files": 15,
                 "name": "Backward 1",
-                "file_name": "pviz_backward 1"
+                "file_name": "pviz_backward 1",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
+            },
+            "Forward": {
+                "total_files": 15,
+                "name": "Forward",
+                "file_name": "pviz_forward",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
             },
             "Backward 2": {
                 "total_files": 15,
                 "name": "Backward 2",
-                "file_name": "pviz_backward 2"
+                "file_name": "pviz_backward 2",
+                "subsample": {
+                    "desktop": 4,
+                    "mobile": 8
+                }
             }
         }
     }

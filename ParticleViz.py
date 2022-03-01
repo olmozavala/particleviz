@@ -1,12 +1,9 @@
 """ParticleViz Options
 
 Usage:
-  ParticleViz.py  --input_file MyNetcd.nc
-  ParticleViz.py  all
+  ParticleViz.py  --input_file <input_file>
   ParticleViz.py  all --config_file <config_file>
-  ParticleViz.py  preproc
   ParticleViz.py  preproc --config_file <config_file>
-  ParticleViz.py  webapp
   ParticleViz.py  webapp --config_file <config_file>
   ParticleViz.py (-h | --help)
   ParticleViz.py --version
@@ -14,8 +11,9 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  <config_file>     The file name
+  <config_file>     The configuration file to use
                 [default: Config.json]
+  <input_file>     NetCDF file to use. This is the output of your lagrangian model (OceanParcels)
 """
 from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz
 from docopt import docopt
@@ -24,6 +22,7 @@ import shutil
 import json
 from os.path import join
 import subprocess
+from ParticleViz_DataPreproc.ConfigParams import ConfigParams
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='ParticleViz 0.0.1')
@@ -34,15 +33,24 @@ if __name__ == '__main__':
     webapp = args['webapp']
 
     # In this case, users are using the default configuration we need to append current directory
-    if config_file == "Config.json":
-        config_file = join(os.getcwd(), config_file)
 
-    f = open(config_file)
-    config_json = json.load(f)
+    # ------------- If starting form just netcdf file, we generate a default configfile
+    if config_file == None and args['--input_file']:
+        dataset_file = args['<input_file>']
+        config_obj = ConfigParams() # Get Default parameters
+        config_obj.set_dataset(dataset_file)
+        config_json = config_obj.get_config()
+        config_file = join(os.getcwd(), "Temp.json")
+        all = True  # In this case we want to do both
+    else:
+        if config_file == "Config.json":
+            config_file = join(os.getcwd(), config_file)
+        f = open(config_file)
+        config_json = json.load(f)
     # ------------- Preprocessing steps ---------------
     if all or preproc:
         print("Doing preprocessing...")
-        mypreproc = PreprocParticleViz(config_file)
+        mypreproc = PreprocParticleViz(config_json, config_file)
         mypreproc.createBinaryFileMultiple()
         print("Done!")
 
@@ -56,4 +64,3 @@ if __name__ == '__main__':
         # Initilize the server
         subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)
         print("Done!")
-

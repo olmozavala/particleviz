@@ -16,15 +16,15 @@ const datasets = config_adv["datasets"]
 
 let models = []
 // Indicates the subsampling level of the particles
-let folder = config_webapp["desktop-subsample"]
-if(isMobile){
-    folder = config_webapp["mobile-subsample"]
-}
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 // console.log(datasets)
 for (const [key, c_dataset] of Object.entries(datasets)) {
+    let folder = c_dataset["subsample"]["desktop"]
+    if(isMobile){
+        folder = c_dataset["subsample"]["mobile"]
+    }
     models.push({
         id: key,
         name: capitalize(c_dataset["name"]),

@@ -3,18 +3,22 @@
         "models": [
             {
                 "name": "With Tides",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc"
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc",
+                "subsample": {
+                    "desktop": 2,
+                    "mobile": 4
+                }
             },
             {
                 "name": "Without Tides",
-                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_ntides_0615_hourly.nc"
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ExampleData/Particle_AZO_grid100000p_ntides_0615_hourly.nc",
+                "subsample": {
+                    "desktop": 2,
+                    "mobile": 4
+                }
             }
         ],
-        "output_folder": "./ParticleViz_WebApp/data/",
-        "subsample": [
-            2,
-            4
-        ]
+        "output_folder": "./ParticleViz_WebApp/data/"
     },
     "webapp": {
         "data_folder": "./data",
@@ -23,8 +27,6 @@
         "intro_image": "",
         "url": "https://www.uu.nl/staff/LGomezNavarro/Contact",
         "intro": " Virtual surface trajectories advected with ocean velocities outputs from a twin ocean model simulation (eNATL60) without and with tidal-forcing.  Particles are released on a regular grid on the initial day of the simulation.  ",
-        "desktop-subsample": "2",
-        "mobile-subsample": "4",
         "zoom-levels": [
             0.045,
             0.03,
@@ -61,12 +63,20 @@
             "With Tides": {
                 "total_files": 2,
                 "name": "With Tides",
-                "file_name": "Laura_with tides"
+                "file_name": "Laura_with tides",
+                "subsample": {
+                    "desktop": 2,
+                    "mobile": 4
+                }
             },
             "Without Tides": {
                 "total_files": 2,
                 "name": "Without Tides",
-                "file_name": "Laura_without tides"
+                "file_name": "Laura_without tides",
+                "subsample": {
+                    "desktop": 2,
+                    "mobile": 4
+                }
             }
         }
     }

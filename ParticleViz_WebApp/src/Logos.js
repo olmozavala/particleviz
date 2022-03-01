@@ -15,7 +15,6 @@ if(typeof config_webapp["logos"] !== "undefined") {
         logos[key]['key'] = key
     }
 }
-console.log(logos)
 
 function RenderLogos(props){
     return (
