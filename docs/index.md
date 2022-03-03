@@ -4,7 +4,7 @@ large number of particles inside dynamic web maps.
 It is designed mostly for Earth Science scientists
 that simulate different processes using Lagrangian models.
 
-The objective of this software are:
+The objectives of this software are:
 * Provide efficient visualizations that can help analyze and understand research made
 through lagrangian modelling in the Earth Sciences, in a fast and easy way. 
 * Make it easy to share this research with other colleagues with selfcontained
