@@ -12,3 +12,4 @@ dependencies:
     - nodejs=*.*
     - netcdf4=*.*
     - docopt=*.*
+    - cartopy=*.*
