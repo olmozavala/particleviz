@@ -5,6 +5,7 @@ import numpy as np
 from netCDF4 import Dataset
 import xarray as xr
 import os
+from os.path import join
 import json
 import zipfile
 import cartopy.crs as ccrs
@@ -29,14 +30,12 @@ def set_start_date(start_date_str, start_time, units):
         return isoparse(start_date_str) + timedelta(days=start_time)
 
 class PreprocParticleViz:
-    def __init__(self, config_json, config_file):
+    def __init__(self, config_json):
         '''
         :param config_json: The configuration parameters to use
-        :param config_file:  The name of the configuration file (this is used to update some parameters from the preprocessing)
         '''
         config = config_json["preprocessing"]
         config_adv = config_json["advanced"]
-        self._config_file = config_file
         self._config_json = config_json
         self._models = config["models"]
         self._output_folder = config["output_folder"]
@@ -195,10 +194,10 @@ class PreprocParticleViz:
                         zip_file.write(binary_file)
                     zip_file.close()
                     # -----  Remove binary file, ParticleViz reads the zip file directly
-                    # os.remove(binary_file)
+                    os.remove(binary_file)
 
             # Updating config file inside ParticleViz WebAapp
-            with open(self._config_file, 'w') as f:
+            with open("Current_Config.json", 'w') as f:
                 json.dump(self._config_json, f, indent=4)
             nc_file.close()
 
@@ -277,7 +276,7 @@ if __name__ == "__main__":
     from ParticleViz_DataPreproc.ConfigParams import ConfigParams
     config_obj = ConfigParams()  # Get Default parameters
     config_json = config_obj.get_config()
-    mypreproc = PreprocParticleViz(config_json, "Delete.json")
+    mypreproc = PreprocParticleViz(config_json)
     # mypreproc.createBinaryFileMultiple()
     # print("IT IS SAVED IN THE WRONG PLACE IF IT IS CALLED FROM HERE!")
 

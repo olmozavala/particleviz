@@ -24,11 +24,12 @@ def_config = {
         "map-extent": [ -180, -90, 180, 90 ],
         "map-center": [0, 0],
         "logos": [],
-        "extra_layers_": []
+        "extra_layers": []
     },
     "advanced": {
         "timesteps_by_file": 50,
-        "file_prefix": "pviz"
+        "file_prefix": "pviz",
+        "datasets": []
     }
 }
 # The configuration file can only have up to 3 nested values so far
@@ -36,8 +37,6 @@ class ConfigParams:
     _config_json = {}
 
     def __init__(self, config_json = None):
-        # f = open("Default_Config_File.json")
-        # self._config_json = json.load(f)
         self._config_json = def_config
         if config_json != None:
             # Replace everything is inside config_json
@@ -52,15 +51,14 @@ class ConfigParams:
         :param new_config:
         :return:
         '''
-        if len(new_config) > 1:
-            for key,value in new_config.items():
-                current_config[key] = cls.update_config(current_config[key], value)
-        else:
-            key = list(new_config.keys())[0]
-            if key in current_config.keys():
-                current_config[key] = new_config[key]
-            else:
-                raise ValueError(F"Key {key} is not a valid entry in the config file.")
+        if isinstance(new_config, dict):  # We have a dictionary
+            for key, value in new_config.items():
+                if isinstance(value, list) or isinstance(value, dict):  # In this case we are in a leave
+                    current_config[key] = cls.update_config(current_config[key], value)
+                else:
+                    current_config[key] = value
+        else:  # We have an array or a single value
+            return new_config
         return current_config
 
     def get_config(self):

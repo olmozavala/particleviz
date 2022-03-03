@@ -3,36 +3,36 @@
         "models": [
             {
                 "name": "January 2010",
-                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_01.nc",
-                "subsample": { "desktop":2, "mobile":4 }
+                "file_name": "./ExampleData/Global_Marine_Debris.nc",
+                "subsample": {
+                    "desktop": 2,
+                    "mobile": 4
+                }
             },
             {
-                "name": "February 2010",
-                "file_name": "/data/COAPS_Net/work/ozavala/WorldLitterOutput/2010-2021_Twelve_Years/TenYears_YesWinds_YesDiffusion_NoUnbeaching_2010_02.nc",
-                "subsample": { "desktop":2, "mobile":4 }
+                "name": "January 2010",
+                "file_name": "./ExampleData/Global_Marine_Debris.nc",
+                "subsample": {
+                    "desktop": 6,
+                    "mobile": 8
+                }
             }
         ],
         "output_folder": "./ParticleViz_WebApp/data/"
     },
     "webapp": {
         "data_folder": "./data",
-        "title": "Marine Plastic Debris",
+        "title": "Marine Plastic Debris Advanced",
         "particles-color": "rgba(255,105,0)",
         "intro_image": "",
-        "_url": "http://marinelitter.coaps.fsu.edu/",
         "url": "https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter",
         "intro": "This is an example of a ParticleViz visualization of Marine Debris. Try other example configuration files and then with your own data!!!! ",
         "zoom-levels": [
             0.24,
-            0.18,
             0.12,
-            0.09,
             0.045,
-            0.0225,
             0.01125,
-            0.005625,
-            0.0028125,
-            0.00140625
+            0.0028125
         ],
         "def-zoom": 1,
         "map-extent": [
@@ -45,28 +45,32 @@
             0,
             0
         ],
+        "logos": [
+            {
+                "img": "logos/logo_example.png",
+                "url": "https://olmozavala.com"
+            }
+        ],
         "extra_layers": [
             {
                 "name": "World Cities",
-                "file": "extra_layers/E1.geojson",
+                "file": "extra_layers/capitals.geojson",
                 "color": "rgb(255,237,0)"
             }
         ]
     },
     "advanced": {
-        "file_prefix": "GlobalLitter",
         "timesteps_by_file": 200,
-        "total_files": 41,
+        "file_prefix": "GlobalLitter",
         "datasets": {
             "January 2010": {
-                "total_files": 22,
+                "total_files": 1,
                 "name": "January 2010",
-                "file_name": "GlobalLitter_january 2010"
-            },
-            "February 2010": {
-                "total_files": 22,
-                "name": "February 2010",
-                "file_name": "GlobalLitter_february 2010"
+                "file_name": "GlobalLitter_january 2010",
+                "subsample": {
+                    "desktop": 6,
+                    "mobile": 8
+                }
             }
         }
     }

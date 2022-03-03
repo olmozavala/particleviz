@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # ------------- If starting form just netcdf file, we generate a default configfile
     if config_file == None and args['--input_file']:
         dataset_file = args['<input_file>']
-        config_obj = ConfigParams() # Get Default parameters
+        config_obj = ConfigParams()  # Get Default parameters
         config_obj.set_dataset(dataset_file)
         config_json = config_obj.get_config()
         config_file = join(os.getcwd(), "Temp.json")
@@ -47,19 +47,23 @@ if __name__ == '__main__':
             config_file = join(os.getcwd(), config_file)
         f = open(config_file)
         config_json = json.load(f)
+        config_obj = ConfigParams()  # Get Default parameters
+        def_config = config_obj.get_config()
+        config_json = config_obj.update_config(def_config, config_json)  # Update with defined values
+        #
     # ------------- Preprocessing steps ---------------
     if all or preproc:
         print("Doing preprocessing...")
-        mypreproc = PreprocParticleViz(config_json, config_file)
+        mypreproc = PreprocParticleViz(config_json)
         mypreproc.createBinaryFileMultiple()
         print("Done!")
 
     if all or webapp:
         print("Initializing webapp...")
         # Copy correct Config.json to the src folder
-        shutil.copyfile(config_file, join("ParticleViz_WebApp","src","Config.json"))
-        if(os.path.exists(join("ParticleViz_WebApp","public","data"))):
-            shutil.rmtree(join("ParticleViz_WebApp","public","data"))
+        shutil.copyfile("Current_Config.json", join("ParticleViz_WebApp","src","Config.json"))
+        if(os.path.exists(join("ParticleViz_WebApp", "public","data"))):
+            shutil.rmtree(join("ParticleViz_WebApp", "public","data"))
         shutil.copytree(config_json["webapp"]["data_folder"], join("ParticleViz_WebApp","public","data"))
         # Initilize the server
         subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)

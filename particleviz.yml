@@ -1,0 +1,14 @@
+name: particleviz
+channels:
+    - conda-forge
+    - nodefaults
+    - anaconda
+dependencies:
+    - python=*.*.*
+    - pandas=*.*.*
+    - numpy=*.*.*
+    - matplotlib=*.*.*
+    - xarray=*.*
+    - nodejs=*.*
+    - netcdf4=*.*
+    - docopt=*.*
