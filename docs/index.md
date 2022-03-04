@@ -44,6 +44,8 @@ it with the `Global_Marine_Debris.nc` file, you should see something like this:
 python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
 ![](media/quickstart.gif)
+<img src="{{site.baseurl | prepend: site.url}}media/quickstart.gif" alt="exmample" />
+
 
 ## Configuration
 ParicleViz generates websites in two steps:
