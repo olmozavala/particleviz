@@ -1,5 +1,5 @@
 
-#  <img src="logos/logo_sm.png" width="200px" style="border:none"> Welcome to ParticleViz  
+#  <img src="docs/logos/logo_sm.png" width="200px" style="border:none"> Welcome to ParticleViz  
 ParticleViz is an Open Source software that is used to animate
 large number of particles inside dynamic web maps.
 It is designed mostly for Earth Science scientists
@@ -52,7 +52,7 @@ Test it with the *Global_Marine_Debris.nc* file inside the *ExampleData* folder 
 ```shell
 python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
-<img src="{{site.baseurl | prepend: site.url}}media/quickstart.gif" alt="exmample" />
+<img src="{{site.baseurl | prepend: site.url}}docs/media/quickstart.gif" alt="exmample" />
 
 
 ## Advanced Configuration
@@ -143,7 +143,7 @@ You can test this *advanced* configuration file with:
 python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
 ```
 
-<img src="{{site.baseurl | prepend: site.url}}media/advanced.gif" alt="exmample" />
+<img src="{{site.baseurl | prepend: site.url}}docs/media/advanced.gif" alt="exmample" />
 
 ### Preprocessing
 The meaning of each attribute is the *Preprocessing* section is following:
