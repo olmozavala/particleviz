@@ -31,8 +31,11 @@ The JS dependencies will be installed the fist time you run the **ParticleViz**.
 
 ## Quick Start
 
-The simplest way to use **ParticleViz** is to run it specifying the input netcdf from
-the command line directly (this should has the format from [OceanParcels](https://oceanparcels.org/)).
+Once you have installed the [Python dependencies](#python-dependencies) and 
+[JS dependencies](#js-dependencies-npm), then the simplest way to 
+use **ParticleViz** is to run it specifying the input netcdf from
+the command line directly (the netcdf file should have the format 
+from [OceanParcels](https://oceanparcels.org/)).
 
 ```shell
 python ParticleViz.py --input_file <path to netcdf> 

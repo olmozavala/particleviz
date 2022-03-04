@@ -30,10 +30,11 @@
     "react-scripts": "^3.4.4"
   },
   "scripts": {
-    "start": "npm run copy-config & react-scripts start",
+    "start": "npm run copy-config & --openssl-legacy-provider start",
+    "_start": "npm run copy-config & react-scripts start",
     "build": "react-scripts build & npm run copy",
     "copy": "cp -r node_modules/lib build/lib",
-    "copy-config": "cpx ./data/**/*.{txt,bin,zip,json} ./public --watch ",
+    "copy-config": "cpx './data/**/*.{txt,bin,zip,json}' ./public --watch ",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
