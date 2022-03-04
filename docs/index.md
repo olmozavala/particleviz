@@ -144,7 +144,7 @@ python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.j
 
 <img src="{{site.baseurl | prepend: site.url}}media/advanced.gif" alt="exmample" />
 
-### Preprocessing
+
 The meaning of each attribute is the *Preprocessing* section is following:
 * ***models***. (required) A list of models to be added into the visualizationl. Each model will be available
 from a dropdown field. 
@@ -156,7 +156,6 @@ from a dropdown field.
     * ***mobile*** (required) An integer value that indicates how much should we subsample the data
     for mobile devices. Normally a higher or equal number than *desktop*.
 
-## ParticleViz binary files
 The meaning of each attribute is the *webapp* section is following:
 * ***title***. The title being displayed on the map.
 * ***particles-color***. Default color to be used to display the particles.

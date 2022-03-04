@@ -145,37 +145,35 @@ python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.j
 
 <img src="docs/media/advanced.gif" alt="exmample" />
 
-### Preprocessing
 The meaning of each attribute is the *Preprocessing* section is following:
 * ***models***. (required) A list of models to be added into the visualizationl. Each model will be available
-from a dropdown field. 
-  * ***name*** (required) The name of your model, it will be the name that appears in the dropdown.
-  * ***file_name*** (required) The path to the netcdf file that stores your model output.
-  * ***subsample*** (optional) It is used to indicate if we need to subsample our data for display purposes. 
-    * ***desktop*** (required) An integer value that indicates how much should we subsample the data. Ex. a
-    2 means half of the particles will be selected at random. 3 means one third, etc. 
-    * ***mobile*** (required) An integer value that indicates how much should we subsample the data
-    for mobile devices. Normally a higher or equal number than *desktop*.
+  from a dropdown field.
+    * ***name*** (required) The name of your model, it will be the name that appears in the dropdown.
+    * ***file_name*** (required) The path to the netcdf file that stores your model output.
+    * ***subsample*** (optional) It is used to indicate if we need to subsample our data for display purposes.
+        * ***desktop*** (required) An integer value that indicates how much should we subsample the data. Ex. a
+          2 means half of the particles will be selected at random. 3 means one third, etc.
+        * ***mobile*** (required) An integer value that indicates how much should we subsample the data
+          for mobile devices. Normally a higher or equal number than *desktop*.
 
-## ParticleViz binary files
 The meaning of each attribute is the *webapp* section is following:
 * ***title***. The title being displayed on the map.
 * ***particles-color***. Default color to be used to display the particles.
 * ***data_folder***. Path where data (logos, extra layers, etc.) is stored. Default location is at `data`.
 * ***intro_image***. Path to an image to use as a replacement of the default intro image. This path is relative to the ***data_folder***.
 * ***url***. Default url for the *home* icon.
-* ***intro***. Text to display at the intro page. 
+* ***intro***. Text to display at the intro page.
 * ***zoom-levels***. Available zoom leves that an user can scroll in the map. These numbers
-**must** be in decreasing order. (larger numbers are to visualize larger areas and smaller numbers are
-used for smaller/zoomed in regions).
+  **must** be in decreasing order. (larger numbers are to visualize larger areas and smaller numbers are
+  used for smaller/zoomed in regions).
 * ***def-zoom***. Default zoom index to use. This should be an integer from 0 to the total length of ***zoom-levels***.
-* ***map-extent***. Restrict the area where the user can pan the map. 
+* ***map-extent***. Restrict the area where the user can pan the map.
 * ***map-center***. Sets the default center of the map
 * ***logos***. List of additional logos
-  * ***img***. Path to an image to use in this logo. This path is relative to the ***data_folder***.
-  * ***url***. Url to open when clicking on the logo. 
-* ***extra_layers***. List of additional *point* geospatial layers to show in the map. 
-  * ***name***. Name of the additional layer.
-  * ***file***. Path to the additional geojson layer, relative to the ***data_folder***
-  * ***color***. Color to use to display this layer. 
+    * ***img***. Path to an image to use in this logo. This path is relative to the ***data_folder***.
+    * ***url***. Url to open when clicking on the logo.
+* ***extra_layers***. List of additional *point* geospatial layers to show in the map.
+    * ***name***. Name of the additional layer.
+    * ***file***. Path to the additional geojson layer, relative to the ***data_folder***
+    * ***color***. Color to use to display this layer. 
  
