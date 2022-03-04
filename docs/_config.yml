@@ -4,7 +4,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   ParticleViz is an Open Source software that is used to animate
   large number of particles inside dynamic web maps.
 
-baseurl: "particleviz/" # the subpath of your site, e.g. /blog
+baseurl: "/particleviz/" # the subpath of your site, e.g. /blog
 url: "https://olmozavala.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  olmozavala

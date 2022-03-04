@@ -23,8 +23,8 @@
     "webapp": {
         "data_folder": "./data",
         "title": "Marine Plastic Debris Advanced",
-        "particles-color": "rgba(255,105,0)",
-        "intro_image": "",
+        "particles-color": "rgba(1,46,252)",
+        "intro_image": "logos/logo_example.png",
         "url": "https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter",
         "intro": "This is an example of a ParticleViz visualization of Marine Debris. Try other example configuration files and then with your own data!!!! ",
         "zoom-levels": [

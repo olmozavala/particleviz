@@ -13,21 +13,23 @@ websites.
 **ParticleViz** currently reads NetCDF outputs from [OceanParcels](https://oceanparcels.org/).
 
 ## Install
-### Python dependencies
+Classic steps:
+
+1. Clone repository
+2. Create conda environment with the proper dependencies
+3. Enjoy life
+
+```shell
+git clone https://github.com/olmozavala/particleviz.git
+cd particleviz
+```
+
 #### Anaconda
 Create new environment from **yml** file and active it.
 ```shell
 conda env create -f particleviz.yml
 conda activate particleviz
 ```
-
-### JS Dependencies (npm)
-#### Ubuntu
-To install with the package manager use:
-```shell
-sudo apt install nodejs npm
-```
-The JS dependencies will be installed the fist time you run the **ParticleViz**.
 
 ## Quick Start
 
@@ -36,26 +38,28 @@ Once you have installed the [Python dependencies](#python-dependencies) and
 use **ParticleViz** is to run it specifying the input netcdf from
 the command line directly (the netcdf file should have the format 
 from [OceanParcels](https://oceanparcels.org/)).
+You need to be patient the first time you run it because it will 
+install all the Javascript dependencies. It will be much faster after that.
+This will generate the *default* web interface to display your data.
 
 ```shell
 python ParticleViz.py --input_file <path to netcdf> 
 ```
 
-This will generate the *default* web interface to display your data. By testing
-it with the `Global_Marine_Debris.nc` file, you should see something like this:
+Test it with the *Global_Marine_Debris.nc* file inside the *ExampleData* folder with:
+
 ```shell
 python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
-![](media/quickstart.gif)
 <img src="{{site.baseurl | prepend: site.url}}media/quickstart.gif" alt="exmample" />
 
 
-## Configuration
+## Advanced Configuration
 ParicleViz generates websites in two steps:
 
 * **Preprocessing**. This first step transforms the lagrangian outputs 
 into multiple binary files that can be transferred efficiently by the internet. 
-* **React app**. The second step generates a website (react app) that reads binary
+* **App builder**. The second step generates a website (react app) that reads binary
  outputs from the **preprocessing** step.
 
 All the customizations of these two steps are made through
@@ -72,7 +76,17 @@ of your dataset, like this:
     }
 }
 ```
-An example with all the possible options in the config file will be the following:
+To run *ParticleViz* from a config file you can do it with the following options
+```
+  ParticleViz.py  all --config_file <config_file>
+  ParticleViz.py  preproc --config_file <config_file>
+  ParticleViz.py  webapp --config_file <config_file>
+```
+To run both steps, **Preprocessing** and **App builder**, you use the **all** command, and to run
+only one of the two you use **preproc** or **webapp** (you need to run **preproc** at least once before
+running webapp).
+
+A configuration file example with all the possible options will be the following:
 
 ```json
 
@@ -121,6 +135,14 @@ An example with all the possible options in the config file will be the followin
   }
 }
 ```
+
+You can test this *advanced* configuration file with:
+
+```shell
+python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
+```
+
+<img src="{{site.baseurl | prepend: site.url}}media/advanced.gif" alt="exmample" />
 
 ### Preprocessing
 The meaning of each attribute is the *Preprocessing* section is following:
