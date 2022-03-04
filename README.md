@@ -52,7 +52,7 @@ Test it with the *Global_Marine_Debris.nc* file inside the *ExampleData* folder 
 ```shell
 python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
-<img src="{{site.baseurl | prepend: site.url}}docs/media/quickstart.gif" alt="exmample" />
+<img src="docs/media/quickstart.gif" alt="exmample" />
 
 
 ## Advanced Configuration
@@ -143,7 +143,7 @@ You can test this *advanced* configuration file with:
 python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
 ```
 
-<img src="{{site.baseurl | prepend: site.url}}docs/media/advanced.gif" alt="exmample" />
+<img src="docs/media/advanced.gif" alt="exmample" />
 
 ### Preprocessing
 The meaning of each attribute is the *Preprocessing* section is following:
