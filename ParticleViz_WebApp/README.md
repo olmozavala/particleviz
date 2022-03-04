@@ -1,6 +1,3 @@
-# Install 
-npm install --save parcel-bundler
-
 ## Files
 ### Index.js
 First file. It defines the following:
@@ -24,25 +21,3 @@ File in charge of displaying the particles
 * Particles per file 
 * How many previous days to draw when the animation is updated
 * Maximum animation speed
-
-
-
-## Update DEVELOPMENT server
-Dev server at `/var/www/virtualhosts/ozavala.coaps.fsu.edu/` 
-You can use `sshweb` from wolf and `cdweb` at ozavalaweb to go to the proper location.
-
-0. Edit `package.json` with the dev home page of  `http://ozavala.coaps.fsu.edu/marine_litter_dev/`
-    and run `npm run-script build`
-1. Run `clear_dev.sh` on the server.
-2. Run `copyscript.sh` from local.
-3. Run `done_dev.sh` on server.
-
-## Update PRODUCTION server
-Production server at `/var/www/virtualhosts/marinelitter.coaps.fsu.edu/` 
-You can use `sshweb` from wolf and `cdweb` at ozavalaweb. Then you have to move to the production folder one 
-branch above.
-
-1. Run `clear_production.sh` on the server.
-2. Run `copyscript.sh` from local.
-3. Run `done_production.sh` on server.
-
