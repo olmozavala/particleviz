@@ -13,12 +13,21 @@ websites.
 **ParticleViz** currently reads NetCDF outputs from [OceanParcels](https://oceanparcels.org/).
 
 ## Install
-### Anaconda
+### Python dependencies
+#### Anaconda
 Create new environment from **yml** file and active it.
 ```shell
 conda env create -f particleviz.yml
 conda activate particleviz
 ```
+
+### JS Dependencies (npm)
+#### Ubuntu
+To install with the package manager use:
+```shell
+sudo apt install nodejs npm
+```
+The JS dependencies will be installed the fist time you run the **ParticleViz**.
 
 ## Quick Start
 
