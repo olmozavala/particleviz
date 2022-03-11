@@ -233,7 +233,7 @@ class  ParticlesLayer extends React.Component {
                 let data = {}
                 data[data_key] = {}
                 // All latitudes and longitudes in the file
-                let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps)) 
+                let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
                 // Not sure why in hte next line is by 2?
                 let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
                 let all_display = []

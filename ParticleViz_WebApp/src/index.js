@@ -62,8 +62,9 @@ let map = new Map({
 
 if (typeof extra_layers !== 'undefined'){
     // console.log(ip_address+"/"+extra_layers[0].file)
-    for (const [key, value] of Object.entries(extra_layers)) {
-        console.log("Adding layer: ", value.name, " - ", key)
+
+    for (const [, value] of Object.entries(extra_layers)) {
+        console.log("Adding layer: ", value.name)
         let color = value.color
         let extra_layer = new VectorLayer({
             source: new VectorSource({
@@ -101,7 +102,8 @@ function PageSummary(){
                         {config_webapp['intro_image'] === ""?
                             <Card.Img variant="top" src={intro_image}/>
                             :
-                            <Card.Img variant="top" src={ip_address+"//data/"+config_webapp["intro_image"]}/>
+
+                            <Card.Img variant="top" src={ip_address+"/data/"+config_webapp['intro_image']}/>
                         }
                         <Card.Body>
                             <Card.Title>{config_webapp['title']}</Card.Title>

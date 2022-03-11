@@ -27,14 +27,14 @@ function RenderLogos(props){
                 <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
             </a>
             {logos.map(d => (
-                <a className="navbar-brand" href={d['url']} key={d['key']} alt="">
-                    <img src={props.url+"//data/"+d['img']} className="rounded" height="30px" alt="Logo"/>
+
+                <a className="navbar-brand" href={d['url']} key={d['key']}>
+                    <img src={props.url+"/data/"+d['img']} className="rounded" height="30px" alt=""/>
                 </a> ))}
         </>
     )
 }
 class  Logos extends React.Component {
-
     render() {
         // if(isMobile ||  window.innerWidth <= 1200) {
         if(isMobile ||  window.innerWidth <= 1200) {

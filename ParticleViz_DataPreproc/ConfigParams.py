@@ -1,6 +1,8 @@
 import json
-from os.path import join
 import os
+from os.path import join, dirname, abspath
+
+parent_path = join(dirname(abspath(__file__)), os.pardir)
 
 def_config = {
     "preprocessing": {
@@ -11,10 +13,10 @@ def_config = {
                 "subsample": { "desktop":2, "mobile":4 }
             }
         ],
-        "output_folder": join(os.path.dirname(__file__),"../ParticleViz_WebApp/data/")
+        "output_folder": f"{join(parent_path, 'ParticleViz_WebApp', 'data')}"
     },
     "webapp": {
-        "data_folder": join(os.path.dirname(__file__),"../data"),
+        "data_folder": f"{join(parent_path, 'ParticleViz_WebApp', 'data')}",
         "title": "ParticleViz Title",
         "particles-color": "rgba(255,105,0)",
         "intro_image": "",

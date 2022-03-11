@@ -276,4 +276,3 @@ class  ParticleVizManager extends React.Component{
 }
 
 export default ParticleVizManager
-

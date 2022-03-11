@@ -10,10 +10,10 @@
                 }
             }
         ],
-        "output_folder": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ParticleViz_DataPreproc/../ParticleViz_WebApp/data/"
+        "output_folder": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ParticleViz_DataPreproc/../ParticleViz_WebApp/data"
     },
     "webapp": {
-        "data_folder": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ParticleViz_DataPreproc/../data",
+        "data_folder": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/ParticleViz_DataPreproc/../ParticleViz_WebApp/data",
         "title": "ParticleViz Title",
         "particles-color": "rgba(255,105,0)",
         "intro_image": "",
