@@ -49,12 +49,6 @@ class PreprocParticleViz:
         """
         timesteps_by_file = self._timesteps_by_file# How many locations to save in each file
 
-        def myfmt(r):  # 'Round to 2 decimals'
-            return np.around(r, 2)
-            # return float(F"{r:.2f}")
-
-        vecfmt = np.vectorize(myfmt)
-
         self._config_json["advanced"]["datasets"] = {}
 
         print("Reading data...")
@@ -278,7 +272,6 @@ if __name__ == "__main__":
     config_json = config_obj.get_config()
     mypreproc = PreprocParticleViz(config_json)
     # mypreproc.createBinaryFileMultiple()
-    # print("IT IS SAVED IN THE WRONG PLACE IF IT IS CALLED FROM HERE!")
 
     test_file = "../ExampleOutput/2/pviz_dataset 1_00"
     mypreproc.testBinaryAndHeaderFiles(test_file)

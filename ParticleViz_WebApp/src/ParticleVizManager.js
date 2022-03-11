@@ -4,7 +4,7 @@ import BackgroundLayerManager from "./BackgroundLayerManager"
 import Logos from "./Logos";
 import _ from "underscore"
 import $ from "jquery"
-import {QuestionCircle, House, List, Activity} from "react-bootstrap-icons"
+import {QuestionCircle, House, List} from "react-bootstrap-icons"
 import {Collapse, Row, Col, Container, Button, Dropdown}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'

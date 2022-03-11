@@ -1,6 +1,7 @@
 import json
+from os.path import join
+import os
 
-# "file_name": "../ExampleData/Global_Marine_Debris.nc",
 def_config = {
     "preprocessing": {
         "models": [
@@ -10,10 +11,10 @@ def_config = {
                 "subsample": { "desktop":2, "mobile":4 }
             }
         ],
-        "output_folder": "./ParticleViz_WebApp/data/"
+        "output_folder": join(os.path.dirname(__file__),"../ParticleViz_WebApp/data/")
     },
     "webapp": {
-        "data_folder": "./data",
+        "data_folder": join(os.path.dirname(__file__),"../data"),
         "title": "ParticleViz Title",
         "particles-color": "rgba(255,105,0)",
         "intro_image": "",

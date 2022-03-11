@@ -61,13 +61,15 @@ if __name__ == '__main__':
     if all or webapp:
         print("Initializing webapp...")
         # Copy correct Config.json to the src folder
-        shutil.copyfile("Current_Config.json", join("ParticleViz_WebApp","src","Config.json"))
-        if os.path.exists(join("ParticleViz_WebApp", "public","data")):
-            shutil.rmtree(join("ParticleViz_WebApp", "public","data"))
-        shutil.copytree(config_json["webapp"]["data_folder"], join("ParticleViz_WebApp","public","data"))
+        shutil.copyfile("Current_Config.json", join(os.path.dirname(__file__),"ParticleViz_WebApp","src","Config.json"))
+        if os.path.exists(join(os.path.dirname(__file__), "ParticleViz_WebApp", "public", "data")):
+            shutil.rmtree(join(os.path.dirname(__file__), "ParticleViz_WebApp", "public", "data"))
+        shutil.copytree(config_json["webapp"]["data_folder"], join(os.path.dirname(__file__),"ParticleViz_WebApp","public","data"))
         # Install npm dependencies if
-        if not(os.path.exists(join("ParticleViz_WebApp","node_modules"))):
-            subprocess.call("npm install --prefix ./ParticleViz_WebApp", shell=True)
+        if not(os.path.exists(join(os.path.dirname(__file__),"ParticleViz_WebApp","node_modules"))):
+            subprocess.call(F"npm install --prefix {join(os.path.dirname(__file__),'ParticleViz_WebApp')}", shell=True)
         # Initilize the server
-        subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)
+        cmd = F"npm start --prefix {join(os.path.dirname(__file__),'ParticleViz_WebApp')}"
+        print(F"Running npm with: {cmd}")
+        subprocess.call(cmd, shell=True)
         print("Done!")

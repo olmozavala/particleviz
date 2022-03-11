@@ -20,7 +20,6 @@ import {
 } from 'react-bootstrap-icons'
 
 import JSZip from "jszip"
-import {readBoolean} from "ol/format/xsd";
 
 const data_key = 'def_part_viz'
 const default_size = 15 // Font size
@@ -320,7 +319,7 @@ class  ParticlesLayer extends React.Component {
 
             // Here we append a new location at the end of each file (if is still not there) to fix the
             // problem of drawing a location at the last timestep of each file.
-            let has_nans = data[data_key]['disp_info'] != undefined? true: false
+            let has_nans = data[data_key]['disp_info'] !== undefined? true: false
 
             current_data[model_id][file_number] = data
             if (this.state.loaded_files >= (files_to_load - 1)) {
@@ -543,7 +542,7 @@ class  ParticlesLayer extends React.Component {
 
             if (this.state.status === STATUS.playing) {
                 this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
-                if(this.time_step % 10 == 0){ // Update the range bar every 10 timesteps
+                if(this.time_step % 10 === 0){ // Update the range bar every 10 timesteps
                     this.updateRange()
                 }
             }
@@ -577,7 +576,7 @@ class  ParticlesLayer extends React.Component {
             let tot_part = drawing_data["lat_lon"][0].length
             let oldpos = [0, 0]
 
-            let has_nans = drawing_data['disp_info'] != undefined? true: false
+            let has_nans = drawing_data['disp_info'] !== undefined? true: false
             if(has_nans){
                 let disp_part = 0
                 for (let part_id = 0; part_id < tot_part; part_id++) {
@@ -675,7 +674,7 @@ class  ParticlesLayer extends React.Component {
             let oldpos = [0, 0]
             let newpos = [0, 0]
 
-            let has_nans = drawing_data['disp_info'] != undefined? true: false
+            let has_nans = drawing_data['disp_info'] !== undefined? true: false
             if(has_nans){
                 // Iterates over all the particles to draw them.
                 for (let part_id = 0; part_id < tot_part; part_id++) {
