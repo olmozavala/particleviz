@@ -20,7 +20,7 @@ from docopt import docopt
 import os
 import shutil
 import json
-from os.path import join
+from os.path import join, dirname, abspath
 import subprocess
 from ParticleViz_DataPreproc.ConfigParams import ConfigParams
 
@@ -60,14 +60,15 @@ if __name__ == '__main__':
 
     if all or webapp:
         print("Initializing webapp...")
+        basepath = dirname(abspath(__file__))
         # Copy correct Config.json to the src folder
-        shutil.copyfile("Current_Config.json", join("ParticleViz_WebApp","src","Config.json"))
-        if os.path.exists(join("ParticleViz_WebApp", "public","data")):
-            shutil.rmtree(join("ParticleViz_WebApp", "public","data"))
-        shutil.copytree(config_json["webapp"]["data_folder"], join("ParticleViz_WebApp","public","data"))
+        shutil.copyfile("Current_Config.json", join(basepath,"ParticleViz_WebApp","src","Config.json"))
+        if os.path.exists(join(basepath,"ParticleViz_WebApp","public","data")):
+            shutil.rmtree(join(basepath,"ParticleViz_WebApp","public","data"))
+        shutil.copytree(join(basepath,"ParticleViz_WebApp",config_json["webapp"]["data_folder"]), join(basepath,"ParticleViz_WebApp","public","data"))
         # Install npm dependencies if
-        if not(os.path.exists(join("ParticleViz_WebApp","node_modules"))):
-            subprocess.call("npm install --prefix ./ParticleViz_WebApp", shell=True)
+        if not(os.path.exists(join(basepath,"ParticleViz_WebApp","node_modules"))):
+            subprocess.call(f"npm install --prefix {join(basepath, 'ParticleViz_WebApp')}", shell=True)
         # Initilize the server
-        subprocess.call("npm start --prefix ./ParticleViz_WebApp", shell=True)
+        subprocess.call(f"npm start --prefix {join(basepath, 'ParticleViz_WebApp')}", shell=True)
         print("Done!")
