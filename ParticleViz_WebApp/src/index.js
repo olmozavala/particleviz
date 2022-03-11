@@ -20,7 +20,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import CircleStyle from "ol/style/Circle";
 import {GeoJSON} from "ol/format";
-import {Fill, Stroke, Style, Text} from "ol/style";
+import {Stroke, Style} from "ol/style";
 
 const config_pviz = require("./Config.json")
 
@@ -62,7 +62,7 @@ let map = new Map({
 
 if (typeof extra_layers !== 'undefined'){
     // console.log(ip_address+"/"+extra_layers[0].file)
-    for (const [key, value] of Object.entries(extra_layers)) {
+    for (const [, value] of Object.entries(extra_layers)) {
         console.log("Adding layer: ", value.name)
         let color = value.color
         let extra_layer = new VectorLayer({
@@ -101,7 +101,7 @@ function PageSummary(){
                         {config_webapp['intro_image'] === ""?
                             <Card.Img variant="top" src={intro_image}/>
                             :
-                            <Card.Img variant="top" src={ip_address+"//"+"data/"+config_webapp['intro_image']}/>
+                            <Card.Img variant="top" src={ip_address+"/data/"+config_webapp['intro_image']}/>
                         }
                         <Card.Body>
                             <Card.Title>{config_webapp['title']}</Card.Title>
