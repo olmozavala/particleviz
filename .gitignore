@@ -41,3 +41,10 @@ ParticleViz_WebApp/public/7
 ParticleViz_WebApp/public/8
 ParticleViz_WebApp/public/data
 ParticleViz_WebApp/build
+/Current_Config.json
+/ParticleViz_WebApp/package-lock.json
+/ConfigExamples/Config_Test.json
+/ConfigExamples/Config_GlobalLitterComplete.json
+/ConfigExamples/Config_Blue_HackBK.json
+/ConfigExamples/Config_Blue_Hack.json
+/ParticleViz_WebApp/BK.json
