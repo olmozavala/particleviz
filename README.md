@@ -64,7 +64,9 @@ python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ## Intro video
 This is a presentation made at OceanSciences meeting about ParticleViz in March 2022.
 
-<img src="docs/media/video_tm.png" width="500px" style="border:none" href="https://youtu.be/7Xk0DxRMPjQ"/>
+[![ParticleViz at OSM](docs/media/video_tm.png)](https://youtu.be/7Xk0DxRMPjQ?t=289)
+
+
 
 
 ## Advanced Configuration
