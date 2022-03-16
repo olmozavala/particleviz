@@ -70,5 +70,8 @@ if __name__ == '__main__':
         if not(os.path.exists(join(basepath,"ParticleViz_WebApp","node_modules"))):
             subprocess.call(f"npm install --prefix {join(basepath, 'ParticleViz_WebApp')}", shell=True)
         # Initilize the server
-        subprocess.call(f"npm start --prefix {join(basepath, 'ParticleViz_WebApp')}", shell=True)
+        if os.name == "nt": # In this case we are running with Windows
+            subprocess.call(f"npm start --prefix {join(basepath, 'ParticleViz_WebApp')} ", shell=True)
+        else:
+            subprocess.call(f"npm start --prefix {join(basepath, 'ParticleViz_WebApp')} | cat", shell=True)
         print("Done!")
