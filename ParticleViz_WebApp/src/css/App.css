@@ -4,6 +4,13 @@
   border-top-right-radius: calc(0.3rem - 1px);
 }
 
+.pv-flipped{
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+
 .pv-palette{
   position: absolute;
   top: 1%;
@@ -13,6 +20,7 @@
   text-align: center;
 }
 
+/*Window for particle color selection*/
 .pv-pcolor{
   z-index: 101;
   top:70px;
@@ -28,6 +36,10 @@
   width: 100%;
 }
 
+.pv-navbar{
+  width:80%
+}
+
 @media(max-width: 767px){
   h5 {
     font-size: 1.0rem;
@@ -39,8 +51,6 @@
     height: 547px;
   }
 }
-
-
 
 @media(max-width: 768px){
   #main-title{
@@ -98,9 +108,16 @@
   max-width: 100px;
 }
 
-@media(max-width: 768px){
+.anim-controls{
+  width: 10em
+}
+
+@media(max-width: 992px){
   .range-ml{
     max-width: 100px;
+  }
+  .anim-controls{
+    width: 6em
   }
 }
 

@@ -14,3 +14,7 @@ theme: jekyll-theme-dinky
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
+
+include:
+  install.md
+  ../README.md

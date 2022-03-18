@@ -49,7 +49,7 @@ class  ParticleVizManager extends React.Component{
             selected_model: models[0],
             chardin: this.props.chardin,
             particle_color:  config_webapp['particles-color'],
-            open: false
+            open_info: false
         }
     }
 
@@ -121,7 +121,7 @@ class  ParticleVizManager extends React.Component{
 
     setOpen(){
         this.setState({
-            open: !this.state.open
+            open_info: !this.state.open_info
         })
     }
 
@@ -131,9 +131,8 @@ class  ParticleVizManager extends React.Component{
     }
 
     render(){
-        if(isMobile ||  window.innerWidth <= 1200){
+        if(isMobile ||  window.innerWidth < 992){
         // if(true){
-            // --------------------- MOBILE  or < 1200---------------------------------
             return (
                 <Container fluid >
                     <Row className={`bg-light py-1`}>
@@ -153,17 +152,17 @@ class  ParticleVizManager extends React.Component{
                                 variant={"info"}
                                 onClick={() => this.setOpen()}
                                 aria-controls="col_content"
-                                aria-expanded={this.state.open} >
+                                aria-expanded={this.state.open_info} >
                                 <List />
                             </Button>
                         </Col>
                     </Row>
-                    <Collapse in={this.state.open} >
+                    <Collapse in={this.state.open_info} >
                         <Container fluid id={"col_content"} className={"mt-4"}>
                             <Row className={`bg-light p-2`} >
                                 {/* ---------- Background selection ------------*/}
-                                <Col xs={6}> <span className={"m-1"}>Background</span> </Col>
-                                <Col xs={{span:5, offset:1}}>
+                                <Col xs={7}> <span className={"m-1"}>Background</span> </Col>
+                                <Col xs={{span:4, offset:1}}>
                                     <BackgroundLayerManager background_layer={this.props.background_layer}
                                                             map={this.props.map}
                                                             url={this.props.url}/>
@@ -171,8 +170,8 @@ class  ParticleVizManager extends React.Component{
                             </Row>
                             <Row className={`bg-light p-2`} >
                                 {/* ---------- Model selection ------------*/}
-                                <Col xs={6}> <span className={"m-1"}>Model</span> </Col>
-                                <Col xs={{span:5, offset:1}}>
+                                <Col xs={7}> <span className={"m-1"}>Model</span> </Col>
+                                <Col xs={{span:4}}>
                                     <Dropdown className="mt-2 d-inline" title="Release month">
                                         <Dropdown.Toggle variant="info" size="sm">
                                             {this.state.selected_model.name}
@@ -186,7 +185,7 @@ class  ParticleVizManager extends React.Component{
                                     </Dropdown>
                                 </Col>
                             </Row>
-                            <Row className={`bg-light`} >
+                            <Row className={`bg-light mb-1`} >
                                 <Col xs={12}>
                                     {/*---------- All options from particles ------------*/}
                                     <ParticlesLayer map={this.props.map}
@@ -203,7 +202,7 @@ class  ParticleVizManager extends React.Component{
         }else {
             // --------------------- DESKTOP ---------------------------------
             return (
-                <nav className="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0">
+                <nav className="navbar navbar-expand-md navbar-light bg-light pt-0 pb-0">
                     {/* ---------- Logos ------------*/}
                     <Logos url={this.props.url}/>
                     {/* ---------- Home ------------*/}
@@ -215,59 +214,50 @@ class  ParticleVizManager extends React.Component{
                                 </a>
                             </div>
                         </span>
-                    {/*------------ Grouped icons ------------------*/}
-                    <button className="navbar-toggler" type="button" data-toggle="collapse"
-                            data-target="#collapseNavMain" aria-controls="collapseNavMain" aria-expanded="false"
-                            aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                    {/*------------ Collapsible navbar------------------*/}
-                    <div className="collapse navbar-collapse" id="collapseNavMain">
-                        {/* ---------- Particles menu ------------*/}
-                        <div className="navbar-nav">
-                            {/* ---------- All options from particles ------------*/}
-                            <ParticlesLayer map={this.props.map}
-                                            url={this.props.url}
-                                            chardin={this.state.chardin}
-                                            particle_color={this.state.particle_color}
-                                            selected_model={this.state.selected_model}/>
-                            {/* ---------- Background selection ------------*/}
-                            <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
-                                <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                        map={this.props.map}
-                                                        url={this.props.url}/>
+                    {/* ---------- Particles menu ------------*/}
+                    <div className="navbar-nav pv-navbar" >
+                        {/* ---------- All options from particles ------------*/}
+                        <ParticlesLayer map={this.props.map}
+                                        url={this.props.url}
+                                        chardin={this.state.chardin}
+                                        particle_color={this.state.particle_color}
+                                        selected_model={this.state.selected_model}/>
+                        {/* ---------- Background selection ------------*/}
+                        <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
+                            <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                    map={this.props.map}
+                                                    url={this.props.url}/>
+                        </span>
+                        {/*/!* ---------- Stats button ------------*!/*/}
+                        {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
+                        {/*        <div className="m-1 d-inline">*/}
+                        {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
+                        {/*                <Activity/>*/}
+                        {/*            </button>*/}
+                        {/*        </div>*/}
+                        {/*    </span>*/}
+                        {/* ---------- Model selection ------------*/}
+                        <span className="navbar-brand my-2" data-intro="Model Selection" data-position="bottom">
+                                <Dropdown className="mt-2 d-inline" title="Release month">
+                                <Dropdown.Toggle variant="info" size="sm">
+                                    {this.state.selected_model.name}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu onClick={this.updateSelectedModel}>
+                                    {models.map((item, index) => (
+                                        <Dropdown.Item eventKey={item.name}
+                                                       key={index}>{item.name} </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </span>
+                        {/* ---------- Help toggle ------------*/}
+                        <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
+                                <div className="m-1 d-inline">
+                                    <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
+                                        <QuestionCircle/>
+                                    </button>
+                                </div>
                             </span>
-                            {/*/!* ---------- Stats button ------------*!/*/}
-                            {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
-                            {/*        <div className="m-1 d-inline">*/}
-                            {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
-                            {/*                <Activity/>*/}
-                            {/*            </button>*/}
-                            {/*        </div>*/}
-                            {/*    </span>*/}
-                            {/* ---------- Model selection ------------*/}
-                            <span className="navbar-brand mt-2" data-intro="Model Selection" data-position="bottom">
-                                    <Dropdown className="mt-2 d-inline" title="Release month">
-                                    <Dropdown.Toggle variant="info" size="sm">
-                                        {this.state.selected_model.name}
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu onClick={this.updateSelectedModel}>
-                                        {models.map((item, index) => (
-                                            <Dropdown.Item eventKey={item.name}
-                                                           key={index}>{item.name} </Dropdown.Item>
-                                        ))}
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </span>
-                            {/* ---------- Help toggle ------------*/}
-                            <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
-                                    <div className="m-1 d-inline">
-                                        <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
-                                            <QuestionCircle/>
-                                        </button>
-                                    </div>
-                                </span>
-                        </div>
                     </div>
                 </nav>
             )

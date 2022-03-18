@@ -16,7 +16,7 @@ import {
     PlayFill, PauseFill, Slash, SquareFill,
     SkipBackwardFill, SkipForwardFill,
     SkipEndFill, SkipStartFill,
-    Brush, BrushFill
+    Brush, BrushFill, ArrowCounterclockwise, ArrowClockwise
 } from 'react-bootstrap-icons'
 
 import JSZip from "jszip"
@@ -61,7 +61,7 @@ const MODES={
     decrease:2
 }
 
-const MAX_ANIMATION_SPEED = 45
+const MAX_ANIMATION_SPEED = 30 // Frames per second
 
 
 class  ParticlesLayer extends React.Component {
@@ -70,7 +70,10 @@ class  ParticlesLayer extends React.Component {
 
         // https://github.com/d3/d3-time-format
         this.dateFormat = d3.timeFormat("%B %e, %Y ")
-        this.time_step = 0
+        this.time_step = 0  // Current time step for the file being displayed
+        this.canvasWidth = 0
+        this.canvasHeight = 0
+        this.draw_until_day = true; // Used to redraw all the positions until current time
         this.state = {
             speed_hz: 10,  // SPeed of animation
             transparency_index: 3,  // Size of particle trail
@@ -88,14 +91,12 @@ class  ParticlesLayer extends React.Component {
             shape_type: false, // true for lines, false for dots
             particle_color: this.props.particle_color,
             display_picker: false,
+            play_backward: false, // It is used to play the videos backward in time
             delta_t: -1,
             start_date: Date.now(),
             date_format: d3.timeFormat("%B %e, %Y "),
             range_time_step: 0
         }
-        this.canvasWidth = 0
-        this.canvasHeight = 0
-        this.draw_until_day = true; // Used to redraw all the positions until current time
 
         // This is repeated should go in a function
         $(".btn").attr("disabled", true)  // Enable all the buttons
@@ -135,6 +136,7 @@ class  ParticlesLayer extends React.Component {
         this.clearPreviousLoop = this.clearPreviousLoop.bind(this)
         this.nextDay = this.nextDay.bind(this)
         this.prevDay = this.prevDay.bind(this)
+        this.tooglePlayDirection= this.tooglePlayDirection.bind(this)
         this.updateDateTxt = this.updateDateTxt.bind(this)
         this.geoToCanvas = this.geoToCanvas.bind(this)
         this.changeParticleColor = this.changeParticleColor.bind(this)
@@ -457,7 +459,7 @@ class  ParticlesLayer extends React.Component {
                 }
                 $(".loading_perc").text("0 %")
                 $(".loading-div").show() // Show the loading
-            }else{ // In this case the file was loaded previously, not much to do
+            }else{ // In this case the file was loaded previously, setting time to 0
                 this.time_step= 0
                 this.setState({
                     selected_model: this.props.selected_model,
@@ -472,8 +474,7 @@ class  ParticlesLayer extends React.Component {
                 // $(".btn").attr("disabled", false)  // Enable all the buttons
                 let canvas = this.d3canvas.node()
                 if (this.state.status === STATUS.playing) {
-                    if (!_.isNull(canvas)) {
-                        // this.interval = setInterval(() => this.drawAnimationFrame(), (1.0 / this.state.speed_hz) * 1000)
+                    if (!_.isNull(canvas)) {// First time we are displaying something
                         this.time = Date.now()
                         this.interval = requestAnimationFrame( this.drawAnimationFrame )
                     }
@@ -514,12 +515,17 @@ class  ParticlesLayer extends React.Component {
             this.updateDateTxt()
             let cur_date = this.time_step
             let to_date = this.time_step
-            if (this.draw_until_day) {
-                cur_date = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 1)
+            if (this.draw_until_day) { // This is just to draw more than one day (necessary when updating the screen)
+                if(this.state.play_backward){
+                    cur_date = Math.min(this.time_step + DRAW_LAST_TIMESTEPS, this.state.total_timesteps[this.state.selected_model.id])
+                }else{
+                    cur_date = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 1)
+                }
                 this.draw_until_day = false
             }
             // Here we draw from the current date up to 'to_date'. Normally is should only be one day
-            for (; cur_date <= to_date; cur_date++) {
+            for (; this.state.play_backward? cur_date >= to_date: cur_date <= to_date;
+                   this.state.play_backward? cur_date--: cur_date++) {
                 if (cur_date === 0) {
                     // Clear the canvas if it is the first date of the animation
                     this.ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -541,6 +547,10 @@ class  ParticlesLayer extends React.Component {
             }// for
 
             if (this.state.status === STATUS.playing) {
+                // This can only happen when playing backward
+                if(cur_date === -1){
+                    cur_date = this.state.total_timesteps[this.state.selected_model.id]-1
+                }
                 this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
                 if(this.time_step % 10 === 0){ // Update the range bar every 10 timesteps
                     this.updateRange()
@@ -803,7 +813,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     increaseSpeed(e) {
-        let new_speed = this.updateValue(this.state.speed_hz, MODES.increase, 5)
+        let new_speed = this.updateValue(this.state.speed_hz, MODES.increase, 2)
         this.setState({
             speed_hz: new_speed
         })
@@ -811,7 +821,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     decreaseSpeed(e) {
-        let new_speed = this.updateValue(this.state.speed_hz, MODES.decrease, 5)
+        let new_speed = this.updateValue(this.state.speed_hz, MODES.decrease, 2)
         this.setState({
             speed_hz: new_speed
         })
@@ -902,6 +912,15 @@ class  ParticlesLayer extends React.Component {
         this.updateRange()
     }
 
+    tooglePlayDirection(e) {
+        let canvas = this.d3canvas.node()
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+        e.preventDefault()
+        this.setState({
+            play_backward: !(this.state.play_backward)
+        })
+    }
+
     /**
      * This function is used to change icon and color sizes
      * @param value
@@ -989,17 +1008,18 @@ class  ParticlesLayer extends React.Component {
     }
 
     render() {
-        if(isMobile ||  window.innerWidth <= 1200){
+        // xs < 576,  >= 576 sm, >= 768 md, >= 992 lg , >= 1200 ex
+        if(isMobile ||  window.innerWidth < 992){
         // if(true){
             return (
                 <Container fluid>
+                    {/*---- Trail size---------*/}
                     <Row>
-                        {/*---- Trail size---------*/}
-                        <Col xs={6}> <span className={"mt-1"}>Trail size</span> </Col>
-                        <Col xs={6}>
+                        <Col xs={7} > <span className={"mt-1"}>Trail size</span> </Col>
+                        <Col xs={5} >
                             <span style={{display: "inline-block", width: "25px"}}>
-                             <ArrowRight
-                                 size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
+                                <ArrowRight
+                                    size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
                             </span>
                              <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
                                      title="Decrease litter trail"
@@ -1016,10 +1036,10 @@ class  ParticlesLayer extends React.Component {
                                              </button>
                         </Col>
                     </Row>
+                    {/*---- Particle size ---------*/}
                     <Row className={"mt-1"}>
-                        {/*---- Particle size ---------*/}
-                        <Col xs={6}><span>Particle size</span></Col>
-                        <Col xs={6}>
+                        <Col xs={7} ><span>Particle size</span></Col>
+                        <Col xs={5} >
                              <span style={{display: "inline-block", width: "25px"}}>
                              <CircleFill
                                  size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
@@ -1037,10 +1057,10 @@ class  ParticlesLayer extends React.Component {
                              </button>
                         </Col>
                     </Row>
-                    <Row>
-                        {/*---- Range Current day ------------*/}
-                        <Col xs={6}><span>Select date</span></Col>
-                        <Col xs={6}>
+                    {/*---- Range Current day ------------*/}
+                    <Row >
+                        <Col xs={7} ><span>Date selection</span></Col>
+                        <Col xs={5} >
                             <span id="date_range" className="navbar-brand mt-1"
                                   data-position="bottom">
                                          <Form.Control type="range"
@@ -1055,78 +1075,79 @@ class  ParticlesLayer extends React.Component {
                             </span>
                         </Col>
                     </Row>
+                    {/*---- Particle Shape & Color ------------*/}
+                    <Row className={'mb-1'}>
+                        {/*<Col xs={7} ><span>Shape & Color</span></Col>*/}
+                        <Col xs={7} ><span>Shape</span></Col>
+                        <Col xs={5}>
+                             <button className={`btn btn-sm btn-info`}
+                                     onClick={this.changeShapeType}
+                                     disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                             {this.state.shape_type ?
+                                 <Slash size={default_size}/>
+                                 :
+                                 <SquareFill size={default_size}/>
+                             }
+                             </button>
+                            {/*{" "}*/}
+                            {/*<button className={`btn btn-sm btn-info `}*/}
+                            {/*        onClick={() => this.setState({display_picker:!this.state.display_picker})}*/}
+                            {/*        title="Color selection"*/}
+                            {/*        disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
+                            {/*     {this.state.display_picker?*/}
+                            {/*         <Brush size={default_size}/>*/}
+                            {/*         :*/}
+                            {/*         <BrushFill size={default_size}/>*/}
+                            {/*     }*/}
+                            {/*</button>*/}
+                        </Col>
+                    </Row>
                     <Row>
-                        <Col xs={5}><span>Animation controls</span></Col>
-                        <Col xs={7}>
-                            {/*---- Animation controls --------*/}
+                    {/*---- Animation controls --------*/}
+                        <Col xs={6} ><span>Animation controls</span></Col>
+                        <Col xs={6} >
                              <ButtonGroup>
                              {/*---- Decrease speed --------*/}
-                                 <OverlayTrigger
-                                     placement="bottom"
-                                     delay={{show: 1, hide: 1}}
-                                     overlay={(props) => (
-                                         <Tooltip id="tooltip_dspeed" {...props}> Decrease animation
-                                             speed </Tooltip>)}>
-                                     <button className="btn btn-info btn-sm" type="button"
-                                             onClick={this.decreaseSpeed}
-                                             disabled={this.state.speed_hz <= .6}>
-                                         {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
-                                         <SkipBackwardFill size={default_size}/>
-                                     </button>
-                                 </OverlayTrigger>
+                                 <button className={`btn btn-info btn-sm ${this.state.status !== STATUS.paused? 'd-block':'d-none'}`}
+                                         onClick={this.decreaseSpeed}
+                                         disabled={this.state.speed_hz <= .6}>
+                                     <SkipBackwardFill size={default_size}/>
+                                 </button>
                                  {/*---- Previous day --------*/}
-                                 <OverlayTrigger
-                                     placement="bottom"
-                                     delay={{show: 1, hide: 1}}
-                                     overlay={(props) => (
-                                         <Tooltip id="tooltip_pday" {...props}> Previous time
-                                             step</Tooltip>)}>
-                                     <button id="pt" className="btn btn-info btn-sm" type="button"
-                                             onClick={this.prevDay}>
-                                         <SkipStartFill size={default_size}/>
-                                     </button>
-                                 </OverlayTrigger>
+                                 <button id="pt" className={`btn btn-info btn-sm ${this.state.status === STATUS.paused? 'd-block':'d-none'}`}
+                                         onClick={this.prevDay}>
+                                     <SkipStartFill size={default_size}/>
+                                 </button>
+                                 {/*---- Play Backward--------*/}
+                                 <button id='bk' className={`btn btn-info btn-sm`} onClick={this.tooglePlayDirection}>
+                                     {this.state.play_backward?
+                                         <ArrowClockwise size={default_size}/>
+                                         :
+                                         <ArrowCounterclockwise size={default_size}/>
+                                     }
+                                 </button>
                                  {/*---- Play/Pause--------*/}
-                                 <OverlayTrigger
-                                     placement="bottom"
-                                     delay={{show: 1, hide: 1}}
-                                     overlay={(props) => (
-                                         <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
-                                     <button className="btn btn-info btn-sm"
-                                             onClick={this.playPause}>
-                                         {this.state.status === STATUS.playing ?
-                                             <PauseFill size={default_size}/> :
-                                             <PlayFill size={default_size}/>}
-                                     </button>
-                                 </OverlayTrigger>
+                                 <button className={`btn btn-info btn-sm ${this.state.play_backward ? 'pv-flipped' : ''}`}
+                                         onClick={this.playPause}>
+                                     {this.state.status === STATUS.playing ?
+                                         <PauseFill size={default_size}/> :
+                                         <PlayFill size={default_size}/>}
+                                 </button>
                                  {/*---- Next day--------*/}
-                                 <OverlayTrigger
-                                     placement="bottom"
-                                     delay={{show: 1, hide: 1}}
-                                     overlay={(props) => (
-                                         <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
-                                     <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
-                                         {/*disabled={this.state.status !== STATUS.paused}>*/}
-                                         <SkipEndFill size={default_size}/>
-                                     </button>
-                                 </OverlayTrigger>
+                                 <button id="nt" className={`btn btn-info btn-sm ${this.state.status === STATUS.paused? 'd-block':'d-none'}`}
+                                         onClick={this.nextDay}>
+                                     <SkipEndFill size={default_size}/>
+                                 </button>
                                  {/*---- Increase speed --------*/}
-                                 <OverlayTrigger
-                                     placement="bottom"
-                                     delay={{show: 1, hide: 1}}
-                                     overlay={(props) => (
-                                         <Tooltip id="tooltip_inc_speed" {...props}> Increase animation
-                                             speed</Tooltip>)}>
-                                     <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                             disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
-                                         <SkipForwardFill size={default_size}/>
-                                     </button>
-                                 </OverlayTrigger>
+                                 <button className={`btn btn-info btn-sm ${this.state.status !== STATUS.paused? 'd-block':'d-none'}`}
+                                         onClick={this.increaseSpeed}
+                                         disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                                     <SkipForwardFill size={default_size}/>
+                                 </button>
                              </ButtonGroup>
                         </Col>
                     </Row>
                 </Container>
-
             )
         }else {
             this.props.chardin.refresh()
@@ -1220,13 +1241,10 @@ class  ParticlesLayer extends React.Component {
                              <OverlayTrigger
                                  placement="bottom"
                                  delay={{show: 1, hide: 1}}
-                                 overlay={(props) => (
-                                     <Tooltip id="tooltip_dspeed" {...props}> Decrease animation
-                                         speed </Tooltip>)}>
-                         <button className="btn btn-info btn-sm" type="button"
+                                 overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip>)}>
+                         <button className={`btn btn-info btn-sm`} type="button"
                                  onClick={this.decreaseSpeed}
                                  disabled={this.state.speed_hz <= .6}>
-                         {/*disabled={(this.state.status !== STATUS.playing) || (this.state.speed_hz <= .6)}>*/}
                              <SkipBackwardFill size={default_size}/>
                          </button>
                          </OverlayTrigger>
@@ -1234,24 +1252,28 @@ class  ParticlesLayer extends React.Component {
                              <OverlayTrigger
                                  placement="bottom"
                                  delay={{show: 1, hide: 1}}
-                                 overlay={(props) => (
-                                     <Tooltip id="tooltip_pday" {...props}> Previous time
-                                         step</Tooltip>)}>
-                         <button id="pt" className="btn btn-info btn-sm" type="button"
-                                 onClick={this.prevDay}>
-                         {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                 overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip>)}>
+                         {/*<button id="pt" className={`btn btn-info btn-sm ${this.state.status === STATUS.paused? 'd-block':'d-none'}`} type="button"*/}
+                                 <button id="pt" className={`btn btn-info btn-sm`} type="button"
+                                         onClick={this.prevDay}>
                              <SkipStartFill size={default_size}/>
                          </button>
                          </OverlayTrigger>
+                         {/*---- Play Backward--------*/}
+                         <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_pflip" {...props}>
+                             {this.state.play_backward? "Play Forward": "Play Backward"} </Tooltip>)}>
+                             <button className={`btn btn-info btn-sm`} onClick={this.tooglePlayDirection}>
+                                 {this.state.play_backward?
+                                     <ArrowClockwise size={default_size}/>
+                                     :
+                                     <ArrowCounterclockwise size={default_size}/>
+                                 }
+                             </button>
+                         </OverlayTrigger>
                              {/*---- Play/Pause--------*/}
-                             <OverlayTrigger
-                                 placement="bottom"
-                                 delay={{show: 1, hide: 1}}
-                                 overlay={(props) => (
-                                     <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
-                         <button className="btn btn-info btn-sm"
+                             <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
+                         <button className={`btn btn-info btn-sm ${this.state.play_backward ? 'pv-flipped' : ''}`}
                                  onClick={this.playPause}>
-                         {/*disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>*/}
                              {this.state.status === STATUS.playing ?
                                  <PauseFill size={default_size}/> :
                                  <PlayFill size={default_size}/>}
@@ -1263,8 +1285,7 @@ class  ParticlesLayer extends React.Component {
                                  delay={{show: 1, hide: 1}}
                                  overlay={(props) => (
                                      <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
-                         <button id="nt" className="btn btn-info btn-sm" onClick={this.nextDay}>
-                         {/*disabled={this.state.status !== STATUS.paused}>*/}
+                                 <button id="nt" className={`btn btn-info btn-sm `} onClick={this.nextDay}>
                              <SkipEndFill size={default_size}/>
                          </button>
                          </OverlayTrigger>
@@ -1275,8 +1296,9 @@ class  ParticlesLayer extends React.Component {
                                  overlay={(props) => (
                                      <Tooltip id="tooltip_inc_speed" {...props}> Increase animation
                                          speed</Tooltip>)}>
-                         <button className="btn btn-info btn-sm" onClick={this.increaseSpeed}
-                                 disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                         {/*<button className={`btn btn-info btn-sm ${this.state.status === STATUS.playing? 'd-block':'d-none'}`} onClick={this.increaseSpeed}*/}
+                                 <button className={`btn btn-info btn-sm `} onClick={this.increaseSpeed}
+                                         disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
                              <SkipForwardFill size={default_size}/>
                          </button>
                          </OverlayTrigger>
