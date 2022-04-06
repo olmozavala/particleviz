@@ -49,7 +49,7 @@ class PreprocParticleViz:
         """
         timesteps_by_file = self._timesteps_by_file# How many locations to save in each file
 
-        self._config_json["advanced"]["datasets"] = {}
+        self._config_json["advanced"]["datasets"] = []
 
         print("Reading data...")
         # Iterate over all the specified models
@@ -66,10 +66,10 @@ class PreprocParticleViz:
             tot_files = tot_time_steps//timesteps_by_file + 1
 
             # Here we update the total number of files generated for this
-            self._config_json["advanced"]["datasets"][model_name] = {}
-            self._config_json["advanced"]["datasets"][model_name]["total_files"] = tot_files
-            self._config_json["advanced"]["datasets"][model_name]["name"] = model_name
-            self._config_json["advanced"]["datasets"][model_name]["file_name"] = F"{self._file_prefix}_{model_name.strip().lower()}"
+            advanced_dataset_model = {}
+            advanced_dataset_model["total_files"] = tot_files
+            advanced_dataset_model["name"] = model_name
+            advanced_dataset_model["file_name"] = F"{self._file_prefix}_{model_name.strip().lower()}"
 
             print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions, Number of files: {tot_files}) ")
 
@@ -94,7 +94,10 @@ class PreprocParticleViz:
             i_part = 0
             # We look for a time delta within the particles first couple of times.
             while delta_t == 0.0:
-                delta_t = ds['time'][i_part,1] - ds['time'][i_part,0]
+                if len(ds['time'].shape) > 1:
+                    delta_t = ds['time'][i_part,1] - ds['time'][i_part,0]
+                else:
+                    delta_t = ds['time'][1] - ds['time'][0]
                 i_part += 1
 
             # Iterate over the options to reduce the number of particles
@@ -104,9 +107,12 @@ class PreprocParticleViz:
             if 'mobile' in c_model['subsample'].keys():
                 subsample_model[1] = c_model['subsample']['mobile']
 
-            self._config_json["advanced"]["datasets"][model_name]["subsample"] = {}
-            self._config_json["advanced"]["datasets"][model_name]["subsample"]["desktop"] = subsample_model[0]
-            self._config_json["advanced"]["datasets"][model_name]["subsample"]["mobile"] = subsample_model[1]
+            advanced_dataset_model["subsample"] = {}
+            advanced_dataset_model["subsample"]["desktop"] = subsample_model[0]
+            advanced_dataset_model["subsample"]["mobile"] = subsample_model[1]
+            # Here we include the dataset into the 'advanced' settings
+            self._config_json["advanced"]["datasets"].append({model_name: advanced_dataset_model})
+
             for subsample_data in subsample_model:
 
                 final_ouput_folder = F"{self._output_folder}/{subsample_data}"
@@ -116,37 +122,42 @@ class PreprocParticleViz:
                 # Subsampled locations
                 lat = lat_all[::subsample_data, :]
                 lon = lon_all[::subsample_data, :]
-                times = times_all[::subsample_data, :]
+                if len(ds['time'].shape) > 1:
+                    times = times_all[::subsample_data, :]
+                else:
+                    times = times_all  # All particles have the same time
 
                 # ------ Fixing nans (replace nans with the last value of that particle)
                 # It only works if the nans are at the end
                 # Here it finds all the particles that finish with a nan value
-                nan_idxs = np.where(np.isnan(lat[:,-1]).data)[0]
-                HAS_NANS = False
-                if len(nan_idxs) > 0:
+                print("Searching for nans...")
+                HAS_NANS = np.isnan(lat).any().item()
+                if HAS_NANS:
                     print("Analyzing nan values ....")
-                    HAS_NANS = True
                     bit_display_array = np.ones(lat.shape, dtype=bool)
                     # Now it verifies the time of the particle
-                    first_nan = times[:,0] > times[0,:]
-                    # Identify the start time for this particle (compare vs time of first particle)
-                    start_time_idx = np.argmax(first_nan.data, axis=1)
-                    start_time_idx -= 1  # Fixing the index
-                    for idx, i in enumerate(nan_idxs):
-                        if idx % 1000 == 0:
-                            print(F"Particle {idx} of {len(nan_idxs)}")
-                        # Re-align vectors so that the times matches between all the particles
-                        if start_time_idx[i] > 0:
-                            lat[i,:] = np.roll(lat[i, :], start_time_idx[i])
-                            lon[i,:] = np.roll(lon[i, :], start_time_idx[i])
+                    if len(ds['time'].shape) > 1:
+                        nan_idxs = np.where(np.isnan(lat[:,-1]).data)[0]
+                        first_nan = times[:,0] > times[0,:]
+                        # Identify the start time for this particle (compare vs time of first particle)
+                        start_time_idx = np.argmax(first_nan.data, axis=1)
+                        start_time_idx -= 1  # Fixing the index
+                        for idx, i in enumerate(nan_idxs):
+                            if idx % 1000 == 0:
+                                print(F"Particle {idx} of {len(nan_idxs)}")
+                            # Re-align vectors so that the times matches between all the particles
+                            if start_time_idx[i] > 0:
+                                lat[i,:] = np.roll(lat[i, :], start_time_idx[i])
+                                lon[i,:] = np.roll(lon[i, :], start_time_idx[i])
 
                     bit_display_array = np.logical_not(np.isnan(lat))
 
                     print("Done!")
 
                 # TODO in our current solution, when particles do not share the same time (for example,
-                # particle 1 has times at 0 and 12 but particle 2 has times at 6 and 18, then we arbitrarly
-                # choose one of the two
+                # particle 1 has times at 0 and 12 but particle 2 has times at 6 and 18, then we arbitrary
+                # choose one of the two)
+
                 # Iterate over the number of partitioned files (how many files are we going to create)
                 for ichunk, cur_chunk in enumerate(np.arange(0, tot_time_steps, timesteps_by_file)):
                     print(F"Working with file {ichunk}...")

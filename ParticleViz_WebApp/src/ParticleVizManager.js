@@ -20,18 +20,20 @@ let models = []
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 // console.log(datasets)
-for (const [key, c_dataset] of Object.entries(datasets)) {
-    let folder = c_dataset["subsample"]["desktop"]
-    if(isMobile){
-        folder = c_dataset["subsample"]["mobile"]
+for (const c_obj of datasets) {
+    for (const [key, c_dataset] of Object.entries(c_obj)) {
+        let folder = c_dataset["subsample"]["desktop"]
+        if (isMobile) {
+            folder = c_dataset["subsample"]["mobile"]
+        }
+        models.push({
+            id: key,
+            name: capitalize(c_dataset["name"]),
+            file: `data/${folder}/${c_dataset["file_name"]}`,
+            num_files: c_dataset["total_files"],
+            time_steps: config_adv["timesteps_by_file"],
+        })
     }
-    models.push({
-        id: key,
-        name: capitalize(c_dataset["name"]),
-        file: `${folder}/${c_dataset["file_name"]}`,
-        num_files: c_dataset["total_files"],
-        time_steps : config_adv["timesteps_by_file"],
-    })
 }
 
 
