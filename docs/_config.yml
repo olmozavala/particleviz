@@ -1,16 +1,14 @@
-title: ParticleViz
 email: ozavala@coaps.fsu.edu
-description: >- # this means to ignore newlines until "baseurl:"
-  ParticleViz is an Open Source software that is used to animate
-  large number of particles inside dynamic web maps.
 
 baseurl: "/particleviz/" # the subpath of your site, e.g. /blog
 url: "https://olmozavala.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  olmozavala
 
 # Build settings
 theme: jekyll-theme-dinky
+# theme: minimal-mistakes-jekyll
+# remote_theme: pages-themes/cayman@v0.2.0
+# theme: minima
+
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
@@ -18,3 +16,39 @@ plugins:
 include:
   install.md
   ../README.md
+
+# ---------- General
+description: "Visualizing Lagrangian model outputs the easy way."
+title: ParticleViz
+
+# ---------- Cayman theme
+
+# ---------- Dinky theme
+#github_username:  olmozavala
+
+# ---------- Minimal-mistakes theme
+#minimal_mistakes_skin: "air"  # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+#name: "Olmo Zavala "
+##masthead_title: "Welcome to ParticleViz"
+#subtitle: "Version 0.1"
+#repository: "olmozavala/particleviz"
+#logo: "/logos/logo.png"
+#search: true
+
+#author:
+#  name    : "Olmo Zavala"
+#  avatar  : "image"
+#  bio     : ""
+#  location: "Tallahassee, FL"
+#  links:
+#      - label: "GitHub"
+#        icon: "fab fa-fw fa-github"
+#        url: "https://github.com/olmozavala"
+
+#sidebar:
+#  - title: "Title"
+#    image: http://placehold.it/350x250
+#    image_alt: "image"
+#    text: "Some text here."
+#  - title: "Another Title"
+#    text: "More text here."

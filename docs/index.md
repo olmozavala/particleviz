@@ -1,6 +1,9 @@
-#  <img src="logos/logo_sm.png" width="200px" style="border:none"> Welcome to ParticleViz  
-ParticleViz is an Open Source software that is used to animate
-large number of particles inside dynamic web maps.
+<img src="logos/logo_sm.png" width="200px" style="border:none"> 
+
+## Welcome to ParticleViz
+
+ParticleViz is an Open Source software that is used to
+visualize large number of particles inside dynamic web maps.
 It is designed mostly for Earth Science scientists
 that simulate different processes using Lagrangian models.
 
@@ -60,7 +63,6 @@ python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
 <img src="{{site.baseurl | prepend: site.url}}media/quickstart.gif" alt="exmample" />
 
-
 ## Advanced Configuration
 ParicleViz generates websites in two steps:
 
@@ -89,9 +91,10 @@ To run *ParticleViz* from a config file you can do it with the following options
   ParticleViz.py  preproc --config_file <config_file>
   ParticleViz.py  webapp --config_file <config_file>
 ```
-To run both steps, **Preprocessing** and **App builder**, you use the **all** command, and to run
-only one of the two you use **preproc** or **webapp** (you need to run **preproc** at least once before
-running webapp).
+To run both steps, **Preprocessing** and **App builder**, you will use the `all` command. 
+To only preprocess your data you you will use `preproc` and
+to only generate the website you will use `webapp` (you need to run `preproc` at least once before
+running **webapp**). 
 
 A configuration file example with all the possible options will be the following:
 
@@ -152,18 +155,18 @@ python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.j
 <img src="{{site.baseurl | prepend: site.url}}media/advanced.gif" alt="exmample" />
 
 
-The meaning of each attribute is the *Preprocessing* section is following:
-* ***models***. (required) A list of models to be added into the visualizationl. Each model will be available
+The meaning of each attribute in the *Preprocessing* section is the following:
+* ***models***. (required) A list of models to be added into the visualization. Each model will be available
 from a dropdown field. 
   * ***name*** (required) The name of your model, it will be the name that appears in the dropdown.
   * ***file_name*** (required) The path to the netcdf file that stores your model output.
-  * ***subsample*** (optional) It is used to indicate if we need to subsample our data for display purposes. 
-    * ***desktop*** (required) An integer value that indicates how much should we subsample the data. Ex. a
-    2 means half of the particles will be selected at random. 3 means one third, etc. 
-    * ***mobile*** (required) An integer value that indicates how much should we subsample the data
+  * ***subsample*** (optional) It is used to indicate if we need to subsample your data for display purposes. 
+    * ***desktop***  An integer value that indicates how much to subsample the data. Ex. a
+    number of 2 means only half of the particles will be visualized (randomly). A 3 means only one third, etc. 
+    * ***mobile***  An integer value that indicates how much should we subsample the data
     for mobile devices. Normally a higher or equal number than *desktop*.
 
-The meaning of each attribute is the *webapp* section is following:
+The meaning of each attribute is the *webapp* section is the following:
 * ***title***. The title being displayed on the map.
 * ***particles-color***. Default color to be used to display the particles.
 * ***data_folder***. Path where data (logos, extra layers, etc.) is stored. Default location is at `data`.
@@ -183,4 +186,23 @@ used for smaller/zoomed in regions).
   * ***name***. Name of the additional layer.
   * ***file***. Path to the additional geojson layer, relative to the ***data_folder***
   * ***color***. Color to use to display this layer. 
- 
+
+## Server Deployment
+If you want to share your visualization with the world, you will need to deploy your site on 
+a computer with a public ip address or in an existing web server. The proper way to do it is
+to build an optimized version ready for production and add it into an existing web server.
+
+Here are the most common steps to do this:
+1. Build your optimized code with `npm`. The following command will generate this build in the `build` folder. 
+```shell
+npm run-script build
+```
+
+2. Copy your build folder into you web server. For example, if you have an [Apache](https://httpd.apache.org/)
+web server at `/var/www/html`  you could copy your project to `/var/www/html/myawesomemodel`. If you don't
+know what I'm talking about ask your IT guy to help you. 
+
+
+## Intro video
+Here is a presentation made at OceanSciences meeting about ParticleViz in March 2022.
+[YouTube link](https://youtu.be/7Xk0DxRMPjQ?t=289)
