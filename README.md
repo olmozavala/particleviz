@@ -13,6 +13,8 @@ websites.
 
 **ParticleViz** currently reads NetCDF outputs from [OceanParcels](https://oceanparcels.org/).
 
+GitHub page at [https://olmozavala.github.io/particleviz/](https://olmozavala.github.io/particleviz/)
+
 ## Status
 ![GitHub Repo stars](https://img.shields.io/github/stars/olmozavala/particleviz?style=social)
 ![GitHub](https://img.shields.io/github/license/olmozavala/particleviz)
