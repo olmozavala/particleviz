@@ -12,6 +12,7 @@ import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from dateutil.parser import isoparse
+from ParticleViz_DataPreproc.PreprocConstants import ModelType
 
 def set_start_date(start_date_str, start_time, units):
     """
@@ -42,6 +43,27 @@ class PreprocParticleViz:
         self._timesteps_by_file = config_adv["timesteps_by_file"]  # How many timesteps do we want to store in each binary file
         self._file_prefix = config_adv["file_prefix"]  # Output file name to use by ParticleViz
 
+
+    def getOutputType(self, xr_ds):
+        '''
+        Identifies the type of output that is in the netcdf file. Current accepted formats are: OceanParcels and OpenDrift
+        :param xr_ds:
+        :return:
+        '''
+        attrs = list(xr_ds.attrs.keys())
+        if np.any([x.find('opendrift') != -1 for x in attrs]):
+            return ModelType.OPEN_DRIFT
+        if np.any([x.find('parcels') != -1 for x in attrs]):
+            return ModelType.OCEAN_PARCELS
+        # TODO Throw an exception
+
+    def getTotTimeStepsAndNumParticles(self, model_type, xr_ds):
+        if model_type == ModelType.OPEN_DRIFT:
+            return xr_ds.trajectory.size, xr_ds.time.size
+
+        if model_type == ModelType.OCEAN_PARCELS:
+            return xr_ds.obs.size, xr_ds.traj.size
+
     def createBinaryFileMultiple(self):
         """
         Creates binary and text files corresponding to the desired 'subsampled' number of particles
@@ -57,12 +79,13 @@ class PreprocParticleViz:
             model_name = c_model["name"]
             file_name = c_model["file_name"]
             # Reading the output from Ocean Parcles
-            nc_file = xr.open_dataset(file_name)
+            xr_ds = xr.open_dataset(file_name)
+            model_type = self.getOutputType(xr_ds)
+
             # This is only used to access time units string (TODO move everything to the NetCDF4 or Xarray library)
             ds = Dataset(file_name)
 
-            tot_time_steps = nc_file.obs.size
-            glob_num_particles = nc_file.traj.size
+            tot_time_steps, glob_num_particles = self.getTotTimeStepsAndNumParticles(model_type, xr_ds)
             tot_files = tot_time_steps//timesteps_by_file + 1
 
             # Here we update the total number of files generated for this
@@ -75,13 +98,19 @@ class PreprocParticleViz:
 
             # Print variables
             print("----- Variables Inside file ----")
-            all_vars = nc_file.variables
+            all_vars = xr_ds.variables
             for name in all_vars.keys():
                 print(name)
 
-            lat_all = all_vars['lat']
-            lon_all = all_vars['lon']
-            times_all = all_vars['time']
+            lat_all = all_vars['lat'].data
+            lon_all = all_vars['lon'].data
+            times_all = all_vars['time'].data
+
+            # Removing all values outside the 'earth' boundaries
+            lat_all[lat_all > 91] = np.nan
+            lat_all[lat_all < -91] = np.nan
+            lon_all[lon_all < -361] = np.nan
+            lon_all[lon_all > 361] = np.nan
 
             time_units_str = ds.variables['time'].units.split(" ")
             # Compute the start date from the start unit and the first timestep
@@ -131,6 +160,7 @@ class PreprocParticleViz:
                 # It only works if the nans are at the end
                 # Here it finds all the particles that finish with a nan value
                 print("Searching for nans...")
+                # Replacing some values with nans
                 HAS_NANS = np.isnan(lat).any().item()
                 if HAS_NANS:
                     print("Analyzing nan values ....")
@@ -204,7 +234,7 @@ class PreprocParticleViz:
             # Updating config file inside ParticleViz WebAapp
             with open("Current_Config.json", 'w') as f:
                 json.dump(self._config_json, f, indent=4)
-            nc_file.close()
+            xr_ds.close()
 
     def testBinaryAndHeaderFiles(self, test_file):
         """
