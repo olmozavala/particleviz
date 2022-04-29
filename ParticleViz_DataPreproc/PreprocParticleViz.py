@@ -96,11 +96,11 @@ class PreprocParticleViz:
 
             print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions, Number of files: {tot_files}) ")
 
-            # Print variables
-            print("----- Variables Inside file ----")
             all_vars = xr_ds.variables
-            for name in all_vars.keys():
-                print(name)
+            # Print variables (debugging)
+            # print("----- Variables Inside file ----")
+            # for name in all_vars.keys():
+            #     print(name)
 
             lat_all = all_vars['lat'].data
             lon_all = all_vars['lon'].data
@@ -163,25 +163,29 @@ class PreprocParticleViz:
                 # Replacing some values with nans
                 HAS_NANS = np.isnan(lat).any().item()
                 if HAS_NANS:
+                    # Here we align all the particles to have the same times. For those that start at a later time
+                    # we shift them to start at the first time, filling with nans all the previous timesteps
+                    # TODO this only works if ALL the particles 'move' with the same dt. If some particles move
+                    # at even days and other particles at odd days, then this will not work.
                     print("Analyzing nan values ....")
                     bit_display_array = np.ones(lat.shape, dtype=bool)
+
                     # Now it verifies the time of the particle
                     if len(ds['time'].shape) > 1:
-                        nan_idxs = np.where(np.isnan(lat[:,-1]).data)[0]
-                        first_nan = times[:,0] > times[0,:]
-                        # Identify the start time for this particle (compare vs time of first particle)
-                        start_time_idx = np.argmax(first_nan.data, axis=1)
-                        start_time_idx -= 1  # Fixing the index
-                        for idx, i in enumerate(nan_idxs):
-                            if idx % 1000 == 0:
-                                print(F"Particle {idx} of {len(nan_idxs)}")
-                            # Re-align vectors so that the times matches between all the particles
-                            if start_time_idx[i] > 0:
-                                lat[i,:] = np.roll(lat[i, :], start_time_idx[i])
-                                lon[i,:] = np.roll(lon[i, :], start_time_idx[i])
+                        # Identify the start time for each particle (compare vs time of first particle)
+                        try:
+                            shifted_particles = np.where(times[:,0] > times[0,0])[0]
+                            for idx, c_part in enumerate(shifted_particles): # For each particle with nans
+                                shift_amount = np.argmax(np.where(times[c_part, 0] > times[0, :])[0]) + 1
+                                if idx % 1000 == 0:
+                                    print(F"Particle {c_part} of shifting {shift_amount} timesteps")
+                                # Re-align vectors so that the times matches between all the particles
+                                lat[c_part,:] = np.roll(lat[c_part, :], shift_amount)
+                                lon[c_part,:] = np.roll(lon[c_part, :], shift_amount)
+                        except Exception as e:
+                            print("No need to shift particles")
 
                     bit_display_array = np.logical_not(np.isnan(lat))
-
                     print("Done!")
 
                 # TODO in our current solution, when particles do not share the same time (for example,

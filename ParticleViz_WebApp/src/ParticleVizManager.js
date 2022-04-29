@@ -50,7 +50,7 @@ class  ParticleVizManager extends React.Component{
             countries: {},
             selected_model: models[0],
             chardin: this.props.chardin,
-            particle_color:  config_webapp['particles-color'],
+            particle_color:  config_webapp['particles_color'],
             open_info: false
         }
     }

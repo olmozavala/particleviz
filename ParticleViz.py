@@ -64,9 +64,21 @@ if __name__ == '__main__':
         appdir = "ParticleViz_WebApp"
         # Copy correct Config.json to the src folder
         shutil.copyfile("Current_Config.json", join(basepath,appdir,"src","Config.json"))
-        if os.path.exists(join(basepath,appdir,"public","data")):
-            shutil.rmtree(join(basepath,appdir,"public","data"))
-        shutil.copytree(join(basepath,appdir,config_json["webapp"]["data_folder"]), join(basepath,appdir,"public","data"))
+        pviz_data_folder = join(basepath,appdir,"public","data")
+        if os.path.exists(pviz_data_folder):
+            shutil.rmtree(pviz_data_folder)
+
+        preproc_data_folder = join(basepath, appdir, "data")
+        print("Copying lagrangian data folder ...")
+        shutil.copytree(preproc_data_folder, pviz_data_folder)
+        print("Done!")
+        print("Copying web data folder...")
+        try:
+            web_data_folder = join(basepath, config_json["webapp"]["data_folder"])
+            shutil.copytree(web_data_folder, pviz_data_folder, dirs_exist_ok=True)
+        except Exception as e:
+            print(F"Failed to copy {web_data_folder} into ParticleViz: {e} ")
+        print("Done!")
         # Install npm dependencies if
         if not(os.path.exists(join(basepath,appdir,"node_modules"))):
             subprocess.call(f"cd {join(basepath,appdir)} && npm install", shell=True)

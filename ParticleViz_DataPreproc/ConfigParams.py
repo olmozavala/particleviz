@@ -18,13 +18,13 @@ def_config = {
     "webapp": {
         "data_folder": f"{join(parent_path, 'ParticleViz_WebApp', 'data')}",
         "title": "ParticleViz Title",
-        "particles-color": "rgba(255,105,0)",
+        "particles_color": "rgba(255,105,0)",
         "intro_image": "",
         "url": "https://olmozavala.github.io/particleviz/",
         "intro": "This is an example intro text for ParticleViz. Customize it through the config file.  ",
-        "zoom-levels": [ 0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625 ],
+        "zoom-levels": [0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625],
         "def-zoom": 1,
-        "map-extent": [ -180, -90, 180, 90 ],
+        "map-extent": [-180, -90, 180, 90],
         "map-center": [0, 0],
         "logos": [],
         "extra_layers": []
@@ -56,13 +56,20 @@ class ConfigParams:
         '''
         if isinstance(new_config, dict):  # We have a dictionary
             for key, value in new_config.items():
-                if isinstance(value, list) or isinstance(value, dict):  # In this case we are in a leave
-                    current_config[key] = cls.update_config(current_config[key], value)
-                else:
-                    current_config[key] = value
+                try:
+                    if isinstance(value, list) or isinstance(value, dict):  # In this case we are in a leave
+                        current_config[key] = cls.update_config(current_config[key], value)
+                    else:
+                        current_config[key] = value
+                except Exception as e:
+                    print(F"Failed for Key: {key}  Value:{value}")  # Just for debugging
+                    # TODO Throw exception
+
+
         else:  # We have an array or a single value
             return new_config
         return current_config
+
 
     def get_config(self):
         return self._config_json

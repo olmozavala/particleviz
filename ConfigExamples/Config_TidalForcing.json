@@ -23,7 +23,7 @@
     "webapp": {
         "data_folder": "./data",
         "title": "Surface trajectories in the A\u00e7ores Islands region",
-        "particles-color": "rgba(255,105,0)",
+        "particles_color": "rgba(255,105,0)",
         "intro_image": "",
         "url": "https://www.uu.nl/staff/LGomezNavarro/Contact",
         "intro": " Virtual surface trajectories advected with ocean velocities outputs from a twin ocean model simulation (eNATL60) without and with tidal-forcing.  Particles are released on a regular grid on the initial day of the simulation.  ",
