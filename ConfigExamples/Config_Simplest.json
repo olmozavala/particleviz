@@ -2,6 +2,6 @@
   "preprocessing": {
     "models": [{
         "name": "Dataset 1",
-        "file_name": "./ExampleData/Global_Marine_debris.nc"}]
+        "file_name": "./ExampleData/Global_Marine_Debris.nc"}]
     }
 }

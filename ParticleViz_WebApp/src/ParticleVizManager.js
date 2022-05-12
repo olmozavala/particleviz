@@ -32,6 +32,7 @@ for (const c_obj of datasets) {
             file: `data/${folder}/${c_dataset["file_name"]}`,
             num_files: c_dataset["total_files"],
             time_steps: config_adv["timesteps_by_file"],
+            color_scheme: c_dataset["color_scheme"]
         })
     }
 }

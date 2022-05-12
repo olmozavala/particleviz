@@ -144,3 +144,12 @@
     max-width: 100%;
   }
 }
+
+
+.pv-layerslist{
+  z-index: 101;
+  left:1%;
+  top:70px;
+  position: absolute;
+  background-color: #e5d7d7;
+}

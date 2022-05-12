@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from dateutil.parser import isoparse
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
+from ParticleViz_DataPreproc.ColorByParticleUtils import updateColorScheme
 
 def set_start_date(start_date_str, start_time, units):
     """
@@ -63,6 +64,9 @@ class PreprocParticleViz:
 
         if model_type == ModelType.OCEAN_PARCELS:
             return xr_ds.obs.size, xr_ds.traj.size
+
+        print("WARNING: The file type format was not identified (OceanParcels nor OpenDrift). Assuming OceanParcels type")
+        return xr_ds.obs.size, xr_ds.traj.size
 
     def createBinaryFileMultiple(self):
         """
@@ -130,11 +134,15 @@ class PreprocParticleViz:
                 i_part += 1
 
             # Iterate over the options to reduce the number of particles
-            subsample_model = [2,4]
+            subsample_model = [2, 4]  # Default values are 2 and 4
             if 'desktop' in c_model['subsample'].keys():
                 subsample_model[0] = c_model['subsample']['desktop']
             if 'mobile' in c_model['subsample'].keys():
                 subsample_model[1] = c_model['subsample']['mobile']
+            if 'color_scheme' in c_model.keys():
+                # We need to create one ending with Desktop and one ending with Mobile
+                updateColorScheme(c_model['color_scheme'], subsample_model, self._output_folder)
+                advanced_dataset_model["color_scheme"] = os.path.basename(c_model['color_scheme'])
 
             advanced_dataset_model["subsample"] = {}
             advanced_dataset_model["subsample"]["desktop"] = subsample_model[0]
@@ -142,8 +150,8 @@ class PreprocParticleViz:
             # Here we include the dataset into the 'advanced' settings
             self._config_json["advanced"]["datasets"].append({model_name: advanced_dataset_model})
 
+            # Generating the binary files for each model
             for subsample_data in subsample_model:
-
                 final_ouput_folder = F"{self._output_folder}/{subsample_data}"
                 if not(os.path.exists(final_ouput_folder)):
                     os.makedirs(final_ouput_folder)
