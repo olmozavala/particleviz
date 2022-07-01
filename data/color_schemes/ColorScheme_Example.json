@@ -1,0 +1,14 @@
+{
+    "Countries": [
+        {
+            "name": "Country 1",
+            "color": "rgba(255,0,0,0.5)",
+            "index": "0-1000"
+        },
+        {
+            "name": "Country 2",
+            "color": "rgba(0,255,0,0.5)",
+            "index": "1001-2000"
+        }
+    ]
+}

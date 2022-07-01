@@ -20,14 +20,15 @@ let models = []
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 // console.log(datasets)
+let id_dataset = 0  // This index is TIGHTLY related with the index generated at the preprocessing step to generate colrschmes files
 for (const c_obj of datasets) {
-    for (const [key, c_dataset] of Object.entries(c_obj)) {
+    for (const c_dataset of Object.values(c_obj)) {
         let folder = c_dataset["subsample"]["desktop"]
         if (isMobile) {
             folder = c_dataset["subsample"]["mobile"]
         }
         models.push({
-            id: key,
+            id: id_dataset,
             name: capitalize(c_dataset["name"]),
             file: `data/${folder}/${c_dataset["file_name"]}`,
             num_files: c_dataset["total_files"],
@@ -35,6 +36,7 @@ for (const c_obj of datasets) {
             color_scheme: c_dataset["color_scheme"]
         })
     }
+    id_dataset ++
 }
 
 
@@ -44,7 +46,7 @@ class  ParticleVizManager extends React.Component{
 
         this.updateMapLocation = this.updateMapLocation.bind(this)
         this.toggleHelp= this.toggleHelp.bind(this)
-        this.setOpen = this.setOpen.bind(this)
+        this.toogleMobileMenu = this.toogleMobileMenu.bind(this)
         this.updateSelectedModel = this.updateSelectedModel.bind(this)
 
         this.state = {
@@ -52,7 +54,7 @@ class  ParticleVizManager extends React.Component{
             selected_model: models[0],
             chardin: this.props.chardin,
             particle_color:  config_webapp['particles_color'],
-            open_info: false
+            show_menu: false
         }
     }
 
@@ -115,16 +117,16 @@ class  ParticleVizManager extends React.Component{
                 break
             }
         }
-        console.log("New model",new_selected_model)
+        // console.log("New model",new_selected_model)
         this.setState({
             selected_model: new_selected_model,
         })
         e.preventDefault()
     }
 
-    setOpen(){
+    toogleMobileMenu(){
         this.setState({
-            open_info: !this.state.open_info
+            show_menu: !this.state.show_menu
         })
     }
 
@@ -147,22 +149,22 @@ class  ParticleVizManager extends React.Component{
                                 <House/>
                             </Button>
                         </Col>
-                        {/* ---------- Info ------------*/}
+                        {/* ---------- Burger Menu ------------*/}
                         <Col xs={2} >
                             <Button
                                 className={"m-1"}
                                 size={"sm"}
                                 variant={"info"}
-                                onClick={() => this.setOpen()}
+                                onClick={() => this.toogleMobileMenu()}
                                 aria-controls="col_content"
-                                aria-expanded={this.state.open_info} >
+                                aria-expanded={this.state.show_menu} >
                                 <List />
                             </Button>
                         </Col>
                     </Row>
-                    <Collapse in={this.state.open_info} >
-                        <Container fluid id={"col_content"} className={"mt-4"}>
-                            <Row className={`bg-light p-2`} >
+                    <Collapse in={this.state.show_menu} >
+                        <Container fluid id={"col_content"} className={"mt-1"}>
+                            <Row className={`bg-light px-2 py-1`} >
                                 {/* ---------- Background selection ------------*/}
                                 <Col xs={7}> <span className={"m-1"}>Background</span> </Col>
                                 <Col xs={{span:4, offset:1}}>
@@ -171,7 +173,7 @@ class  ParticleVizManager extends React.Component{
                                                             url={this.props.url}/>
                                 </Col>
                             </Row>
-                            <Row className={`bg-light p-2`} >
+                            <Row className={`bg-light px-2 py-1`} >
                                 {/* ---------- Model selection ------------*/}
                                 <Col xs={7}> <span className={"m-1"}>Model</span> </Col>
                                 <Col xs={{span:4}}>
@@ -195,7 +197,8 @@ class  ParticleVizManager extends React.Component{
                                                     url={this.props.url}
                                                     chardin={this.state.chardin}
                                                     particle_color={this.state.particle_color}
-                                                    selected_model={this.state.selected_model}/>
+                                                    selected_model={this.state.selected_model}
+                                    />
                                 </Col>
                             </Row>
                         </Container>

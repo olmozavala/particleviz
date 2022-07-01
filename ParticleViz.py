@@ -42,7 +42,7 @@ if __name__ == '__main__':
         config_json = config_obj.get_config()
         config_file = join(os.getcwd(), "Temp.json")
         all = True  # In this case we want to do both
-    else:
+    else:  # If start from own config file we update a 'template' config file with the provided information
         if config_file == "Config.json":
             config_file = join(os.getcwd(), config_file)
         f = open(config_file)
@@ -52,17 +52,27 @@ if __name__ == '__main__':
         config_json = config_obj.update_config(def_config, config_json)  # Update with defined values
         #
     # ------------- Preprocessing steps ---------------
+    # In this case we preprocess the data and generate a Current_Config.json file
     if all or preproc:
         print("Doing preprocessing...")
         mypreproc = PreprocParticleViz(config_json)
-        mypreproc.createBinaryFileMultiple()
+        mypreproc.createBinaryFileMultiple()  # This function as part of the preprocessing generates the Current_Config.json
         print("Done!")
+    else:
+        # Here we assume that we are using a previously generated Current_Config.json file so we update it with current parameters
+        config_obj = ConfigParams()  # Get Default parameters
+        f = open("Current_Config.json")
+        current_config_json = json.load(f)
+        current_config_json = config_obj.update_config(current_config_json, config_json)  # Update with defined values
+        with open("Current_Config.json", 'w') as f:
+            json.dump(current_config_json, f, indent=4)
 
     if all or webapp:
         print("Initializing webapp...")
         basepath = dirname(abspath(__file__))
         appdir = "ParticleViz_WebApp"
         # Copy correct Config.json to the src folder
+        # TODO here we should merge the input json with the Current_config one
         shutil.copyfile("Current_Config.json", join(basepath,appdir,"src","Config.json"))
         pviz_data_folder = join(basepath,appdir,"public","data")
         if os.path.exists(pviz_data_folder):

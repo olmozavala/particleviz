@@ -32,7 +32,6 @@ def_config = {
     "advanced": {
         "timesteps_by_file": 50,
         "file_prefix": "pviz",
-        "datasets": []
     }
 }
 # The configuration file can only have up to 3 nested values so far

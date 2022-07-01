@@ -2,14 +2,16 @@
     "preprocessing": {
         "models": [
             {
-                "name": "January 2010",
+                "name": "Color by Country",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
-                "subsample": { "desktop": 2, "mobile": 4 }
+                "subsample": { "desktop": 1, "mobile": 1 },
+                "color_scheme": "./data/color_schemes/ColorSchemeWorldLitterCountries.json"
             },
             {
-                "name": "January 2010",
+                "name": "Color by MPW",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
-                "subsample": { "desktop": 6, "mobile": 8 }
+                "subsample": { "desktop": 2, "mobile": 2 },
+                "color_scheme": "./data/color_schemes/ColorSchemeWorldLitterMPW.json"
             }
         ]
     },

@@ -64,7 +64,7 @@ if (typeof extra_layers !== 'undefined'){
     // console.log(ip_address+"/"+extra_layers[0].file)
 
     for (const [, value] of Object.entries(extra_layers)) {
-        console.log("Adding layer: ", value.name)
+        console.log("Adding extra vector layer: ", value.name)
         let color = value.color
         let extra_layer = new VectorLayer({
             source: new VectorSource({

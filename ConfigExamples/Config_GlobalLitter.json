@@ -5,9 +5,10 @@
                 "name": "January 2010",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
                 "subsample": {
-                    "desktop": 2,
-                    "mobile": 4
-                }
+                    "desktop": 1,
+                    "mobile": 1
+                },
+                "color_scheme": "./data/color_schemes/ColorSchemeWorldLitter.json"
             }
         ]
     }

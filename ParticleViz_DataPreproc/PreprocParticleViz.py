@@ -125,6 +125,7 @@ class PreprocParticleViz:
             # TODO here we assume we have at least 2 particles and the delta_t is constant
             delta_t = 0.0
             i_part = 0
+            print("Analyzing times of the particles....")
             # We look for a time delta within the particles first couple of times.
             while delta_t == 0.0:
                 if len(ds['time'].shape) > 1:
@@ -141,8 +142,8 @@ class PreprocParticleViz:
                 subsample_model[1] = c_model['subsample']['mobile']
             if 'color_scheme' in c_model.keys():
                 # We need to create one ending with Desktop and one ending with Mobile
-                updateColorScheme(c_model['color_scheme'], subsample_model, self._output_folder)
-                advanced_dataset_model["color_scheme"] = os.path.basename(c_model['color_scheme'])
+                updateColorScheme(id, c_model['color_scheme'], subsample_model, self._output_folder, num_part=len(lat_all))
+                advanced_dataset_model["color_scheme"] = f"{id}_{os.path.basename(c_model['color_scheme'])}"
 
             advanced_dataset_model["subsample"] = {}
             advanced_dataset_model["subsample"]["desktop"] = subsample_model[0]
@@ -150,7 +151,8 @@ class PreprocParticleViz:
             # Here we include the dataset into the 'advanced' settings
             self._config_json["advanced"]["datasets"].append({model_name: advanced_dataset_model})
 
-            # Generating the binary files for each model
+            # Generating the binary files for the 'Desktop' and 'Mobile'
+            print("Subsampling for destkop and mobile versions..")
             for subsample_data in subsample_model:
                 final_ouput_folder = F"{self._output_folder}/{subsample_data}"
                 if not(os.path.exists(final_ouput_folder)):

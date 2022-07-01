@@ -7,8 +7,7 @@ import _ from "lodash"
 import $ from 'jquery'
 import { isMobile } from "react-device-detect"
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
-import {Container, ButtonGroup, Row, Col, Form}  from "react-bootstrap";
-// import { GithubPicker, CirclePicker, TwitterPicker } from 'react-color';
+import {Container, ButtonGroup, Row, Col, Form, Button}  from "react-bootstrap";
 import { TwitterPicker } from 'react-color';
 
 import {
@@ -16,7 +15,8 @@ import {
     PlayFill, PauseFill, Slash, SquareFill,
     SkipBackwardFill, SkipForwardFill,
     SkipEndFill, SkipStartFill,
-    Brush, BrushFill, ArrowCounterclockwise, ArrowClockwise, ListCheck
+    Brush, BrushFill, ArrowCounterclockwise, ArrowClockwise, ListCheck,
+    X, List
 } from 'react-bootstrap-icons'
 
 import JSZip from "jszip"
@@ -39,7 +39,7 @@ const TRAIL_SIZE = {
     5: .90  // Shortest trail
 }
 
-let PARTICLE_SIZES= {
+const PARTICLE_SIZES= {
     1: .5,
     2: 1,
     3: 2,
@@ -63,8 +63,6 @@ const MODES={
 
 const MAX_ANIMATION_SPEED = 30 // Frames per second
 
-
-
 class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props)
@@ -75,6 +73,7 @@ class  ParticlesLayer extends React.Component {
         this.canvasWidth = 0
         this.canvasHeight = 0
         this.draw_until_day = true // Used to redraw all the positions until current time
+        this.color_promise_status = 'none'
         this.state = {
             speed_hz: 10,  // SPeed of animation
             transparency_index: 3,  // Size of particle trail
@@ -96,8 +95,8 @@ class  ParticlesLayer extends React.Component {
             toggle_all_layers_display: true,   // Indicates if we are displaying or not all the layers
             play_backward: false, // It is used to play the videos backward in time
             delta_t: -1,
-            color_scheme_name: "default",
-            color_scheme: {'default':[]},
+            color_scheme_name: {},
+            color_scheme: {},
             start_date: Date.now(),
             date_format: d3.timeFormat("%B %e, %Y "),
             range_time_step: 0
@@ -146,6 +145,7 @@ class  ParticlesLayer extends React.Component {
         this.changeParticleColor = this.changeParticleColor.bind(this)
         this.strDeltaTimeToMiliseconds = this.strDeltaTimeToMiliseconds.bind(this)
         this.readColorScheme= this.readColorScheme.bind(this)
+        this.processNewColorScheme= this.processNewColorScheme.bind(this)
     }
 
 
@@ -250,7 +250,6 @@ class  ParticlesLayer extends React.Component {
                     let byte_idx = 0
                     let bin_mask = 0
                     let data_int = new Uint8Array(binarydata, buf_off + (num_part * tot_timesteps * 4), parseInt(Math.ceil(num_part*tot_timesteps/8)))
-                    // console.log(data_int)
                     for(let c_part=0; c_part < num_part; c_part++){
                         let c_part_display = new Array(tot_timesteps)
                         for(let c_time=0; c_time < tot_timesteps; c_time++) {
@@ -264,7 +263,6 @@ class  ParticlesLayer extends React.Component {
                 }
                 // Adding information on when to display a particle, If we need to include the array of nans
                 // Split locations by particles
-                // console.log(all_display)
                 let lats_by_part = []
                 let lons_by_part = []
                 for(let c_part=0; c_part < num_part; c_part++){
@@ -283,6 +281,37 @@ class  ParticlesLayer extends React.Component {
                 this.readUnzippedFileStepTwo(data, this.props.selected_model.file, file_number)
             })
         })
+    }
+
+    processNewColorScheme(selected_model){
+        /**
+         * Initializes the reading of a color scheme from a new model
+         */
+        if( selected_model.color_scheme !== undefined){
+            let color_scheme_url = ""
+            // These files are harcoded and are created by the Preproc module of ParticleViz
+            if(isMobile) {
+                color_scheme_url = `${this.props.url}/data/${selected_model.color_scheme.replace('.json','_Mobile.json')}`
+            }else{
+                color_scheme_url = `${this.props.url}/data/${selected_model.color_scheme.replace('.json','_Desktop.json')}`
+            }
+            console.log(color_scheme_url) // For debugging
+            console.log("Reading new color scheme for model: ", this.state.selected_model.name)
+            console.log("Color scheme:", this.state.color_scheme)
+            console.log("Color scheme name:", this.state.color_scheme_name)
+            this.color_promise_status = "pending"
+            d3.json(color_scheme_url).then((data) => this.readColorScheme(data))
+        }else{
+            this.readColorScheme({
+                "default": [
+                    {
+                        "name": "All",
+                        "color": this.state.particle_color,
+                        "index": "all"
+                    }
+                ]
+            })
+        }
     }
 
     readColorScheme(color_scheme){
@@ -304,11 +333,18 @@ class  ParticlesLayer extends React.Component {
             color_scheme[scheme_name][id]['display'] = true
             color_scheme[scheme_name][id]['id'] = id
         }
-        console.log("Color scheme:", color_scheme)
+
+        let cur_color_scheme = this.state.color_scheme
+        let cur_color_scheme_name = this.state.color_scheme_name
+        cur_color_scheme[this.state.selected_model.id] = color_scheme[scheme_name]
+        cur_color_scheme_name[this.state.selected_model.id] = scheme_name
+        console.log("New color scheme state variable: ", cur_color_scheme)
+        this.color_promise_status = "finished"
         this.setState({
-            color_scheme: color_scheme[scheme_name],
-            color_scheme_name: scheme_name
+            color_scheme: cur_color_scheme,
+            color_scheme_name: cur_color_scheme_name
         })
+        // console.log(Object.keys(color_scheme[scheme_name]).map((key) => [key, color_scheme[scheme_name][key]]))
     }
 
     /**
@@ -332,11 +368,11 @@ class  ParticlesLayer extends React.Component {
                 // console.log("Done reading and uncompressed the minimum number of files!!!!")
                 cur_state = STATUS.playing
                 $(".btn").attr("disabled", false)  // Enable all the buttons
-                // TODO is there a better place to do this? (setting the particle range of the color scheme for full range, when there is no colro scheme)
+                // TODO is there a better place to do this? (setting the particle range of the color scheme for full range, when there is no color scheme)
                 // TODO we are missing the option of specifying a list of indexes rather than a range
-                if( this.state.color_scheme_name === "default"){
+                if( this.state.color_scheme_name[this.props.selected_model.id] === "default"){
                     // The color_scheme should only have one entry in this case
-                    color_scheme[0].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
+                    color_scheme[this.props.selected_model.id].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
                 }
             }else{
                 let perc = parseInt(100 * (this.state.loaded_files / files_to_load))
@@ -363,6 +399,8 @@ class  ParticlesLayer extends React.Component {
 
             current_data[model_id][file_number] = data
             if (this.state.loaded_files >= (files_to_load - 1)) {
+                // Here we have finished loading the files we needed
+                this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
                     // Be sure we have already loaded the next file
                     if(!_.isUndefined(current_data[model_id][c_file_number+1])) {
@@ -480,7 +518,10 @@ class  ParticlesLayer extends React.Component {
         this.clearPreviousLoop()
         // Verify the update was caused by the parent component and we have updated
         // the file to read.
+
+        // In this case the data of the selected model has not been loaded
         if (this.state.selected_model !== this.props.selected_model) {
+            this.color_promise_status = "newmodel"  // It is used to avoid requesting the color squeme multiple times
             if(_.isUndefined(this.state.data[this.props.selected_model.id])){
                 $(".btn").attr("disabled", true)  // Enable all the buttons
                 // In this case is a new file, we need to reset almost everything
@@ -505,7 +546,7 @@ class  ParticlesLayer extends React.Component {
                     cur_state: STATUS.playing
                 })
             }
-        } else { // The update is within the same file
+        } else { // In this case the data for this model has already been loaded we just need to update the animation
             if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
                 $(".loading-div").show() // In this case we are still loading something
             }else{
@@ -513,16 +554,24 @@ class  ParticlesLayer extends React.Component {
                 // $(".btn").attr("disabled", false)  // Enable all the buttons
                 let canvas = this.d3canvas.node()
                 if (this.state.status === STATUS.playing) {
-                    if (!_.isNull(canvas)) {// First time we are displaying something
+                    if (!_.isNull(canvas)) {// If we have already setup the canvas (not null) then we draw
                         this.time = Date.now()
                         this.interval = requestAnimationFrame( this.drawAnimationFrame )
                     }
                 }
                 if (this.state.status === STATUS.paused) {
-                    if (!_.isNull(canvas)) {
+                    if (!_.isNull(canvas)) {// If we have already setup the canvas (not null) then we draw
                         this.drawAnimationFrame()
                     }
                 }
+            }
+        }
+
+        // Verify we need to update the color scheme
+        if(_.isUndefined(this.state.color_scheme[this.state.selected_model.id])){
+            if( this.color_promise_status !== 'pending') {
+                this.color_promise_status = "pending"
+                this.processNewColorScheme(this.props.selected_model)
             }
         }
     }
@@ -544,6 +593,7 @@ class  ParticlesLayer extends React.Component {
         })
     }
 
+
     /**
      * Draws a single frame (timestep) using D3
      */
@@ -562,7 +612,7 @@ class  ParticlesLayer extends React.Component {
                 if(this.state.play_backward){
                     cur_date = Math.min(this.time_step + DRAW_LAST_TIMESTEPS, this.state.total_timesteps[this.state.selected_model.id])
                 }else{
-                    cur_date = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 1)
+                    cur_date = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 0)
                 }
                 this.draw_until_day = false
             }
@@ -616,7 +666,7 @@ class  ParticlesLayer extends React.Component {
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
         let file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
-        let color_scheme = this.state.color_scheme
+        let color_scheme = this.state.color_scheme[model_id]
 
         let cur_date = cur_date_all_files % this.state.timesteps_per_file
 
@@ -625,7 +675,6 @@ class  ParticlesLayer extends React.Component {
             let clon = 0
             // Retreive all the information from the first available file
             let drawing_data = this.state.data[model_id][file_number][data_key]
-            let tot_part = drawing_data["lat_lon"][0].length
             let oldpos = [0, 0]
 
             let has_nans = drawing_data['disp_info'] !== undefined? true: false
@@ -721,13 +770,12 @@ class  ParticlesLayer extends React.Component {
         let model_id = this.state.selected_model.id
         let available_files = Object.keys(this.state.data[model_id])
         let file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
-        let color_scheme = this.state.color_scheme
+        let color_scheme = this.state.color_scheme[model_id]
 
         let clon = 0
         let clat = 0
         let nlon = 0
         let nlat = 0
-        let disp_part = 0
 
         let tlon = 0
         let tnlon = 0
@@ -737,7 +785,6 @@ class  ParticlesLayer extends React.Component {
         if (available_files.includes(file_number)) {
             // Retreive all the information from the first available file
             let drawing_data = this.state.data[model_id][file_number][data_key]
-            let tot_part = drawing_data["lat_lon"][0].length
             // console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
             let oldpos = [0, 0]
             let newpos = [0, 0]
@@ -849,40 +896,16 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidMount() {
-        for(let file_number in _.range(0, this.props.selected_model.num_files)){
+        let selected_model = this.props.selected_model
+        for(let file_number in _.range(0, selected_model.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
-            let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
+            let url = `${this.props.url}/${selected_model.file}_${file_number_str}.txt`
             d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
         }
-
-        // If a colorscheme is defined by the user we read it here
-        if( this.props.selected_model.color_scheme !== undefined){
-            let color_scheme_url = ""
-            // These files are harcoded and are created by the Preproc module of ParticleViz
-            if(isMobile) {
-                color_scheme_url = `${this.props.url}/data/ColorScheme_Mobile.json`
-            }else{
-                color_scheme_url = `${this.props.url}/data/ColorScheme_Desktop.json`
-            }
-            // For debugging
-            console.log(color_scheme_url)
-            d3.json(color_scheme_url).then((data) => this.readColorScheme(data))
-        }else{
-            this.readColorScheme({
-                "default": [
-                    {
-                        "name": "All",
-                        "color": this.state.particle_color,
-                        "index": "all"
-                    }
-                ]
-            })
-        }
-        console.log("Updating particles:", this.props.selected_model.file)
-        this.updateAnimation()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        // console.log("Component update")
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
@@ -1216,7 +1239,6 @@ class  ParticlesLayer extends React.Component {
                     </Row>
                     {/*---- Particle Shape & Color ------------*/}
                     <Row className={'mb-1'}>
-                        {/*<Col xs={7} ><span>Shape & Color</span></Col>*/}
                         <Col xs={7} ><span>Shape</span></Col>
                         <Col xs={5}>
                             <button className={`btn btn-sm btn-info`}
@@ -1286,6 +1308,74 @@ class  ParticlesLayer extends React.Component {
                             </ButtonGroup>
                         </Col>
                     </Row>
+                    {/*---- Layers Selection --------*/}
+                    <Row className={"mt-1"}>
+                        <Col xs={7} ><span>Layers</span></Col>
+                        <Col xs={5} >
+                            <span style={{display: "inline-block", width: "25px"}}>
+                                 <button className={`btn btn-sm btn-info d-md-none d-lg-inline mr-2`}
+                                         onClick={this.toggleLayersContainer}
+                                         title="Toogle layers dropdown"
+                                         disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                             {this.state.display_layers?
+                                 <ListCheck size={default_size}/>
+                                 :
+                                 <List size={default_size}/>
+                             }
+                             </button>
+                             </span>
+                        </Col>
+                    </Row>
+                    <div id='layers' className={`position-fixed pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
+                        <Form className="bg-light">
+                            <Row  >
+                                <Col xs={9}>
+                                    <Form.Check
+                                        type="switch"
+                                        key="all"
+                                        id="all"
+                                        label="All"
+                                        checked={this.state.toggle_all_layers_display}
+                                        onChange={this.toggleAllLayerDisplay}
+                                        className="m-2"
+                                    ></Form.Check>
+                                </Col>
+                                <Col xs={3} >
+                                    <Button variant="info"
+                                            size="sm"
+                                            onClick={this.toggleLayersContainer} title="Close layers " >
+                                        <X size={default_size}/>
+                                    </Button>
+                                </Col>
+                            </Row>
+                            {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) ?
+                                <Row  className='bg-light'>
+                                    <Col>
+                                        <ul className="pv-layerslist">
+                                            {this.state.color_scheme[this.state.selected_model.id].length ?
+                                                this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                                    <li key={c_layer.id}>
+                                                        <Form.Check
+                                                            type="switch"
+                                                            key={c_layer.id}
+                                                            id={c_layer.id}
+                                                            label={c_layer.name}
+                                                            checked={c_layer.display}
+                                                            onChange={this.toggleLayerDisplay}
+                                                            className="m-1"
+                                                        ></Form.Check>
+                                                    </li>
+                                                ))
+                                                : <span></span>
+                                            }
+                                        </ul>
+                                    </Col>
+                                </Row>
+                                :
+                                <span></span>
+                            }
+                        </Form>
+                    </div>
                 </Container>
             )
         }else {
@@ -1449,32 +1539,63 @@ class  ParticlesLayer extends React.Component {
                                      onClick={this.toggleLayersContainer}
                                      title="Toogle layers dropdown"
                                      disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                             <ListCheck size={default_size}/>
+                             {this.state.display_layers?
+                                 <ListCheck size={default_size}/>
+                                 :
+                                 <List size={default_size}/>
+                             }
                              </button>
                      </span>
-                    <Form className="position-fixed pv-layerslist my_round">
-                        <Form.Check
-                                type="checkbox"
-                                key="all"
-                                id="all"
-                                label="All"
-                                checked={this.state.toggle_all_layers_display}
-                                onChange={this.toggleAllLayerDisplay}
-                        ></Form.Check>
-                        { this.state.color_scheme.length?
-                            this.state.color_scheme.map(c_layer =>(
-                            <Form.Check
-                                type="checkbox"
-                                key={c_layer.id}
-                                id={c_layer.id}
-                                label={c_layer.name}
-                                checked={c_layer.display}
-                                onChange={this.toggleLayerDisplay}
-                            ></Form.Check>
-                            ))
-                        : <span>Single one</span>
+                    <div className={`position-fixed pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
+                        <Form className="bg-light">
+                            <Row  >
+                                <Col xs={9}>
+                                    <Form.Check
+                                        type="switch"
+                                        key="all"
+                                        id="all"
+                                        label="All"
+                                        checked={this.state.toggle_all_layers_display}
+                                        onChange={this.toggleAllLayerDisplay}
+                                        className="m-2"
+                                    ></Form.Check>
+                                </Col>
+                                <Col xs={3} >
+                                   <Button variant="info"
+                                           size="sm"
+                                           onClick={this.toggleLayersContainer} title="Close layers " >
+                                         <X size={default_size}/>
+                                    </Button>
+                                </Col>
+                            </Row>
+                            {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) ?
+                                <Row className='bg-light'>
+                                    <Col>
+                                        <ul className="pv-layerslist">
+                                            {this.state.color_scheme[this.state.selected_model.id].length ?
+                                                this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                                    <li key={c_layer.id}>
+                                                        <Form.Check
+                                                            type="switch"
+                                                            key={c_layer.id}
+                                                            id={c_layer.id}
+                                                            label={c_layer.name}
+                                                            checked={c_layer.display}
+                                                            onChange={this.toggleLayerDisplay}
+                                                            className="m-1"
+                                                        ></Form.Check>
+                                                    </li>
+                                                ))
+                                                : <span>Single one</span>
+                                            }
+                                        </ul>
+                                    </Col>
+                                </Row>
+                                :
+                                <span>Single one</span>
                             }
-                    </Form>
+                        </Form>
+                    </div >
                  </span>
             )
         }
