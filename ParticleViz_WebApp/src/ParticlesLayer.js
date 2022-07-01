@@ -1146,13 +1146,15 @@ class  ParticlesLayer extends React.Component {
         e.preventDefault()
         let disp_all_layers = !this.state.toggle_all_layers_display
 
-        let color_scheme = this.state.color_scheme
+        let all_color_schemes = this.state.color_scheme
+        let color_scheme = all_color_schemes[this.state.selected_model.id]
         for(let id=0; id < color_scheme.length; id++) {
             color_scheme[id].display = disp_all_layers
         }
 
+        all_color_schemes[this.state.selected_model.id] = color_scheme
         this.setState({
-            color_scheme: color_scheme,
+            color_scheme: all_color_schemes,
             toggle_all_layers_display: disp_all_layers
         })
     }
@@ -1161,11 +1163,14 @@ class  ParticlesLayer extends React.Component {
         e.persist()
         e.preventDefault()
         let id = parseInt(e.target.id)
-        let color_scheme = this.state.color_scheme
+
+        let all_color_schemes = this.state.color_scheme
+        let color_scheme = all_color_schemes[this.state.selected_model.id]
         color_scheme[id].display = !color_scheme[id].display
 
+        all_color_schemes[this.state.selected_model.id] = color_scheme
         this.setState({
-            color_scheme: color_scheme
+            color_scheme: all_color_schemes
         })
     }
 
