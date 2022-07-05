@@ -100,6 +100,7 @@ class PreprocParticleViz:
 
             print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions, Number of files: {tot_files}) ")
 
+            print("Verifying data boundaries...")
             all_vars = xr_ds.variables
             # Print variables (debugging)
             # print("----- Variables Inside file ----")

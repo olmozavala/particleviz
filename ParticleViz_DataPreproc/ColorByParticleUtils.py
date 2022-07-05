@@ -26,7 +26,6 @@ def updateColorScheme(model_id, json_file, subsample, output_folder, num_part):
     scheme_name = list(data.keys())[0]  # We only allow one name
     for i, cc_scheme in enumerate(data[scheme_name]): # Iterate over all the
         orig_index = cc_scheme['index']
-        # TODO CONSIDER THE CASE OF RANGES AND SEQUENCES
         if orig_index.find("-") != -1: # In this case we have a range
             orig_start = int(orig_index.split('-')[0])
             orig_end = int(orig_index.split('-')[1])
@@ -41,8 +40,8 @@ def updateColorScheme(model_id, json_file, subsample, output_folder, num_part):
             # Debug
             print(F"Old: {orig_index}, subsample:{subsample}, desktop:{desktop_index}, mobile: {mobile_index}")
         else:  # In this case we have a sequence
-            print("WARNING: When setting the color scheme with specific indexes, the "
-                  "assigned color may not be correct if you are subsampling the data!")
+            # print("WARNING: When setting the color scheme with specific indexes, the "
+            #       "assigned color may not be correct if you are subsampling the data!")
             orig_index_int = np.array([int(x) for x in orig_index.split(',')])
             desk_valid_idxs = [str(int(x/subsample[0])) for x in orig_index_int if x % subsample[0] == 0 and x < num_part]
             mob_valid_idxs = [str(int(x/subsample[1])) for x in orig_index_int if x % subsample[1] == 0 and x < num_part]
