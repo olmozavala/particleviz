@@ -1238,7 +1238,7 @@ class  ParticlesLayer extends React.Component {
                                                        min="0" max={(this.state.status === STATUS.loading ||
                                              this.state.status === STATUS.decompressing) ? 0 :
                                              this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                                       custom />
+                                                       custom="true" />
                             </span>
                         </Col>
                     </Row>
@@ -1464,7 +1464,7 @@ class  ParticlesLayer extends React.Component {
                                            min="0" max={(this.state.status === STATUS.loading ||
                                  this.state.status === STATUS.decompressing) ? 0 :
                                  this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                           custom
+                                           custom="true"
                                            disabled={this.state.status === STATUS.loading}/>
                        </span>
                      </span>
