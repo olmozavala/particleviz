@@ -901,7 +901,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log("Component update")
+        // console.log("Component update")
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
