@@ -693,26 +693,24 @@ class  ParticlesLayer extends React.Component {
                             disp_part = drawing_data["disp_info"][part_id][cur_date]
 
                             if(disp_part){
-                                if (clon !== this.state.timesteps_per_file) {
-                                    if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                        oldpos = this.geoToCanvas(clon, clat)
+                                if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                    oldpos = this.geoToCanvas(clon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                }
+                                // Draw the particles on the additional map on the east
+                                if (this.show_east_map) {
+                                    let tlon = clon + 360
+                                    if (tlon >= this.state.extent[0]) {
+                                        oldpos = this.geoToCanvas(tlon, clat)
                                         this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                     }
-                                    // Draw the particles on the additional map on the east
-                                    if (this.show_east_map) {
-                                        let tlon = clon + 360
-                                        if (tlon >= this.state.extent[0]) {
-                                            oldpos = this.geoToCanvas(tlon, clat)
-                                            this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                        }
-                                    }
-                                    // Draw the particles on the additional map on the west
-                                    if (this.show_west_map){
-                                        let tlon = clon - 360
-                                        if (tlon >= this.state.extent[0]) {
-                                            oldpos = this.geoToCanvas(tlon, clat)
-                                            this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                        }
+                                }
+                                // Draw the particles on the additional map on the west
+                                if (this.show_west_map){
+                                    let tlon = clon - 360
+                                    if (tlon >= this.state.extent[0]) {
+                                        oldpos = this.geoToCanvas(tlon, clat)
+                                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                     }
                                 }
                             }
@@ -732,26 +730,24 @@ class  ParticlesLayer extends React.Component {
                             let part_id = part_indxs[part_indxs_id]
                             let clon = drawing_data["lat_lon"][1][part_id][cur_date]
                             let clat = drawing_data["lat_lon"][0][part_id][cur_date]
-                            if (clon !== this.state.timesteps_per_file) {
-                                if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                    oldpos = this.geoToCanvas(clon, clat)
+                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                oldpos = this.geoToCanvas(clon, clat)
+                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                            }
+                            // Draw the particles on the additional map on the east
+                            if (this.show_east_map) {
+                                let tlon = clon + 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
                                     this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                 }
-                                // Draw the particles on the additional map on the east
-                                if (this.show_east_map) {
-                                    let tlon = clon + 360
-                                    if (tlon >= this.state.extent[0]) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                    }
-                                }
-                                // Draw the particles on the additional map on the west
-                                if (this.show_west_map) {
-                                    let tlon = clon - 360
-                                    if (tlon >= this.state.extent[0]) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                    }
+                            }
+                            // Draw the particles on the additional map on the west
+                            if (this.show_west_map) {
+                                let tlon = clon - 360
+                                if (tlon >= this.state.extent[0]) {
+                                    oldpos = this.geoToCanvas(tlon, clat)
+                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
                                 }
                             }
                         }
@@ -905,7 +901,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // console.log("Component update")
+        console.log("Component update")
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){

@@ -24,7 +24,7 @@ def_config = {
         "intro": "This is an example intro text for ParticleViz. Customize it through the config file.  ",
         "zoom-levels": [0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625],
         "def-zoom": 1,
-        "map-extent": [-180, -90, 180, 90],
+        "map-extent": [-360, -90, 360, 90],
         "map-center": [0, 0],
         "logos": [],
         "extra_layers": []
