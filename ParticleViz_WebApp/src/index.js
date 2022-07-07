@@ -40,6 +40,7 @@ let map_view = new View({
         resolutions: resolutions,
         zoom: config_webapp["def-zoom"],
         moveTolerance: 400,
+        multiWorld: true,
         // maxZoom: 8,
         // minZoom: 2
         // ---------- OR ----------------
