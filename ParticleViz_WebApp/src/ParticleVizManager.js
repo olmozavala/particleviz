@@ -13,14 +13,13 @@ const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
 const config_adv = config_pviz.advanced
 const datasets = config_adv["datasets"]
-
-let models = []
-// Indicates the subsampling level of the particles
-
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+let models = []
 
 // console.log(datasets)
-let id_dataset = 0  // This index is TIGHTLY related with the index generated at the preprocessing step to generate colrschmes files
+// This index is TIGHTLY related with the index generated at the preprocessing
+// step to generate the color scheme files
+let id_dataset = 0
 for (const c_obj of datasets) {
     for (const c_dataset of Object.values(c_obj)) {
         let folder = c_dataset["subsample"]["desktop"]
@@ -107,8 +106,7 @@ class  ParticleVizManager extends React.Component{
 
     updateSelectedModel(e){
         /**
-         * Selects a new monthly release
-         * @type {*[]}
+         * Select one of the available models
          */
         let new_selected_model = []
         for(let i = 0; i < models.length; i++){
