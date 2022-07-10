@@ -42,9 +42,7 @@ The simplest way to use **ParticleViz** is to run it specifying the input netcdf
 python ParticleViz.py --input_file <path_to_netcdf> 
 ```
 
-This will generate the *default* web interface and store the parameters into a configuration file, `Current_Config.json`. It can be edited to customize the interface.
-
-You need to be _patient_ the first time you run it because it will install all the Javascript dependencies (stored in the `node_modules` folder).
+This will generate the *default* web interface and store the parameters into a configuration file, `Current_Config.json`. It can be edited to customize the interface. You need to be _patient_ the first time you run it because it will install all the Javascript dependencies.
 
 Test it with the *Global_Marine_Debris.nc* example file in the *ExampleData* folder:
 
