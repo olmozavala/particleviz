@@ -372,7 +372,7 @@ class  ParticlesLayer extends React.Component {
                 // TODO we are missing the option of specifying a list of indexes rather than a range
                 if( this.state.color_scheme_name[this.props.selected_model.id] === "default"){
                     // The color_scheme should only have one entry in this case
-                    color_scheme[this.props.selected_model.id][0].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
+                    color_scheme[this.props.selected_model.id].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
                 }
             }else{
                 let perc = parseInt(100 * (this.state.loaded_files / files_to_load))
@@ -1237,8 +1237,7 @@ class  ParticlesLayer extends React.Component {
                                                        value={this.time_step}
                                                        min="0" max={(this.state.status === STATUS.loading ||
                                              this.state.status === STATUS.decompressing) ? 0 :
-                                             this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                                       custom />
+                                             this.state.total_timesteps[this.state.selected_model.id] - 2} custom />
                             </span>
                         </Col>
                     </Row>

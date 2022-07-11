@@ -93,8 +93,5 @@ if __name__ == '__main__':
         if not(os.path.exists(join(basepath,appdir,"node_modules"))):
             subprocess.call(f"cd {join(basepath,appdir)} && npm install", shell=True)
         # Initilize the server
-        if os.name == "nt": # In this case we are running with Windows
-            subprocess.call(f"cd {join(basepath,appdir)} && npm start", shell=True)
-        else:
-            subprocess.call(f"cd {join(basepath,appdir)} && npm start | cat", shell=True)
+        subprocess.call(f"cd {join(basepath,appdir)} && npm start", shell=True)
         print("Done!")

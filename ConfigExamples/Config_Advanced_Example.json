@@ -2,9 +2,10 @@
     "preprocessing": {
         "models": [
             {
-                "name": "Color by Country",
+                "_name": "Color by Country",
+                "name": "PHILI",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
-                "subsample": { "desktop": 1, "mobile": 1 },
+                "subsample": { "desktop": 1, "mobile": 9 },
                 "color_scheme": "./data/color_schemes/ColorSchemeWorldLitterCountries.json"
             },
             {
