@@ -13,6 +13,7 @@ const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
 const config_adv = config_pviz.advanced
 const datasets = config_adv["datasets"]
+const default_size = 15 // fontsize
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 let models = []
 
@@ -142,7 +143,7 @@ class  ParticleVizManager extends React.Component{
                         <Col xs={10} >
                             <Logos url={this.props.url}/>
                             {/* ---------- Home ------------*/}
-                             <Button variant="info" size={"sm"} className={"ml-auto"}
+                             <Button variant="info" size={"sm"} className={"ms-auto"}
                                      href={config_webapp['url']}>
                                 <House/>
                             </Button>
@@ -206,64 +207,62 @@ class  ParticleVizManager extends React.Component{
         }else {
             // --------------------- DESKTOP ---------------------------------
             return (
-                <nav className="navbar navbar-expand-md navbar-light bg-light pt-0 pb-0">
+            <span>
+                <nav className="navbar navbar-expand-md navbar-light bg-light justify-content-center">
                     {/* ---------- Logos ------------*/}
-                    <Logos url={this.props.url}/>
+                    <span className="navbar-brand align-middle">
+                        <Logos url={this.props.url}/>
+                    </span>
                     {/* ---------- Home ------------*/}
-                    <span className="m-2" data-intro="Main site" data-position="bottom">
-                            <div className="m-1 d-inline">
-                                <a title="Home" className="btn  btn-info btn-sm"
-                                   href={config_webapp['url']}>
-                                    <House/>
-                                </a>
-                            </div>
-                        </span>
+                    <span className="navbar-brand align-middle" data-intro="Doc">
+                        <a title="Home" className="btn btn-info btn-sm" href={config_webapp['url']} role="button">
+                            <House size="14px"/>
+                        </a>
+                    </span>
                     {/* ---------- Particles menu ------------*/}
-                    <div className="navbar-nav pv-navbar" >
-                        {/* ---------- All options from particles ------------*/}
+                    {/* ---------- All options from particles ------------*/}
+                    <span className="navbar-brand align-middle"> {/* data-intro="Particles" */}
                         <ParticlesLayer map={this.props.map}
                                         url={this.props.url}
                                         chardin={this.state.chardin}
                                         particle_color={this.state.particle_color}
                                         selected_model={this.state.selected_model}/>
-                        {/* ---------- Background selection ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
-                            <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                    map={this.props.map}
-                                                    url={this.props.url}/>
-                        </span>
-                        {/*/!* ---------- Stats button ------------*!/*/}
-                        {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
-                        {/*        <div className="m-1 d-inline">*/}
-                        {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
-                        {/*                <Activity/>*/}
-                        {/*            </button>*/}
-                        {/*        </div>*/}
-                        {/*    </span>*/}
-                        {/* ---------- Model selection ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Model Selection" data-position="bottom">
-                                <Dropdown className="mt-2 d-inline" title="Release month">
-                                <Dropdown.Toggle variant="info" size="sm">
-                                    {this.state.selected_model.name}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu onClick={this.updateSelectedModel}>
-                                    {models.map((item, index) => (
-                                        <Dropdown.Item eventKey={item.name}
-                                                       key={index}>{item.name} </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </span>
+                    </span>
+                    {/* ---------- Background selection ------------*/}
+                    <span className="navbar-brand align-middle" data-intro="Map Style">
+                        <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                map={this.props.map}
+                                                url={this.props.url}/>
+                    </span>
+                    {/*/!* ---------- Stats button ------------*!/*/}
+                    {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
+                    {/*        <div className="m-1 d-inline">*/}
+                    {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
+                    {/*                <Activity/>*/}
+                    {/*            </button>*/}
+                    {/*        </div>*/}
+                    {/*    </span>*/}
+                    {/* ---------- Model selection ------------*/}
+                    <span className="navbar-brand align-middle" data-intro="Model Selection">
+                        <Dropdown className="d-inline me-1" title="Release month">
+                            <Dropdown.Toggle variant="info" size="sm">
+                                {this.state.selected_model.name}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu onClick={this.updateSelectedModel}>
+                                {models.map((item, index) => (
+                                    <Dropdown.Item eventKey={item.name}
+                                                   key={index}>{item.name}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                         {/* ---------- Help toggle ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
-                                <div className="m-1 d-inline">
-                                    <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
-                                        <QuestionCircle/>
-                                    </button>
-                                </div>
-                            </span>
-                    </div>
+                        <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
+                            <QuestionCircle size={default_size}/>
+                        </button>
+                    </span>
                 </nav>
+            </span>
             )
         }
     }

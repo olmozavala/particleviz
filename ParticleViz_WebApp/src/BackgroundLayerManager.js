@@ -134,17 +134,14 @@ class  BackgroundLayerManager extends React.Component{
     render(){
         return (
             <span>
-                <Dropdown className="d-inline" title="Switch background">
-                    <DropdownToggle variant="light">
+                <Dropdown title="Switch background">
+                    <DropdownToggle variant="light" size="sm" className="p-0">
                         <FontAwesomeIcon icon={faMap}/>
                     </DropdownToggle>
                     <DropdownMenu>
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
                             <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
                         </DropdownItem>
-                        {/*<DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.un} >*/}
-                        {/*    <img src={img_map_un} className="rounded" width="100px"  alt="UN"/>*/}
-                        {/*</DropdownItem>*/}
                         <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
                             <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
                         </DropdownItem>

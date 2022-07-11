@@ -1219,15 +1219,16 @@ class  ParticlesLayer extends React.Component {
                         <Col xs={5} >
                             <span id="date_range" className="navbar-brand mt-1"
                                   data-position="bottom">
-                                         <Form.Control type="range"
-                                                       className="range-ml"
-                                                       title="Date selection"
-                                                       onChange={this.changeDayRange}
-                                                       value={this.time_step}
-                                                       min="0" max={(this.state.status === STATUS.loading ||
-                                             this.state.status === STATUS.decompressing) ? 0 :
-                                             this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                                       custom="true" />
+                                         <input type="range"
+                                                className="range-ml"
+                                                title="Date selection"
+                                                onChange={this.changeDayRange}
+                                                value={this.time_step}
+                                                min="0" max={(this.state.status === STATUS.loading ||
+                                                this.state.status === STATUS.decompressing) ? 0 :
+                                                this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                                custom="true"
+                                         />
                             </span>
                         </Col>
                     </Row>
@@ -1303,7 +1304,7 @@ class  ParticlesLayer extends React.Component {
                         </Col>
                     </Row>
                     {/*---- Layers Selection --------*/}
-                    <Row className={"mt-1"}>
+                    <Row>
                         <Col xs={7} ><span>Layers</span></Col>
                         <Col xs={5} >
                             <span style={{display: "inline-block", width: "25px"}}>
@@ -1320,7 +1321,7 @@ class  ParticlesLayer extends React.Component {
                              </span>
                         </Col>
                     </Row>
-                    <div id='layers' className={`position-fixed pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
+                    <div id='layers' className={`pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
                         <Form className="bg-light">
                             <Row  >
                                 <Col xs={9}>
@@ -1375,174 +1376,180 @@ class  ParticlesLayer extends React.Component {
         }else {
             this.props.chardin.refresh()
             return (
-                <span className="mt-1">
-                     {/*---- Size of Streamline ---------*/}
-                    <span className="navbar-brand col-auto viz-control" data-intro={"Path length"} data-position={"bottom"}>
-                                         <span style={{display: "inline-block", width: "25px"}}>
-                                         <ArrowRight
-                                             size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
-                                         </span>
-                                         <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
-                                                 title="Decrease litter trail"
-                                                 disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
-                                                     this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                         <Dash size={default_size}/>
-                                         </button>
-                        {" "}
-                        <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
-                                title="Increase litter trail"
-                                disabled={this.state.transparency_index === 1 ||
-                                    this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                         <Plus size={default_size}/>
-                                         </button>
-                                         </span>
+                <span>
+                    {/*---- Size of Streamline ---------*/}
+                    <span className="text-center" data-intro={"Path length"}>
+                        <span className="me-1" style={{display: "inline-block", width: "25px"}}>
+                            <ArrowRight
+                                size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}
+                            />
+                        </span>
+                        <button className="btn btn-sm btn-info me-1" onClick={this.increaseTransparency}
+                            title="Decrease litter trail"
+                            disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
+                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            <Dash size={default_size}/>
+                        </button>
+                        <button className="btn btn-sm btn-info me-1" onClick={this.decreaseTransparency}
+                            title="Increase litter trail"
+                            disabled={this.state.transparency_index === 1 ||
+                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            <Plus size={default_size}/>
+                        </button>
+                    </span>
+
                     {/*---- Particle size ---------*/}
-                    <span className="navbar-brand col-auto viz-control" data-intro={"Particle size"} data-position={"bottom"}>
-                                         <span style={{display: "inline-block", width: "25px"}}>
-                                         <CircleFill
-                                             size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}/>
-                                         </span>
-                                         <button className="btn btn-info btn-sm" onClick={this.decreaseSize}
-                                                 title="Decrease litter size"
-                                                 disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                         <Dash size={default_size}/>
-                                         </button>
-                        {" "}
-                        <button className="btn btn-info btn-sm" onClick={this.increaseSize}
-                                title="Increase litter size"
-                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                         <Plus size={default_size}/>
-                                         </button>
-                                         </span>
+                    <span className="text-center" data-intro={"Size"}>
+                        <span className="me-1" style={{display: "inline-block", width: "25px"}}>
+                            <CircleFill
+                                size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}
+                            />
+                        </span>
+                        <button className="btn btn-sm btn-info me-1" onClick={this.decreaseSize}
+                             title="Decrease litter size"
+                             disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            <Dash size={default_size}/>
+                        </button>
+                        <button className="btn btn-sm btn-info me-1" onClick={this.increaseSize}
+                            title="Increase litter size"
+                            disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            <Plus size={default_size}/>
+                        </button>
+                    </span>
+
                     {/*---- Particle Shape & Color ------------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Particle shape & color"} data-position={"bottom"}>
-                             <button className={`btn btn-sm btn-info d-md-none d-lg-inline mr-2`}
-                                     onClick={this.toggleShapeType}
-                                     title="Shape selection"
-                                     disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                             {this.state.shape_type ?
-                                 <Slash size={default_size}/>
-                                 :
-                                 <SquareFill size={default_size}/>
-                             }
-                             </button>
-                            <button className={`btn btn-sm btn-info d-md-none d-lg-inline `}
-                                    onClick={() => this.setState({display_picker:!this.state.display_picker})}
-                                    title="Color selection"
-                                    disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                 {this.state.display_picker?
-                                     <Brush size={default_size}/>
-                                     :
-                                     <BrushFill size={default_size}/>
-                                 }
-                            </button>
+                    <span data-intro={"Shape & color"}>
+                        <button className={`btn btn-sm btn-info me-1`}
+                            onClick={this.toggleShapeType}
+                            title="Shape selection"
+                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            {this.state.shape_type ?
+                                <Slash size={default_size}/> : <SquareFill size={default_size}/>
+                            }
+                        </button>
+                        <button className={`btn btn-sm btn-info`}
+                            onClick={() => this.setState({display_picker:!this.state.display_picker})}
+                            title="Color selection"
+                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            {this.state.display_picker?
+                                <Brush size={default_size}/> : <BrushFill size={default_size}/>
+                            }
+                        </button>
                     </span>
-                    <span className="position-fixed pv-pcolor">
-                        <TwitterPicker className="position-fixed"
-                                       color={this.state.particle_color}
-                                       onChange={this.changeParticleColor}
-                                       triangle="hide" />
+                    <span className="pv-pcolor">
+                        <TwitterPicker
+                           color={this.state.particle_color}
+                           onChange={this.changeParticleColor}
+                           triangle="hide"
+                        />
                     </span>
+
                     {/*---- Range Current day ------------*/}
-                    <span id="date_range" className="navbar-brand m-1 range-ml" data-intro="Time selection" data-position="bottom">
-                        <span className={"mt-5"}>
-                             <Form.Control type="range"
-                                           title="Date selection"
-                                           onChange={this.changeDayRange}
-                                           value={this.time_step}
-                                           min="0" max={(this.state.status === STATUS.loading ||
-                                 this.state.status === STATUS.decompressing) ? 0 :
-                                 this.state.total_timesteps[this.state.selected_model.id] - 2}
-                                           custom="true"
-                                           disabled={this.state.status === STATUS.loading}/>
-                       </span>
-                     </span>
-                    {/*---- Animation controls --------*/}
-                    <span className="navbar-brand col-auto anim-controls" data-intro="Animation controls" data-position="bottom">
-                         <ButtonGroup>
-                         {/*---- Decrease speed --------*/}
-                             <OverlayTrigger
-                                 placement="bottom"
-                                 delay={{show: 1, hide: 1}}
-                                 overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip>)}>
-                         <button className={`btn btn-info btn-sm`} type="button"
-                                 onClick={this.decreaseSpeed}
-                                 disabled={this.state.speed_hz <= .6}>
-                             <SkipBackwardFill size={default_size}/>
-                         </button>
-                         </OverlayTrigger>
-                             {/*---- Previous day --------*/}
-                             <OverlayTrigger
-                                 placement="bottom"
-                                 delay={{show: 1, hide: 1}}
-                                 overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip>)}>
-                         {/*<button id="pt" className={`btn btn-info btn-sm ${this.state.status === STATUS.paused? 'd-block':'d-none'}`} type="button"*/}
-                                 <button id="pt" className={`btn btn-info btn-sm`} type="button"
-                                         onClick={this.prevDay}>
-                             <SkipStartFill size={default_size}/>
-                         </button>
-                         </OverlayTrigger>
-                             {/*---- Play Backward--------*/}
-                             <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_pflip" {...props}>
-                                 {this.state.play_backward? "Play Forward": "Play Backward"} </Tooltip>)}>
-                             <button className={`btn btn-info btn-sm`} onClick={this.togglePlayDirection}>
-                                 {this.state.play_backward?
-                                     <ArrowClockwise size={default_size}/>
-                                     :
-                                     <ArrowCounterclockwise size={default_size}/>
-                                 }
-                             </button>
-                         </OverlayTrigger>
-                             {/*---- Play/Pause--------*/}
-                             <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
-                         <button className={`btn btn-info btn-sm ${this.state.play_backward ? 'pv-flipped' : ''}`}
-                                 onClick={this.playPause}>
-                             {this.state.status === STATUS.playing ?
-                                 <PauseFill size={default_size}/> :
-                                 <PlayFill size={default_size}/>}
-                         </button>
-                         </OverlayTrigger>
-                             {/*---- Next day--------*/}
-                             <OverlayTrigger
-                                 placement="bottom"
-                                 delay={{show: 1, hide: 1}}
-                                 overlay={(props) => (
-                                     <Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
-                                 <button id="nt" className={`btn btn-info btn-sm `} onClick={this.nextDay}>
-                             <SkipEndFill size={default_size}/>
-                         </button>
-                         </OverlayTrigger>
-                             {/*---- Increase speed --------*/}
-                             <OverlayTrigger
-                                 placement="bottom"
-                                 delay={{show: 1, hide: 1}}
-                                 overlay={(props) => (
-                                     <Tooltip id="tooltip_inc_speed" {...props}> Increase animation
-                                         speed</Tooltip>)}>
-                         {/*<button className={`btn btn-info btn-sm ${this.state.status === STATUS.playing? 'd-block':'d-none'}`} onClick={this.increaseSpeed}*/}
-                                 <button className={`btn btn-info btn-sm `} onClick={this.increaseSpeed}
-                                         disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
-                             <SkipForwardFill size={default_size}/>
-                         </button>
-                         </OverlayTrigger>
-                         </ButtonGroup>
+                    <span id="date_range" className="ms-2 me-2" data-intro="Time selection">
+                        <input type="range"
+                            title="Date selection"
+                            onChange={this.changeDayRange}
+                            value={this.time_step}
+                            min="0" max={(this.state.status === STATUS.loading ||
+                            this.state.status === STATUS.decompressing) ? 0 :
+                            this.state.total_timesteps[this.state.selected_model.id] - 2}
+                            custom="true" disabled={this.state.status === STATUS.loading}
+                        />
                     </span>
+
+                    {/*---- Animation controls --------*/}
+                    <span data-intro="Animation controls">
+                        <ButtonGroup>
+                            {/*---- Decrease speed --------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip>)}>
+                                <button className={`btn btn-info btn-sm`} type="button"
+                                    onClick={this.decreaseSpeed}
+                                    disabled={this.state.speed_hz <= .6}>
+                                    <SkipBackwardFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
+
+                            {/*---- Previous day --------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => ( <Tooltip id="tooltip_pday" {...props}> Previous time step</Tooltip>)}>
+                                <button className={`btn btn-info btn-sm`} type="button"
+                                    onClick={this.prevDay}>
+                                    <SkipStartFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
+
+                            {/*---- Play Backward--------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => ( <Tooltip id="tooltip_pflip" {...props}> {this.state.play_backward? "Play Forward": "Play Backward"} </Tooltip>)}>
+                                <button className={`btn btn-info btn-sm`} type="button"
+                                    onClick={this.togglePlayDirection} >
+                                    {this.state.play_backward?
+                                        <ArrowClockwise size={default_size}/> : <ArrowCounterclockwise size={default_size}/>
+                                    }
+                                </button>
+                            </OverlayTrigger>
+
+                            {/*---- Play/Pause--------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => ( <Tooltip id="tooltip_ppause" {...props}> Play/Pause </Tooltip>)}>
+                                <button className={`btn btn-info btn-sm ${this.state.play_backward ? 'pv-flipped' : ''}`}
+                                    onClick={this.playPause}>
+                                    {this.state.status === STATUS.playing ?
+                                    <PauseFill size={default_size}/> :
+                                    <PlayFill size={default_size}/>}
+                                </button>
+                            </OverlayTrigger>
+
+                            {/*---- Next day--------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => (<Tooltip id="tooltip_nday" {...props}> Next time step </Tooltip>)}>
+                                <button
+                                    className={`btn btn-info btn-sm `}
+                                    onClick={this.nextDay}>
+                                    <SkipEndFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
+
+                            {/*---- Increase speed --------*/}
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{show: 1, hide: 1}}
+                                overlay={(props) => (<Tooltip id="tooltip_inc_speed" {...props}> Increase animation speed</Tooltip>)}>
+                                {/*<button className={`btn btn-info btn-sm ${this.state.status === STATUS.playing? 'd-block':'d-none'}`} onClick={this.increaseSpeed}*/}
+                                <button
+                                    className={`btn btn-info btn-sm me-1`} onClick={this.increaseSpeed}
+                                    disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
+                                    <SkipForwardFill size={default_size}/>
+                                </button>
+                            </OverlayTrigger>
+                        </ButtonGroup>
+                    </span>
+
                     {/*---- Layers Selection --------*/}
-                    <span className="navbar-brand col-auto" data-intro={"Layers"} data-position={"bottom"}>
-                             <button className={`btn btn-sm btn-info d-md-none d-lg-inline mr-2`}
-                                     onClick={this.toggleLayersContainer}
-                                     title="Toogle layers dropdown"
-                                     disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                             {this.state.display_layers?
-                                 <ListCheck size={default_size}/>
-                                 :
-                                 <List size={default_size}/>
-                             }
-                             </button>
-                     </span>
-                    <div className={`position-fixed pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
+                    <span data-intro={"Layers"}>
+                        <button className={`btn btn-sm btn-info`}
+                            onClick={this.toggleLayersContainer}
+                            title="Toogle layers dropdown"
+                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                            {this.state.display_layers?
+                                <ListCheck size={default_size}/> : <List size={default_size}/>
+                            }
+                        </button>
+                    </span>
+                    <div className={`pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
                         <Form className="bg-light">
-                            <Row  >
+                            <Row>
                                 <Col xs={9}>
                                     <Form.Check
                                         type="switch"
@@ -1551,10 +1558,9 @@ class  ParticlesLayer extends React.Component {
                                         label="All"
                                         checked={this.state.toggle_all_layers_display}
                                         onChange={this.toggleAllLayerDisplay}
-                                        className="m-2"
                                     ></Form.Check>
                                 </Col>
-                                <Col xs={3} >
+                                <Col xs={3}>
                                    <Button variant="info"
                                            size="sm"
                                            onClick={this.toggleLayersContainer} title="Close layers " >
@@ -1576,7 +1582,6 @@ class  ParticlesLayer extends React.Component {
                                                             label={c_layer.name}
                                                             checked={c_layer.display}
                                                             onChange={this.toggleLayerDisplay}
-                                                            className="m-1"
                                                         ></Form.Check>
                                                     </li>
                                                 ))
@@ -1589,8 +1594,8 @@ class  ParticlesLayer extends React.Component {
                                 <span>Single one</span>
                             }
                         </Form>
-                    </div >
-                 </span>
+                    </div>
+                </span>
             )
         }
     }

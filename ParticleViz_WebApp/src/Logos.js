@@ -19,15 +19,15 @@ function RenderLogos(props){
     return (
         // list of logos
         <>
-            <a className="navbar-brand" href="https://olmozavala.github.io/particleviz/">
-                <img src={pviz_logo} className="rounded" width="30px" alt="ParticleViz"/>
+            <a className="m-2" href="https://olmozavala.github.io/particleviz/">
+                <img src={pviz_logo} className="rounded" width="45px" alt="ParticleViz"/>
             </a>
-            <a className="navbar-brand" href="https://www.coaps.fsu.edu/">
+            <a className="m-2" href="https://www.coaps.fsu.edu/">
                 <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
             </a>
             {logos.map(d => (
-              <a className="navbar-brand" href={d['url']} key={d['key']}>
-                <img src={props.url+"/data/"+d['img']} className="rounded" height="30px" alt=""/>
+              <a className="m-2" href={d['url']} key={d['key']}>
+                <img src={props.url+"/data/"+d['img']} className="rounded" height="30px" alt="extraLogo"/>
               </a>
             ))}
         </>
@@ -42,7 +42,9 @@ class Logos extends React.Component {
             )
         }else{
             return(
-                <div data-intro="Logos" data-position="bottom" className="logos"> <RenderLogos url={this.props.url}/> </div>
+                <div data-intro="Logos" className="logos">
+                    <RenderLogos url={this.props.url}/>
+                </div>
             )
         }
     }

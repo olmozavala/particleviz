@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './css/index.css';
 import './css/chardinjs.css'
 import ParticleVizManager from './ParticleVizManager';
@@ -92,13 +92,12 @@ var intro_chardin = new chardinJs("body")
 function PageSummary(){
     return (
         <div className="row p-0 m-0">
-            <div className="col-xs-6 col-sm-4 col-md-3 col-lg-3  offset-sm-4 offset-md-4 offset-lg-4">
-                <div id="intro_text" className=" mt-3" >
-                    <Card style={{ width: '100%' }}>
+            <div className="col-xs-6 col-sm-4 col-md-3 col-lg-3 offset-sm-4 offset-md-4 offset-lg-4">
+                <div id="intro_text">
+                    <Card style={{ width: '50%' }}>
                         {config_webapp['intro_image'] === ""?
                             <Card.Img variant="top" src={intro_image}/>
                             :
-
                             <Card.Img variant="top" src={ip_address+"/data/"+config_webapp['intro_image']}/>
                         }
                         <Card.Body>
@@ -106,19 +105,17 @@ function PageSummary(){
                             <Card.Text  style={{ textAlign: 'justify' }} className="">
                                 {config_webapp['intro']}
                                 Click
-                                <button title="Continue" className="m-1 btn btn-info btn-sm" onClick={() =>  {
+                                <button title="Continue" className="btn btn-info btn-sm m-1" onClick={() =>  {
                                     intro_chardin.stop()}
                                 }>
                                     <Check/>
                                 </button>
-                                to continue and please wait for the site to load.
-                                For more information go to
-                                <a title="Home" className="btn ml-2 btn-info btn-sm"
-                                   href={config_webapp['url']}>
+                                to continue and please wait for the site to load. For more information go to
+                                <a title="Home" className="btn btn-info btn-sm ms-1" href={config_webapp['url']}>
                                     <House/>
                                 </a>.
                             </Card.Text>
-                            <div className="h5 col-12 text-center loading-div" >
+                            <div className="col-12 text-center loading-div" >
                                 <Spinner animation="border" variant="info"/>
                                 {" "} Loading ... <span className="loading_perc"> </span>
                             </div>
@@ -129,30 +126,33 @@ function PageSummary(){
         </div>)
 }
 
-ReactDOM.render(<span>
-                    <ParticleVizManager map={map} background_layer={background_layer} url={ip_address} chardin={intro_chardin}/>
-                    <div className="container-fluid pv-title">
-                        <div className="row p-0 m-0">
-                            <div className="col-12 text-center">
-                               <div id="main-title" className="display-4 mt-3"> {config_webapp['title']} </div>
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
+    <span>
+        <ParticleVizManager map={map} background_layer={background_layer} url={ip_address} chardin={intro_chardin}/>
+        <div className="container-fluid pv-title">
+            <div className="row p-0 m-0">
+                <div className="col-12 text-center">
+                   <div id="main-title" className="display-4 mt-3"> {config_webapp['title']} </div>
 
-                            </div>
-                        </div>
-                        <div className="row p-0 m-0">
-                            <div className="col-12 text-center">
-                               <div id="dates-title" className="h4 mt-3"></div>
-                            </div>
-                        </div>
-                        <div className="row p-0 m-0">
-                            <div className="h5 col-12 text-center loading-div" >
-                               <Spinner animation="border" variant="info"/>
-                                {" "} Loading ... <span className="loading_perc"> </span>
-                           </div>
-                        </div>
-                    </div>
-                    <PageSummary/>
-                </span>,
-    document.getElementById('root'));
+                </div>
+            </div>
+            <div className="row p-0 m-0">
+                <div className="col-12 text-center">
+                   <div id="dates-title" className="h4 mt-3"></div>
+                </div>
+            </div>
+            <div className="row p-0 m-0">
+                <div className="h5 col-12 text-center loading-div" >
+                   <Spinner animation="border" variant="info"/>
+                    {" "} Loading ... <span className="loading_perc"> </span>
+               </div>
+            </div>
+        </div>
+        <PageSummary/>
+    </span>
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
