@@ -23,14 +23,12 @@ import {GeoJSON} from "ol/format";
 import {Stroke, Style} from "ol/style";
 
 const config_pviz = require("./Config.json")
-
 const config_webapp = config_pviz.webapp
-
 const ip_address = window.location.href
 const resolutions = config_webapp["zoom-levels"]
 const extra_layers = config_webapp["extra_layers"]
 
-// /FORMAT=image/png&HEIGHT=256&WIDTH=256&BBOX=-180.000005437,-89.900001526,180.0,83.627418516
+// create layers for the app
 let background_layer = new TileLayer({ source: new OSM() });
 
 let map_view = new View({
@@ -50,10 +48,7 @@ let map_view = new View({
         // minZoom: 2
     })
 
-
-let ol_controls = []
-
-// let color= "rgb(134,229,56)"
+const ol_controls = []  // remove zoom and pan buttons
 let map = new Map({
     layers: [background_layer],
     target: 'map',
@@ -65,7 +60,7 @@ if (typeof extra_layers !== 'undefined'){
     // console.log(ip_address+"/"+extra_layers[0].file)
 
     for (const [, value] of Object.entries(extra_layers)) {
-        console.log("Adding extra vector layer: ", value.name)
+        // console.log("Adding extra vector layer: ", value.name)
         let color = value.color
         let extra_layer = new VectorLayer({
             source: new VectorSource({

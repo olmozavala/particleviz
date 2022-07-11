@@ -6,10 +6,9 @@ import {Fill, Stroke, Style, Text} from "ol/style";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import './css/App.css';
-
 require('ol/ol.css');
 
-let country_color = `rgba(212, 212, 213, 0.1)`;
+const country_color = `rgba(212, 212, 213, 0.1)`;
 
 class  StatesLayer extends React.Component{
     constructor(props){

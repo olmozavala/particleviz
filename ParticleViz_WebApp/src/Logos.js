@@ -7,7 +7,6 @@ import './css/App.css'
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
 
-
 let logos = []
 if(typeof config_webapp["logos"] !== "undefined") {
     logos = config_webapp["logos"]
@@ -18,7 +17,7 @@ if(typeof config_webapp["logos"] !== "undefined") {
 
 function RenderLogos(props){
     return (
-        /*------------ Logos ------------------*/
+        // list of logos
         <>
             <a className="navbar-brand" href="https://olmozavala.github.io/particleviz/">
                 <img src={pviz_logo} className="rounded" width="30px" alt="ParticleViz"/>
@@ -27,16 +26,16 @@ function RenderLogos(props){
                 <img src={coaps_logo} className="rounded" width="30px" height="30px" alt="COAPS"/>
             </a>
             {logos.map(d => (
-
-                <a className="navbar-brand" href={d['url']} key={d['key']}>
-                    <img src={props.url+"/data/"+d['img']} className="rounded" height="30px" alt=""/>
-                </a> ))}
+              <a className="navbar-brand" href={d['url']} key={d['key']}>
+                <img src={props.url+"/data/"+d['img']} className="rounded" height="30px" alt=""/>
+              </a>
+            ))}
         </>
     )
 }
-class  Logos extends React.Component {
+
+class Logos extends React.Component {
     render() {
-        // if(isMobile ||  window.innerWidth <= 1200) {
         if(isMobile ||  window.innerWidth <= 1200) {
             return(
                 <> <RenderLogos url={this.props.url}/> </>
