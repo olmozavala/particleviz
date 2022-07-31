@@ -1338,7 +1338,7 @@ class  ParticlesLayer extends React.Component {
                                 <Col xs={3} >
                                     <Button variant="info"
                                             size="sm"
-                                            onClick={this.toggleLayersContainer} title="Close layers " >
+                                            onClick={this.toggleLayersContainer} title="Close layers" >
                                         <X size={default_size}/>
                                     </Button>
                                 </Col>
@@ -1563,7 +1563,7 @@ class  ParticlesLayer extends React.Component {
                                 <Col xs={3}>
                                    <Button variant="info"
                                            size="sm"
-                                           onClick={this.toggleLayersContainer} title="Close layers " >
+                                           onClick={this.toggleLayersContainer} title="Close layers" >
                                          <X size={default_size}/>
                                     </Button>
                                 </Col>

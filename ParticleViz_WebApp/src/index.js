@@ -123,7 +123,8 @@ function PageSummary(){
                     </Card>
                 </div>
             </div>
-        </div>)
+        </div>
+    )
 }
 
 const container = document.getElementById('root');
