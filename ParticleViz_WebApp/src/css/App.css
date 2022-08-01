@@ -4,6 +4,12 @@
   width: 6px;
 }
 
+/* must be defined for ol 6 */
+#map {
+    height: 100%;
+    width: 100%;
+}
+
 /* Track */
 ::-webkit-scrollbar-track {
   background: #9cb1b2;
@@ -184,4 +190,3 @@
     max-width: 100%;
   }
 }
-

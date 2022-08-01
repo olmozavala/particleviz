@@ -9,9 +9,7 @@ import img_map_dark from "./imgs/dark.jpg";
 import img_map_stamen from "./imgs/stamen.jpg";
 import img_map_bingaer from "./imgs/bing_aer.jpg";
 import img_map_osm from "./imgs/osm.jpg";
-// import img_map_un from "./imgs/un.jpg";
 import img_map_blank from "./imgs/blank.jpg";
-//https://geonode.wfp.org/layers/geonode%3Awld_bnd_admin0_l_unmap_2019
 import DropdownToggle from "react-bootstrap/DropdownToggle";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import DropdownMenu from "react-bootstrap/DropdownMenu";
