@@ -67,6 +67,7 @@ class  StatesLayer extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        // Everyime there is a new selection of a background layer it is decided if we need to render the countries or not
         this.state.states_layer.set('visible', this.props.drawstates)
     }
 

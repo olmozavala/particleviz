@@ -26,9 +26,10 @@
         "def-zoom": 1,
         "map-extent": [ -360, -90, 360, 90 ],
         "map-center": [ 0, 0 ],
-        "def_style": {
-
-        },
+        "particle_size": 1,
+        "trail_size": 5,
+        "background": 4,
+        "shape_type": 1,
         "logos": [{
             "img": "logos/logo_example.png",
             "url": "https://olmozavala.com"

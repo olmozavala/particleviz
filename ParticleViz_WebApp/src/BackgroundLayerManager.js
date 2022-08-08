@@ -11,28 +11,34 @@ import img_map_bingaer from "./imgs/bing_aer.jpg";
 import img_map_osm from "./imgs/osm.jpg";
 import img_map_blank from "./imgs/blank.jpg";
 import DropdownToggle from "react-bootstrap/DropdownToggle";
-import DropdownItem from "react-bootstrap/DropdownItem";
-import DropdownMenu from "react-bootstrap/DropdownMenu";
+import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import BingMaps from "ol/source/BingMaps";
 import OSM from "ol/source/OSM";
 import TileWMS from "ol/source/TileWMS";
 import StatesLayer from "./StatesLayer";
+import _ from "lodash";
+
+const config_pviz = require("./Config.json")
+const config_webapp = config_pviz.webapp
 
 const BACKGROUND_MAPS = {
-    dark: 0,
-    stamen: 1,
-    nature: 2,
-    osm: 3,
-    un: 4,
-    empty: 5
+    empty: 0,
+    osm: 1,
+    stamen: 2,
+    nature: 3,
+    dark: 4,
+    un: 5
 };
+
 
 class  BackgroundLayerManager extends React.Component{
     constructor(props){
+
+        let def_background = _.isUndefined(config_webapp['background']) ? BACKGROUND_MAPS.nature : config_webapp['background']
         super(props)
         this.state = {
             bk_layer: this.props.background_layer,
-            selected_bk: BACKGROUND_MAPS.nature,
+            selected_bk: _.isInteger(def_background) && (1 <= def_background <= 5)? def_background - 1: BACKGROUND_MAPS.nature,
             draw_states: true
         };
 
@@ -54,7 +60,7 @@ class  BackgroundLayerManager extends React.Component{
     }
 
     updateBackgroundLayer(e){
-        // console.log("Updating background layer...")
+        // console.log("Updating background layer..." + e)
         let bk_layer = this.state.bk_layer;
         let selected_bk = parseInt(e)
         let draw_states = true;
@@ -134,28 +140,33 @@ class  BackgroundLayerManager extends React.Component{
     render(){
         return (
             <span>
-                <Dropdown title="Switch background">
-                    <DropdownToggle variant="light" size="sm" className="p-0">
-                        <FontAwesomeIcon icon={faMap}/>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.empty} >
-                            <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
-                        </DropdownItem>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.osm} >
-                            <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
-                        </DropdownItem>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.stamen} >
-                            <img src={img_map_stamen} className="rounded" width="100px" alt="Stamen"/>
-                        </DropdownItem>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.nature} >
-                            <img src={img_map_bingaer} className="rounded" width="100px" alt="Nature"/>
-                        </DropdownItem>
-                        <DropdownItem onSelect={this.updateBackgroundLayer} eventKey={BACKGROUND_MAPS.dark} >
-                            <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>
-                        </DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_switch_bk" {...props}> Switch Background </Tooltip>)}>
+                    <Dropdown onSelect={this.updateBackgroundLayer}>
+                        <DropdownToggle variant="light" size="sm" className="p-0">
+                            <FontAwesomeIcon icon={faMap}/>
+                        </DropdownToggle>
+                        <Dropdown.Menu  >
+                            <Dropdown.Item eventKey={BACKGROUND_MAPS.empty} >
+                                <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
+                            </Dropdown.Item>
+                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.osm} >
+                                <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
+                            </Dropdown.Item>
+                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.stamen} >
+                                <img src={img_map_stamen} className="rounded" width="100px" alt="Stamen"/>
+                            </Dropdown.Item>
+                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.nature} >
+                                <img src={img_map_bingaer} className="rounded" width="100px" alt="Nature"/>
+                            </Dropdown.Item>
+                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.dark} >
+                                <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>
+                            </Dropdown.Item>
+                            {/*<Dropdown.Item  eventKey={BACKGROUND_MAPS.un} >*/}
+                            {/*    <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>*/}
+                            {/*</Dropdown.Item>*/}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </OverlayTrigger>
                 <StatesLayer map={this.props.map}
                              url={this.props.url}
                              drawstates={this.state.draw_states}/>

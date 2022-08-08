@@ -153,7 +153,7 @@ class PreprocParticleViz:
             self._config_json["advanced"]["datasets"].append({model_name: advanced_dataset_model})
 
             # Generating the binary files for the 'Desktop' and 'Mobile'
-            print("Subsampling for destkop and mobile versions..")
+            print("Subsampling for desktop and mobile versions..")
             for subsample_data in subsample_model:
                 final_ouput_folder = F"{self._output_folder}/{subsample_data}"
                 if not(os.path.exists(final_ouput_folder)):

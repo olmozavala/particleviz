@@ -5,6 +5,7 @@ import Logos from "./Logos";
 import _ from "underscore"
 import $ from "jquery"
 import {QuestionCircle, House, List} from "react-bootstrap-icons"
+import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import {Collapse, Row, Col, Container, Button, Dropdown}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
@@ -206,6 +207,7 @@ class  ParticleVizManager extends React.Component{
             )
         }else {
             // --------------------- DESKTOP ---------------------------------
+            let chardin_offset = 2
             return (
             <span>
                 <nav className="navbar navbar-expand-md navbar-light bg-light justify-content-center">
@@ -214,10 +216,15 @@ class  ParticleVizManager extends React.Component{
                         <Logos url={this.props.url}/>
                     </span>
                     {/* ---------- Home ------------*/}
-                    <span className="navbar-brand align-middle" data-intro="Doc">
-                        <a title="Home" className="btn btn-info btn-sm" href={config_webapp['url']} role="button">
-                            <House size="14px"/>
-                        </a>
+                    <span className="navbar-brand align-middle" data-intro="Main" data-oz-position={chardin_offset}>
+                        <OverlayTrigger
+                            placement="bottom"
+                            delay={{show: 1, hide: 1}}
+                            overlay={(props) => (<Tooltip id="tooltip_home_icon" {...props}> Home</Tooltip>)}>
+                            <a className="btn btn-info btn-sm" href={config_webapp['url']} role="button">
+                                <House size="14px"/>
+                            </a>
+                        </OverlayTrigger>
                     </span>
                     {/* ---------- Particles menu ------------*/}
                     {/* ---------- All options from particles ------------*/}
@@ -229,7 +236,7 @@ class  ParticleVizManager extends React.Component{
                                         selected_model={this.state.selected_model}/>
                     </span>
                     {/* ---------- Background selection ------------*/}
-                    <span className="navbar-brand align-middle" data-intro="Map Style">
+                    <span className="navbar-brand align-middle" data-intro="Map Style" data-oz-position={chardin_offset} >
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map}
                                                 url={this.props.url}/>
@@ -243,23 +250,27 @@ class  ParticleVizManager extends React.Component{
                     {/*        </div>*/}
                     {/*    </span>*/}
                     {/* ---------- Model selection ------------*/}
-                    <span className="navbar-brand align-middle" data-intro="Model Selection">
-                        <Dropdown className="d-inline me-1" title="Release month">
-                            <Dropdown.Toggle variant="info" size="sm">
-                                {this.state.selected_model.name}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu onClick={this.updateSelectedModel}>
-                                {models.map((item, index) => (
-                                    <Dropdown.Item eventKey={item.name}
-                                                   key={index}>{item.name}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
+                    <span className="navbar-brand align-middle" >
+                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_mod_sel" {...props}> Datasets</Tooltip>)}>
+                            <Dropdown className="d-inline me-1" data-intro="Model Selection" data-oz-position={chardin_offset + 10} >
+                                <Dropdown.Toggle variant="info" size="sm">
+                                    {this.state.selected_model.name}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu onClick={this.updateSelectedModel}>
+                                    {models.map((item, index) => (
+                                        <Dropdown.Item eventKey={item.name}
+                                                       key={index}>{item.name}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </OverlayTrigger>
                         {/* ---------- Help toggle ------------*/}
-                        <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
-                            <QuestionCircle size={default_size}/>
-                        </button>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_help" {...props}> Help </Tooltip>)}>
+                            <button className="btn btn-info btn-sm" onClick={this.toggleHelp} data-intro="Help"  data-oz-position={chardin_offset + 5}>
+                                <QuestionCircle size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
                     </span>
                 </nav>
             </span>

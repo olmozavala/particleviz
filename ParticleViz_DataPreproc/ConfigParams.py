@@ -26,8 +26,13 @@ def_config = {
         "def-zoom": 1,
         "map-extent": [-360, -90, 360, 90],
         "map-center": [0, 0],
+        "particle_size": 3,  # Integer from 1 to 5 to define the default size of the particles
+        "trail_size": 3,  # Integer from 1 to 5 to define the default size of the trail of the particles
+        "background": 4,  # Integer from 1 to 5 to define the default background layer
+        # ( 1: empty ,2: osm ,3: stamen ,4: nature ,5: dark },
+        "shape_type": 0,  # 0 For squares and 1 for lines
         "logos": [],
-        "extra_layers": []
+        "extra_layers": [],
     },
     "advanced": {
         "timesteps_by_file": 50,

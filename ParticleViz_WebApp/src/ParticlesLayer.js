@@ -9,17 +9,18 @@ import { isMobile } from "react-device-detect"
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import {Container, ButtonGroup, Row, Col, Form, Button}  from "react-bootstrap";
 import { TwitterPicker } from 'react-color';
-
 import {
     ArrowRight, CircleFill, Plus, Dash,
     PlayFill, PauseFill, Slash, SquareFill,
     SkipBackwardFill, SkipForwardFill,
     SkipEndFill, SkipStartFill,
-    Brush, BrushFill, ArrowCounterclockwise, ArrowClockwise, ListCheck,
-    X, List
+    Brush, BrushFill, ArrowCounterclockwise, ArrowClockwise, X,
+    ListTask, ListStars
 } from 'react-bootstrap-icons'
-
 import JSZip from "jszip"
+
+const config_pviz = require("./Config.json")
+const config_webapp = config_pviz.webapp
 
 const data_key = 'def_part_viz'
 const default_size = 15 // font size
@@ -68,6 +69,15 @@ class  ParticlesLayer extends React.Component {
     constructor(props) {
         super(props)
 
+        // Validate default values
+        let trail_size = _.isUndefined(config_webapp['trail_size']) ? 3 : -config_webapp['trail_size'] + 6
+        let particle_size = _.isUndefined(config_webapp['particle_size']) ? 3 : config_webapp['particle_size']
+        let shape_type = _.isUndefined(config_webapp['shape_type']) ? false : !!config_webapp['shape_type']
+        // Verify is within range
+        trail_size =  _.isInteger(trail_size) && (1 <= trail_size <= 5)? trail_size : 3
+        particle_size =  _.isInteger(particle_size) && (1 <= particle_size <= 5)? particle_size : 3
+        // _.isInteger(config_webapp['trail_size'])
+
         // https://github.com/d3/d3-time-format
         this.dateFormat = d3.timeFormat("%B %e, %Y ")
         this.time_step = 0  // Current time step for the file being displayed
@@ -75,21 +85,21 @@ class  ParticlesLayer extends React.Component {
         this.canvasHeight = 0
         this.draw_until_day = true // Used to redraw all the positions until current time
         this.color_promise_status = 'none'
+        this.loaded_files = 0
         this.state = {
             speed_hz: 10,  // Speed of animation
-            transparency_index: 3,  // Size of particle trail
+            trail_size:  trail_size,  // Size of particle trail
             status: STATUS.loading,  // Status of animation
-            particle_size_index: 3,  // Size of the particle
+            particle_size_index: particle_size,  // Size of the particle
             selected_model: this.props.selected_model,  // selected model
             canvas_layer: -1,
-            loaded_files: 0,
             data: {},
             extent: null,  // Current extent of the window
             domain: null,
             ol_canvas_size: null,
             total_timesteps: {},
             timesteps_per_file:this.props.selected_model.time_steps,
-            shape_type: false,  // true for lines, false for dots
+            shape_type: _.isBoolean(shape_type)? shape_type: false,  // true for lines, false for dots
             particle_color: this.props.particle_color,
             display_picker: false,
             display_layers: false,  // Displays the dropdown of the available layers (by color)
@@ -360,15 +370,13 @@ class  ParticlesLayer extends React.Component {
         if(name === this.props.selected_model.file) {
             // console.log(`Uncompressed file received, file number: ${file_number} ....`)
             const total_timesteps = data[data_key]["lat_lon"][0][0].length
-            let cur_state = this.state.status
             let color_scheme = this.state.color_scheme
 
             // We will wait for this percentage of files to be loaded
             let wait_for = 1  // [0, 1]
             let files_to_load = parseInt(this.state.selected_model.num_files * wait_for)
-            if (this.state.loaded_files >= (files_to_load - 1)) {
+            if (this.loaded_files >= (files_to_load - 1)) {
                 // console.log("Done reading and uncompressed the minimum number of files!!!!")
-                cur_state = STATUS.playing
                 $(".btn").attr("disabled", false)  // Enable all the buttons
                 // TODO is there a better place to do this? (setting the particle range of the color scheme for full range, when there is no color scheme)
                 // TODO we are missing the option of specifying a list of indexes rather than a range
@@ -377,7 +385,7 @@ class  ParticlesLayer extends React.Component {
                     color_scheme[this.props.selected_model.id][0].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
                 }
             }else{
-                let perc = parseInt(100 * (this.state.loaded_files / files_to_load))
+                let perc = parseInt(100 * (this.loaded_files / files_to_load))
                 $(".loading_perc").text(`${perc} %`)
             }
 
@@ -400,7 +408,7 @@ class  ParticlesLayer extends React.Component {
             let has_nans = data[data_key]['disp_info'] !== undefined? true: false
 
             current_data[model_id][file_number] = data
-            if (this.state.loaded_files >= (files_to_load - 1)) {
+            if (this.loaded_files >= (files_to_load - 1)) {
                 // finished loading the required files
                 this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
@@ -423,7 +431,9 @@ class  ParticlesLayer extends React.Component {
                 }
             }
 
+            // console.log(`Loaded files:  ${this.loaded_files + 1} of ${files_to_load}. `)
             // This is useful for doing things we want to do only once
+            this.loaded_files += 1
             if(file_number === 0) {
                 let canv_lay = this.state.canvas_layer
                 if (canv_lay === -1) {
@@ -437,18 +447,15 @@ class  ParticlesLayer extends React.Component {
                 this.setState({
                     canvas_layer: canv_lay,
                     data: {...current_data},
-                    loaded_files: this.state.loaded_files + 1,
                     total_timesteps: {...model_timesteps},
-                    status: cur_state,
+                    status: this.loaded_files >= (files_to_load - 1)? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
             }else{
-                // console.log(`Loaded files:  ${this.state.loaded_files + 1}`)
                 this.setState({
                     data: {...current_data},
-                    loaded_files: this.state.loaded_files + 1,
                     total_timesteps: {...model_timesteps},
-                    status: cur_state,
+                    status: this.loaded_files >= (files_to_load - 1)? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
             }
@@ -491,7 +498,7 @@ class  ParticlesLayer extends React.Component {
         if (!_.isUndefined(this.state.data)) {
             const domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
             let new_status = this.state.status
-            if ((this.state.status === STATUS.decompressing) && (this.state.loaded_files >= this.state.selected_model.num_files - 1)) {
+            if ((this.state.status === STATUS.decompressing) && (this.loaded_files >= this.state.selected_model.num_files - 1)) {
                 new_status = STATUS.playing
             }
 
@@ -526,8 +533,8 @@ class  ParticlesLayer extends React.Component {
                 $(".btn").attr("disabled", true)  // Enable all the buttons
                 // In this case is a new file, we need to reset almost everything
                 this.time_step= 0
+                this.loaded_files = 0
                 this.setState({
-                    loaded_files: 0,
                     selected_model: this.props.selected_model,
                     status: STATUS.loading,
                 })
@@ -583,12 +590,19 @@ class  ParticlesLayer extends React.Component {
      */
     changeParticleColor(color){
         const rgb = color.rgb
-        let color_scheme = this.state.color_scheme
-        for(let scheme_id = 0; scheme_id < color_scheme.length; scheme_id++){
-            color_scheme[scheme_id].color = "rgb("+rgb.r+","+rgb.g+","+rgb.b+","+rgb.a+")"
+        const model_id = this.state.selected_model.id
+        let color_scheme_all = this.state.color_scheme
+        let color_scheme = color_scheme_all[model_id]
+        if(_.isUndefined(color_scheme.length)){ // It means it only has one color for all the dataset
+            color_scheme.color = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + rgb.a + ")"
+        }else {
+            for (let scheme_id = 0; scheme_id < color_scheme.length; scheme_id++) {
+                color_scheme[scheme_id].color = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + rgb.a + ")"
+            }
         }
+        color_scheme_all[model_id] = color_scheme
         this.setState({
-            color_scheme: color_scheme,
+            color_scheme: color_scheme_all,
             display_picker: false
         })
     }
@@ -625,7 +639,7 @@ class  ParticlesLayer extends React.Component {
                     // Make previous frame slightly transparent
                     var prev = this.ctx.globalCompositeOperation
                     this.ctx.globalCompositeOperation = "destination-out"
-                    this.ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.transparency_index]})`
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${TRAIL_SIZE[this.state.trail_size]})`
                     this.ctx.fillRect(0, 0, canvas.width, canvas.height)
                     this.ctx.globalCompositeOperation = prev
                     this.ctx.fill()
@@ -898,7 +912,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // console.log("Component update")
+        // console.log("Loaded files: ", this.loaded_files)
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
@@ -966,23 +980,23 @@ class  ParticlesLayer extends React.Component {
     }
 
     increaseTransparency(e) {
-        let new_trans = this.state.transparency_index
+        let new_trans = this.state.trail_size
         if (new_trans < (Object.keys(TRAIL_SIZE).length)) {
             new_trans += 1
         }
         this.setState({
-            transparency_index: new_trans
+            trail_size: new_trans
         })
         e.preventDefault()
     }
 
     decreaseTransparency(e) {
-        let new_trans = this.state.transparency_index
+        let new_trans = this.state.trail_size
         if (new_trans > 0) {
             new_trans -= 1
         }
         this.setState({
-            transparency_index: new_trans
+            trail_size: new_trans
         })
         e.preventDefault()
     }
@@ -1175,18 +1189,18 @@ class  ParticlesLayer extends React.Component {
                         <Col xs={5} >
                             <span style={{display: "inline-block", width: "25px"}}>
                                 <ArrowRight
-                                    size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}/>
+                                    size={this.getIconColorSizeBoostrap(this.state.trail_size, true)}/>
                             </span>
                             <button className="btn btn-info btn-sm " onClick={this.increaseTransparency}
                                     title="Decrease litter trail"
-                                    disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
+                                    disabled={this.state.trail_size === (Object.keys(TRAIL_SIZE).length) ||
                                         this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Dash size={default_size}/>
                             </button>
                             {" "}
                             <button className="btn btn-info btn-sm" onClick={this.decreaseTransparency}
                                     title="Increase litter trail"
-                                    disabled={this.state.transparency_index === 1 ||
+                                    disabled={this.state.trail_size === 1 ||
                                         this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
                                 <Plus size={default_size}/>
                             </button>
@@ -1312,11 +1326,7 @@ class  ParticlesLayer extends React.Component {
                                          onClick={this.toggleLayersContainer}
                                          title="Toogle layers dropdown"
                                          disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                             {this.state.display_layers?
-                                 <ListCheck size={default_size}/>
-                                 :
-                                 <List size={default_size}/>
-                             }
+                             {this.state.display_layers? <ListTask size={default_size}/> : <ListStars size={default_size}/> }
                              </button>
                              </span>
                         </Col>
@@ -1375,67 +1385,76 @@ class  ParticlesLayer extends React.Component {
             )
         }else {
             this.props.chardin.refresh()
+            let chardin_offset = 11
             return (
-                <span>
+                <div>
                     {/*---- Size of Streamline ---------*/}
-                    <span className="text-center" data-intro={"Path length"}>
+                    <span className="text-center" data-intro={"Path length"} data-oz-position={chardin_offset}>
                         <span className="me-1" style={{display: "inline-block", width: "25px"}}>
                             <ArrowRight
-                                size={this.getIconColorSizeBoostrap(this.state.transparency_index, true)}
+                                size={this.getIconColorSizeBoostrap(this.state.trail_size, true)}
                             />
                         </span>
-                        <button className="btn btn-sm btn-info me-1" onClick={this.increaseTransparency}
-                            title="Decrease litter trail"
-                            disabled={this.state.transparency_index === (Object.keys(TRAIL_SIZE).length) ||
-                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            <Dash size={default_size}/>
-                        </button>
-                        <button className="btn btn-sm btn-info me-1" onClick={this.decreaseTransparency}
-                            title="Increase litter trail"
-                            disabled={this.state.transparency_index === 1 ||
-                            this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            <Plus size={default_size}/>
-                        </button>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_dec_trail" {...props}> Decrease trail size</Tooltip>)}>
+                            <button className="btn btn-sm btn-info me-1" onClick={this.increaseTransparency}
+                                title="Decrease litter trail"
+                                disabled={this.state.trail_size === (Object.keys(TRAIL_SIZE).length) ||
+                                this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                <Dash size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_inc_trail" {...props}> Increase trail size</Tooltip>)}>
+                            <button className="btn btn-sm btn-info me-1" onClick={this.decreaseTransparency}
+                                disabled={this.state.trail_size === 1 ||
+                                this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                <Plus size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
                     </span>
 
                     {/*---- Particle size ---------*/}
-                    <span className="text-center" data-intro={"Size"}>
+                    <span className="text-center" data-intro={"Size"}  data-oz-position={chardin_offset}>
                         <span className="me-1" style={{display: "inline-block", width: "25px"}}>
                             <CircleFill
                                 size={this.getIconColorSizeBoostrap(this.state.particle_size_index, false)}
                             />
                         </span>
-                        <button className="btn btn-sm btn-info me-1" onClick={this.decreaseSize}
-                             title="Decrease litter size"
-                             disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            <Dash size={default_size}/>
-                        </button>
-                        <button className="btn btn-sm btn-info me-1" onClick={this.increaseSize}
-                            title="Increase litter size"
-                            disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            <Plus size={default_size}/>
-                        </button>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_dec_size" {...props}> Decrease particle size</Tooltip>)}>
+                            <button className="btn btn-sm btn-info me-1" onClick={this.decreaseSize}
+                                 disabled={this.state.particle_size_index === 1 || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                <Dash size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_inc_size" {...props}> Increase particle size</Tooltip>)}>
+                            <button className="btn btn-sm btn-info me-1" onClick={this.increaseSize}
+                                disabled={this.state.particle_size_index === (Object.keys(PARTICLE_SIZES).length) || this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                <Plus size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
                     </span>
 
                     {/*---- Particle Shape & Color ------------*/}
-                    <span data-intro={"Shape & color"}>
-                        <button className={`btn btn-sm btn-info me-1`}
-                            onClick={this.toggleShapeType}
-                            title="Shape selection"
-                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            {this.state.shape_type ?
-                                <Slash size={default_size}/> : <SquareFill size={default_size}/>
-                            }
-                        </button>
-                        <button className={`btn btn-sm btn-info`}
-                            onClick={() => this.setState({display_picker:!this.state.display_picker})}
-                            title="Color selection"
-                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            {this.state.display_picker?
-                                <Brush size={default_size}/> : <BrushFill size={default_size}/>
-                            }
-                        </button>
-                    </span>
+                    <span data-intro={"Shape & color"}  data-oz-position={chardin_offset}>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_shape" {...props}> Shape selection</Tooltip>)}>
+                            <button className={`btn btn-sm btn-info me-1`}
+                                onClick={this.toggleShapeType}
+                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                {this.state.shape_type ?
+                                    <Slash size={default_size}/> : <SquareFill size={default_size}/>
+                                }
+                            </button>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_color" {...props}> Color selection</Tooltip>)}>
+                            <button className={`btn btn-sm btn-info`}
+                                onClick={() => this.setState({display_picker:!this.state.display_picker})}
+                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                {this.state.display_picker?
+                                    <Brush size={default_size}/> : <BrushFill size={default_size}/>
+                                }
+                            </button>
+                        </OverlayTrigger>
+                    </span >
                     <span className="pv-pcolor">
                         <TwitterPicker
                            color={this.state.particle_color}
@@ -1445,26 +1464,27 @@ class  ParticlesLayer extends React.Component {
                     </span>
 
                     {/*---- Range Current day ------------*/}
-                    <span id="date_range" className="ms-2 me-2" data-intro="Time selection">
-                        <input type="range"
-                            title="Date selection"
-                            onChange={this.changeDayRange}
-                            value={this.time_step}
-                            min="0" max={(this.state.status === STATUS.loading ||
-                            this.state.status === STATUS.decompressing) ? 0 :
-                            this.state.total_timesteps[this.state.selected_model.id] - 2}
-                            custom="true" disabled={this.state.status === STATUS.loading}
-                        />
+                    <span id="date_range" className="ms-2 me-2" >
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_daterange" {...props}> Time selection</Tooltip>)}>
+                            <input type="range"
+                                data-intro="Time selection"
+                                data-oz-position={chardin_offset + 5}
+                                onChange={this.changeDayRange}
+                                value={this.time_step}
+                                min="0" max={(this.state.status === STATUS.loading ||
+                                this.state.status === STATUS.decompressing) ? 0 :
+                                this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                custom="true" disabled={this.state.status === STATUS.loading}
+                            />
+                        </OverlayTrigger>
                     </span>
 
                     {/*---- Animation controls --------*/}
-                    <span data-intro="Animation controls">
-                        <ButtonGroup>
+                    <span>
+                        <ButtonGroup  data-intro="Animation controls"
+                            data-oz-position={chardin_offset - 4}>
                             {/*---- Decrease speed --------*/}
-                            <OverlayTrigger
-                                placement="bottom"
-                                delay={{show: 1, hide: 1}}
-                                overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip>)}>
+                            <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_dspeed" {...props}> Decrease animation speed </Tooltip>)}>
                                 <button className={`btn btn-info btn-sm`} type="button"
                                     onClick={this.decreaseSpeed}
                                     disabled={this.state.speed_hz <= .6}>
@@ -1526,7 +1546,6 @@ class  ParticlesLayer extends React.Component {
                                 placement="bottom"
                                 delay={{show: 1, hide: 1}}
                                 overlay={(props) => (<Tooltip id="tooltip_inc_speed" {...props}> Increase animation speed</Tooltip>)}>
-                                {/*<button className={`btn btn-info btn-sm ${this.state.status === STATUS.playing? 'd-block':'d-none'}`} onClick={this.increaseSpeed}*/}
                                 <button
                                     className={`btn btn-info btn-sm me-1`} onClick={this.increaseSpeed}
                                     disabled={this.state.speed_hz >= MAX_ANIMATION_SPEED}>
@@ -1537,18 +1556,22 @@ class  ParticlesLayer extends React.Component {
                     </span>
 
                     {/*---- Layers Selection --------*/}
-                    <span data-intro={"Layers"}>
-                        <button className={`btn btn-sm btn-info`}
-                            onClick={this.toggleLayersContainer}
-                            title="Toogle layers dropdown"
-                            disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                            {this.state.display_layers?
-                                <ListCheck size={default_size}/> : <List size={default_size}/>
-                            }
-                        </button>
-                    </span>
-                    <div className={`pv-layerslistcontainer my_round ${this.state.display_layers? 'd-block':'d-none'}`}>
-                        <Form className="bg-light">
+                    {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) && this.state.color_scheme[this.state.selected_model.id].length > 1 ?
+                        <span>
+                            <span>
+                                <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_layerlist" {...props}> Layers list</Tooltip>)}>
+                                    <button className={`btn btn-sm btn-info`}
+                                                data-intro={"Layers"}
+                                                data-oz-position={chardin_offset - 4}
+                                                onClick={this.toggleLayersContainer}
+                                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                      {this.state.display_layers ? <ListTask size={default_size}/> :
+                                          <ListStars size={default_size}/>}
+                                    </button>
+                                </OverlayTrigger>
+                            </span>
+                            <div className={`pv-layerslistcontainer my_round ${this.state.display_layers ? 'd-block' : 'd-none'}`}>
+                                <Form className="bg-light">
                             <Row>
                                 <Col xs={9}>
                                     <Form.Check
@@ -1561,41 +1584,39 @@ class  ParticlesLayer extends React.Component {
                                     ></Form.Check>
                                 </Col>
                                 <Col xs={3}>
-                                   <Button variant="info"
-                                           size="sm"
-                                           onClick={this.toggleLayersContainer} title="Close layers" >
-                                         <X size={default_size}/>
+                                    <Button variant="info"
+                                            size="sm"
+                                            onClick={this.toggleLayersContainer} title="Close layers">
+                                        <X size={default_size}/>
                                     </Button>
                                 </Col>
                             </Row>
-                            {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) ?
-                                <Row className='bg-light'>
-                                    <Col>
-                                        <ul className="pv-layerslist">
-                                            {this.state.color_scheme[this.state.selected_model.id].length ?
-                                                this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
-                                                    <li key={c_layer.id}>
-                                                        <Form.Check
-                                                            type="switch"
-                                                            key={c_layer.id}
-                                                            id={c_layer.id}
-                                                            label={c_layer.name}
-                                                            checked={c_layer.display}
-                                                            onChange={this.toggleLayerDisplay}
-                                                        ></Form.Check>
-                                                    </li>
-                                                ))
-                                                : <span>Single one</span>
-                                            }
-                                        </ul>
-                                    </Col>
-                                </Row>
-                                :
-                                <span>Single one</span>
-                            }
+                            <Row className='bg-light'>
+                                <Col>
+                                    <ul className="pv-layerslist">
+                                        {this.state.color_scheme[this.state.selected_model.id].length ?
+                                            this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                                <li key={c_layer.id}>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        key={c_layer.id}
+                                                        id={c_layer.id}
+                                                        label={c_layer.name}
+                                                        checked={c_layer.display}
+                                                        onChange={this.toggleLayerDisplay}
+                                                    ></Form.Check>
+                                                </li>
+                                            ))
+                                            : <span>Single one</span>
+                                        }
+                                    </ul>
+                                </Col>
+                            </Row>
                         </Form>
-                    </div>
-                </span>
+                            </div>
+                        </span>
+                         :<span></span> }
+                </div>
             )
         }
     }

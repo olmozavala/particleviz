@@ -42,7 +42,10 @@ class Logos extends React.Component {
             )
         }else{
             return(
-                <div data-intro="Logos" className="logos">
+                // <div data-intro="Logos"  lassName="logos" data-position="left"> // Example change location
+                // <div data-intro="Logos"  lassName="logos" data-position="bottom:50">  // Move the text 50% to the right
+                // <div data-intro="Logos"  lassName="logos" data-position="bottom:50,200"> // Move 50% to the right and text twice as far
+                <div data-intro="Logos"  className="logos" data-oz-position="6">
                     <RenderLogos url={this.props.url}/>
                 </div>
             )
