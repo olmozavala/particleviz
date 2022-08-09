@@ -1,7 +1,25 @@
-/* ---------------- Chainging how scrollbars look */
+/* ---------------- Changing how scrollbars look */
 /* width */
 ::-webkit-scrollbar {
   width: 6px;
+}
+
+/*If we want to override the default color of the menus*/
+.btn-info {
+    --bs-btn-color: #000;
+    --bs-btn-bg: #0dcaf0;
+    --bs-btn-border-color: #0dcaf0;
+    --bs-btn-hover-color: #000;
+    --bs-btn-hover-bg: #31d2f2;
+    --bs-btn-hover-border-color: #25cff2;
+    --bs-btn-focus-shadow-rgb: 11,172,204;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #3dd5f3;
+    --bs-btn-active-border-color: #25cff2;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #000;
+    --bs-btn-disabled-bg: #0dcaf0;
+    --bs-btn-disabled-border-color: #0dcaf0;
 }
 
 /* must be defined for ol 6 */
@@ -66,10 +84,6 @@
   width: 100%;
 }
 
-.pv-navbar{
-  width:80%
-}
-
 .pv-layerslistcontainer{
   z-index: 101;
   left:0%;
@@ -103,8 +117,7 @@
     display: none;
   }
   #intro_text {
-    top: 0px;
-    left: 0px;
+    top: 35%;
   }
   .pv-palette{
       left: 5%;
@@ -113,7 +126,7 @@
 
 @media(min-width: 768px){
   #intro_text {
-    top: 100px;
+    top: 150px;
 
   }
   .pv-palette{
@@ -130,7 +143,7 @@
     display: block;
   }
   #intro_text {
-    top: 130px;
+    top: 150px;
   }
 }
 
@@ -169,7 +182,8 @@
 
 @media(max-width: 1300px) and (min-width: 992px){
     .logos{
-       min-width: 160px;
+      min-width: 160px;
+      text-align: center;
     }
     /*.anim-controls{*/
     /*    margin-left: 100px;*/

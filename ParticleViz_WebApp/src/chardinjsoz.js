@@ -196,6 +196,16 @@ export class chardinJs{
         return (positionString === null ? 1 : 1 + parseInt(((_ref = positionString.split(':')) != null ? (_ref[1] || '').split(',')[0] : void 0) || 0, 10) / 100)
     }
 
+    _get_oz_position_offset (element) {
+        var positionString, _ref
+        var helpref = element.getAttribute(this.data_attribute)
+        if (helpref[0] === '#' && this.data_helptext[helpref].position)
+            positionString = this.data_helptext[helpref].position
+        else
+            positionString = element.getAttribute('data-oz-position')
+
+        return (positionString === null ? 1 : 1 + parseInt(positionString))
+    }
     _get_position_distance (element) {
         var positionString, _ref
         var helpref = element.getAttribute(this.data_attribute)
@@ -278,11 +288,12 @@ export class chardinJs{
     }
 
     _position_helper_layer (element) {
-        var element_position, helper_layer
+        var element_position, helper_layer, oz_offset
         helper_layer = $(element).data('helper_layer')
         element_position = this._get_offset(element)
+        oz_offset = this._get_oz_position_offset(element)
         if ($(element).is(':visible') && helper_layer) {
-            helper_layer.setAttribute("style", "display: block; width: " + element_position.width + "px; height:" + element_position.height + "px; top:" + element_position.top + "px; left: " + element_position.left + "px;")
+            helper_layer.setAttribute("style", "display: block; width: " + element_position.width + "px; height:" + (element_position.height + oz_offset) + "px; top:" + element_position.top + "px; left: " + element_position.left + "px;")
         }
         if ($(element).is(':visible') && !helper_layer) {
             this._show_element(element)

@@ -5,6 +5,7 @@ import Logos from "./Logos";
 import _ from "underscore"
 import $ from "jquery"
 import {QuestionCircle, House, List} from "react-bootstrap-icons"
+import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import {Collapse, Row, Col, Container, Button, Dropdown}  from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 import './css/App.css'
@@ -13,6 +14,7 @@ const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
 const config_adv = config_pviz.advanced
 const datasets = config_adv["datasets"]
+const default_size = 15 // fontsize
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 let models = []
 
@@ -142,7 +144,7 @@ class  ParticleVizManager extends React.Component{
                         <Col xs={10} >
                             <Logos url={this.props.url}/>
                             {/* ---------- Home ------------*/}
-                             <Button variant="info" size={"sm"} className={"ml-auto"}
+                             <Button variant="info" size={"sm"} className={"ms-auto"}
                                      href={config_webapp['url']}>
                                 <House/>
                             </Button>
@@ -205,65 +207,73 @@ class  ParticleVizManager extends React.Component{
             )
         }else {
             // --------------------- DESKTOP ---------------------------------
+            let chardin_offset = 2
             return (
-                <nav className="navbar navbar-expand-md navbar-light bg-light pt-0 pb-0">
+            <span>
+                <nav className="navbar navbar-expand-md navbar-light bg-light justify-content-center">
                     {/* ---------- Logos ------------*/}
-                    <Logos url={this.props.url}/>
+                    <span className="navbar-brand align-middle">
+                        <Logos url={this.props.url}/>
+                    </span>
                     {/* ---------- Home ------------*/}
-                    <span className="m-2" data-intro="Main site" data-position="bottom">
-                            <div className="m-1 d-inline">
-                                <a title="Home" className="btn  btn-info btn-sm"
-                                   href={config_webapp['url']}>
-                                    <House/>
-                                </a>
-                            </div>
-                        </span>
+                    <span className="navbar-brand align-middle" data-intro="Main" data-oz-position={chardin_offset}>
+                        <OverlayTrigger
+                            placement="bottom"
+                            delay={{show: 1, hide: 1}}
+                            overlay={(props) => (<Tooltip id="tooltip_home_icon" {...props}> Home</Tooltip>)}>
+                            <a className="btn btn-info btn-sm" href={config_webapp['url']} role="button">
+                                <House size="14px"/>
+                            </a>
+                        </OverlayTrigger>
+                    </span>
                     {/* ---------- Particles menu ------------*/}
-                    <div className="navbar-nav pv-navbar" >
-                        {/* ---------- All options from particles ------------*/}
+                    {/* ---------- All options from particles ------------*/}
+                    <span className="navbar-brand align-middle"> {/* data-intro="Particles" */}
                         <ParticlesLayer map={this.props.map}
                                         url={this.props.url}
                                         chardin={this.state.chardin}
                                         particle_color={this.state.particle_color}
                                         selected_model={this.state.selected_model}/>
-                        {/* ---------- Background selection ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Map Background" data-position="bottom:0,200">
-                            <BackgroundLayerManager background_layer={this.props.background_layer}
-                                                    map={this.props.map}
-                                                    url={this.props.url}/>
-                        </span>
-                        {/*/!* ---------- Stats button ------------*!/*/}
-                        {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
-                        {/*        <div className="m-1 d-inline">*/}
-                        {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
-                        {/*                <Activity/>*/}
-                        {/*            </button>*/}
-                        {/*        </div>*/}
-                        {/*    </span>*/}
-                        {/* ---------- Model selection ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Model Selection" data-position="bottom">
-                                <Dropdown className="mt-2 d-inline" title="Release month">
+                    </span>
+                    {/* ---------- Background selection ------------*/}
+                    <span className="navbar-brand align-middle" data-intro="Map Style" data-oz-position={chardin_offset} >
+                        <BackgroundLayerManager background_layer={this.props.background_layer}
+                                                map={this.props.map}
+                                                url={this.props.url}/>
+                    </span>
+                    {/*/!* ---------- Stats button ------------*!/*/}
+                    {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
+                    {/*        <div className="m-1 d-inline">*/}
+                    {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
+                    {/*                <Activity/>*/}
+                    {/*            </button>*/}
+                    {/*        </div>*/}
+                    {/*    </span>*/}
+                    {/* ---------- Model selection ------------*/}
+                    <span className="navbar-brand align-middle" >
+                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_mod_sel" {...props}> Datasets</Tooltip>)}>
+                            <Dropdown className="d-inline me-1" data-intro="Model Selection" data-oz-position={chardin_offset + 10} >
                                 <Dropdown.Toggle variant="info" size="sm">
                                     {this.state.selected_model.name}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu onClick={this.updateSelectedModel}>
                                     {models.map((item, index) => (
                                         <Dropdown.Item eventKey={item.name}
-                                                       key={index}>{item.name} </Dropdown.Item>
+                                                       key={index}>{item.name}
+                                        </Dropdown.Item>
                                     ))}
                                 </Dropdown.Menu>
                             </Dropdown>
-                        </span>
+                        </OverlayTrigger>
                         {/* ---------- Help toggle ------------*/}
-                        <span className="navbar-brand my-2" data-intro="Help" data-position="bottom">
-                                <div className="m-1 d-inline">
-                                    <button title="Help" className="btn btn-info btn-sm" onClick={this.toggleHelp}>
-                                        <QuestionCircle/>
-                                    </button>
-                                </div>
-                            </span>
-                    </div>
+                        <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_help" {...props}> Help </Tooltip>)}>
+                            <button className="btn btn-info btn-sm" onClick={this.toggleHelp} data-intro="Help"  data-oz-position={chardin_offset + 5}>
+                                <QuestionCircle size={default_size}/>
+                            </button>
+                        </OverlayTrigger>
+                    </span>
                 </nav>
+            </span>
             )
         }
     }

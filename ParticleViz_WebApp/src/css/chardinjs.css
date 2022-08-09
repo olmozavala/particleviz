@@ -50,7 +50,7 @@
     padding-left: 10px; }
   .chardinjs-tooltip.chardinjs-bottom {
     margin-bottom: -30px;
-    padding-top: 10px; }
+    padding-top: 10px; } /* Vertical line */
   .chardinjs-tooltip.chardinjs-top {
     margin-top: -30px;
     padding-bottom: 10px; }
@@ -66,7 +66,7 @@
     top: 50%; }
   .chardinjs-tooltip.chardinjs-bottom:before, .chardinjs-tooltip.chardinjs-top:after {
     width: 1px;
-    height: 30px;
+    height: 30px;  /* Vertical line */
     left: 50%; }
   .chardinjs-tooltip.chardinjs-bottom:before {
     top: -30px; }
