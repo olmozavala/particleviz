@@ -102,8 +102,9 @@ class  ParticlesLayer extends React.Component {
             shape_type: _.isBoolean(shape_type)? shape_type: false,  // true for lines, false for dots
             particle_color: this.props.particle_color,
             display_picker: false,
+            display_color_menu: true,
             display_layers: false,  // Displays the dropdown of the available layers (by color)
-            toggle_all_layers_display: true,  // Indicates if we are displaying or not all the layers
+            display_all_layers: true,  // Indicates if we are displaying or not all the layers
             play_backward: false,  // It is used to play the videos backward in time
             delta_t: -1,
             color_scheme_name: {},
@@ -115,7 +116,6 @@ class  ParticlesLayer extends React.Component {
 
         // This is repeated should go in a function
         $(".btn").attr("disabled", true)  // Enable all the buttons
-
 
         // Setting up d3 objects TODO somethings doesn't make sense here
         this.d3canvas = d3.select(document.createElement("canvas")).attr("id", "particle_canvas")
@@ -142,6 +142,7 @@ class  ParticlesLayer extends React.Component {
         this.decreaseSize = this.decreaseSize.bind(this)
         this.updateAnimation = this.updateAnimation.bind(this)
         this.increaseTransparency = this.increaseTransparency.bind(this)
+        this.allowFirstAnimation= this.allowFirstAnimation.bind(this)
         this.readZipStepOne = this.readZipStepOne.bind(this)
         this.decreaseTransparency = this.decreaseTransparency.bind(this)
         this.playPause = this.playPause.bind(this)
@@ -158,7 +159,6 @@ class  ParticlesLayer extends React.Component {
         this.readColorScheme= this.readColorScheme.bind(this)
         this.processNewColorScheme= this.processNewColorScheme.bind(this)
     }
-
 
     /**
      * Returns the number of miliseconds per timestep based header files
@@ -296,8 +296,11 @@ class  ParticlesLayer extends React.Component {
 
     /**
      * Initializes the reading of a color scheme from a new model
+     * Called after each update when the color_scheme is undefined
     */
+
     processNewColorScheme(selected_model){
+        // console.log("Processing new color squeme")
         if( selected_model.color_scheme !== undefined){
             let color_scheme_url = ""
             // These files are harcoded by the preproc module of ParticleViz
@@ -312,17 +315,24 @@ class  ParticlesLayer extends React.Component {
             // console.log("Color scheme name:", this.state.color_scheme_name)
             this.color_promise_status = "pending"
             d3.json(color_scheme_url).then((data) => this.readColorScheme(data))
+            this.setState({
+                display_color_menu:false
+            })
         }else{
-            this.readColorScheme({
-                "default": [
-                    {
-                        "name": "All",
-                        "color": this.state.particle_color,
-                        "index": "all"
-                    }
-                ]
+            this.setState({
+                display_color_menu:true
             })
         }
+    }
+
+    /** This function verifies we are allowed to start our first animation, based on the number of files received **/
+    allowFirstAnimation(){
+        let wait_for = 1  // [0, 1] percentage to indicate when can we start animating. If 10 files and = .8 we start after rading 8 files
+        let files_to_load = parseInt(this.state.selected_model.num_files * wait_for)
+        // console.log("Files to load: " + files_to_load)
+        // If we need to read only one file or have loaded enough files, then we can start the animation
+        let ready_to_animate = (this.loaded_files >= files_to_load) || (files_to_load === 1)
+        return ready_to_animate
     }
 
     /**
@@ -368,26 +378,16 @@ class  ParticlesLayer extends React.Component {
     readUnzippedFileStepTwo(data, name, file_number_str) {
         const file_number = parseInt(file_number_str)
         if(name === this.props.selected_model.file) {
-            // console.log(`Uncompressed file received, file number: ${file_number} ....`)
+            // console.log(`Uncompressed file received, file number: ${file_number} Loaded files: ${this.loaded_files}`)
             const total_timesteps = data[data_key]["lat_lon"][0][0].length
             let color_scheme = this.state.color_scheme
 
+            let files_to_load = parseInt(this.state.selected_model.num_files)
+            let startAnimation = this.allowFirstAnimation()
+
             // We will wait for this percentage of files to be loaded
-            let wait_for = 1  // [0, 1]
-            let files_to_load = parseInt(this.state.selected_model.num_files * wait_for)
-            if (this.loaded_files >= (files_to_load - 1)) {
-                // console.log("Done reading and uncompressed the minimum number of files!!!!")
-                $(".btn").attr("disabled", false)  // Enable all the buttons
-                // TODO is there a better place to do this? (setting the particle range of the color scheme for full range, when there is no color scheme)
-                // TODO we are missing the option of specifying a list of indexes rather than a range
-                if( this.state.color_scheme_name[this.props.selected_model.id] === "default"){
-                    // The color_scheme should only have one entry in this case
-                    color_scheme[this.props.selected_model.id].index = _.range(0, data['def_part_viz']['lat_lon'][0].length)
-                }
-            }else{
-                let perc = parseInt(100 * (this.loaded_files / files_to_load))
-                $(".loading_perc").text(`${perc} %`)
-            }
+            this.loaded_files += 1
+
 
             const model_id = this.state.selected_model.id
             let current_data = this.state.data
@@ -408,8 +408,11 @@ class  ParticlesLayer extends React.Component {
             let has_nans = data[data_key]['disp_info'] !== undefined? true: false
 
             current_data[model_id][file_number] = data
-            if (this.loaded_files >= (files_to_load - 1)) {
-                // finished loading the required files
+            // Copy first location of the next adjacent file as the first location of the current file
+            // we only do it once most of the files are being loaded
+            if (startAnimation) {
+                // console.log("Done reading and uncompressed the minimum number of files!!!!")
+                $(".btn").attr("disabled", false)  // Enable all the buttons
                 this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
                     // make sure the next file is loaded
@@ -429,11 +432,13 @@ class  ParticlesLayer extends React.Component {
                         }
                     }
                 }
+
+            }else{
+                let perc = parseInt(100 * (this.loaded_files / files_to_load))
+                $(".loading_perc").text(`${perc} %`)
             }
 
-            // console.log(`Loaded files:  ${this.loaded_files + 1} of ${files_to_load}. `)
             // This is useful for doing things we want to do only once
-            this.loaded_files += 1
             if(file_number === 0) {
                 let canv_lay = this.state.canvas_layer
                 if (canv_lay === -1) {
@@ -444,18 +449,32 @@ class  ParticlesLayer extends React.Component {
                     })
                     this.props.map.addLayer(canv_lay)
                 }
+                if( this.props.selected_model.color_scheme === undefined){
+                    // In this case we need to set a default color with the full index of the particles
+                    this.readColorScheme({
+                            "default": [
+                                {
+                                    "name": "All",
+                                    "color": this.state.particle_color,
+                                    "index": _.range(0, data['def_part_viz']['lat_lon'][0].length).join()
+                                }
+                            ]
+                        })
+               }
+                // console.log(`Updating state to ${startAnimation? STATUS.playing : STATUS.decompressing}`)
                 this.setState({
                     canvas_layer: canv_lay,
                     data: {...current_data},
                     total_timesteps: {...model_timesteps},
-                    status: this.loaded_files >= (files_to_load - 1)? STATUS.playing : STATUS.decompressing,
+                    status: startAnimation? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
             }else{
+                // console.log(`Updating state to ${startAnimation? STATUS.playing : STATUS.decompressing}`)
                 this.setState({
                     data: {...current_data},
                     total_timesteps: {...model_timesteps},
-                    status: this.loaded_files >= (files_to_load - 1)? STATUS.playing : STATUS.decompressing,
+                    status: startAnimation? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
             }
@@ -497,16 +516,13 @@ class  ParticlesLayer extends React.Component {
 
         if (!_.isUndefined(this.state.data)) {
             const domain = [Math.abs(extent[2] - extent[0]), Math.abs(extent[3] - extent[1])]
-            let new_status = this.state.status
-            if ((this.state.status === STATUS.decompressing) && (this.loaded_files >= this.state.selected_model.num_files - 1)) {
-                new_status = STATUS.playing
-            }
-
+            let startAnimation = this.allowFirstAnimation()
+            // console.log(`Updating state to ${startAnimation? STATUS.playing : STATUS.decompressing}`)
             this.setState({
                 extent: extent,
                 domain: domain,
                 ol_canvas_size: size,
-                status: new_status,
+                status: startAnimation? STATUS.playing : STATUS.decompressing,
             })
         }
         return this.d3canvas.node()
@@ -529,16 +545,25 @@ class  ParticlesLayer extends React.Component {
         if (this.state.selected_model !== this.props.selected_model) {
             this.color_promise_status = "newmodel"  // It is used to avoid requesting the color squeme multiple times
             // In this case the data of the selected model has not been loaded
+
+            let display_color_menu = true
+            if( this.props.selected_model.color_scheme !== undefined){
+                display_color_menu = false
+            }
             if(_.isUndefined(this.state.data[this.props.selected_model.id])){
                 $(".btn").attr("disabled", true)  // Enable all the buttons
                 // In this case is a new file, we need to reset almost everything
                 this.time_step= 0
                 this.loaded_files = 0
+
+                // console.log(`2 Updating state to ${STATUS.loading}`)
                 this.setState({
                     selected_model: this.props.selected_model,
                     status: STATUS.loading,
+                    display_color_menu: display_color_menu
                 })
-                // single file version
+
+                // Single file version
                 for(let file_number in _.range(0, this.props.selected_model.num_files)){
                     let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
                     let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
@@ -549,9 +574,11 @@ class  ParticlesLayer extends React.Component {
 
             }else{  // In this case the file was loaded previously
                 this.time_step= 0  // reset time to 0
+                // console.log(`3 Updating state to ${STATUS.playing}`)
                 this.setState({
                     selected_model: this.props.selected_model,
-                    cur_state: STATUS.playing
+                    cur_state: STATUS.playing,
+                    display_color_menu: display_color_menu
                 })
             }
         } else { // In this case the data for this model has already been loaded we just need to update the animation
@@ -559,7 +586,6 @@ class  ParticlesLayer extends React.Component {
                 $(".loading-div").show() // In this case we are still loading something
             }else{
                 $(".loading-div").hide() // Hide the loading page
-                // $(".btn").attr("disabled", false)  // Enable all the buttons
                 let canvas = this.d3canvas.node()
                 if (this.state.status === STATUS.playing) {
                     if (!_.isNull(canvas)) {  // If we have already setup the canvas (not null) then we draw
@@ -568,7 +594,7 @@ class  ParticlesLayer extends React.Component {
                     }
                 }
                 if (this.state.status === STATUS.paused) {
-                    if (!_.isNull(canvas)) {// If we have already setup the canvas (not null) then we draw
+                    if (!_.isNull(canvas)) {
                         this.drawAnimationFrame()
                     }
                 }
@@ -909,10 +935,13 @@ class  ParticlesLayer extends React.Component {
             let url = `${this.props.url}/${selected_model.file}_${file_number_str}.txt`
             d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
         }
+        // Resize layers container
+        // console.log("Updating")
+        // $("#layers").css("max-height", `${parseInt(window.innerHeight*.9)}px`)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // console.log("Loaded files: ", this.loaded_files)
+        // console.log("Status:"+ this.state.status)
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
@@ -1150,17 +1179,27 @@ class  ParticlesLayer extends React.Component {
     toggleAllLayerDisplay(e){
         e.persist()
         e.preventDefault()
-        const disp_all_layers = !this.state.toggle_all_layers_display
+        const disp_all_layers = !this.state.display_all_layers
         let all_color_schemes = this.state.color_scheme
         let color_scheme = all_color_schemes[this.state.selected_model.id]
         for(let id=0; id < color_scheme.length; id++) {
             color_scheme[id].display = disp_all_layers
         }
         all_color_schemes[this.state.selected_model.id] = color_scheme
+        let canvas = this.d3canvas.node()
+        var prev = this.ctx.globalCompositeOperation
+        this.ctx.globalCompositeOperation = "destination-out"
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 255)'
+        this.ctx.fillRect(0, 0, canvas.width, canvas.height)
+        this.ctx.globalCompositeOperation = prev
+        this.ctx.fill()
+        this.drawAnimationFrame()
         this.setState({
             color_scheme: all_color_schemes,
-            toggle_all_layers_display: disp_all_layers
+            display_all_layers: disp_all_layers,
+            status: disp_all_layers? STATUS.playing: STATUS.paused
         })
+
     }
 
     toggleLayerDisplay(e){
@@ -1173,7 +1212,8 @@ class  ParticlesLayer extends React.Component {
         color_scheme[id].display = !color_scheme[id].display
         all_color_schemes[this.state.selected_model.id] = color_scheme
         this.setState({
-            color_scheme: all_color_schemes
+            color_scheme: all_color_schemes,
+            status: STATUS.playing
         })
     }
 
@@ -1340,7 +1380,7 @@ class  ParticlesLayer extends React.Component {
                                         key="all"
                                         id="all"
                                         label="All"
-                                        checked={this.state.toggle_all_layers_display}
+                                        checked={this.state.display_all_layers}
                                         onChange={this.toggleAllLayerDisplay}
                                         className="m-2"
                                     ></Form.Check>
@@ -1445,15 +1485,19 @@ class  ParticlesLayer extends React.Component {
                             </button>
                         </OverlayTrigger>
 
-                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_color" {...props}> Color selection</Tooltip>)}>
-                            <button className={`btn btn-sm btn-info`}
-                                onClick={() => this.setState({display_picker:!this.state.display_picker})}
-                                disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
-                                {this.state.display_picker?
-                                    <Brush size={default_size}/> : <BrushFill size={default_size}/>
-                                }
-                            </button>
-                        </OverlayTrigger>
+                        {this.state.display_color_menu?
+                            <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (
+                                <Tooltip id="tooltip_color" {...props}> Color selection</Tooltip>)}>
+                                <button className={`btn btn-sm btn-info`}
+                                        onClick={() => this.setState({display_picker: !this.state.display_picker})}
+                                        disabled={this.state.status === STATUS.loading || this.state.status === STATUS.decompressing}>
+                                    {this.state.display_picker ?
+                                        <Brush size={default_size}/> : <BrushFill size={default_size}/>
+                                    }
+                                </button>
+                            </OverlayTrigger>
+                             :<></>
+                        }
                     </span >
                     <span className="pv-pcolor">
                         <TwitterPicker
@@ -1570,49 +1614,46 @@ class  ParticlesLayer extends React.Component {
                                     </button>
                                 </OverlayTrigger>
                             </span>
-                            <div className={`pv-layerslistcontainer my_round ${this.state.display_layers ? 'd-block' : 'd-none'}`}>
+                            <div id='layers' className={`pv-layerslistcontainer my_round ${this.state.display_layers ? 'd-block' : 'd-none'}`}
+                                        style={{maxHeight: parseInt(window.innerHeight*.9)+'px'}}>
                                 <Form className="bg-light">
-                            <Row>
-                                <Col xs={9}>
-                                    <Form.Check
-                                        type="switch"
-                                        key="all"
-                                        id="all"
-                                        label="All"
-                                        checked={this.state.toggle_all_layers_display}
-                                        onChange={this.toggleAllLayerDisplay}
-                                    ></Form.Check>
-                                </Col>
-                                <Col xs={3}>
-                                    <Button variant="info"
-                                            size="sm"
-                                            onClick={this.toggleLayersContainer} title="Close layers">
-                                        <X size={default_size}/>
-                                    </Button>
-                                </Col>
-                            </Row>
-                            <Row className='bg-light'>
-                                <Col>
-                                    <ul className="pv-layerslist">
-                                        {this.state.color_scheme[this.state.selected_model.id].length ?
-                                            this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
-                                                <li key={c_layer.id}>
-                                                    <Form.Check
-                                                        type="switch"
-                                                        key={c_layer.id}
-                                                        id={c_layer.id}
-                                                        label={c_layer.name}
-                                                        checked={c_layer.display}
-                                                        onChange={this.toggleLayerDisplay}
-                                                    ></Form.Check>
-                                                </li>
-                                            ))
-                                            : <span>Single one</span>
-                                        }
-                                    </ul>
-                                </Col>
-                            </Row>
-                        </Form>
+                                    <Row>
+                                        <Col xs={9} >
+                                            <Button size="sm" className='m-1'
+                                                    onClick={this.toggleAllLayerDisplay} >
+                                                All
+                                            </Button>
+                                        </Col>
+                                        <Col xs={3}>
+                                            <Button variant="info"
+                                                    size="sm"
+                                                    onClick={this.toggleLayersContainer} title="Close layers">
+                                                <X size={default_size}/>
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                    <Row className='bg-light'>
+                                        <Col>
+                                            <ul className="pv-layerslist">
+                                                {this.state.color_scheme[this.state.selected_model.id].length ?
+                                                    this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                                        <li key={c_layer.id}>
+                                                            <Form.Check
+                                                                key={c_layer.id}
+                                                                id={c_layer.id}
+                                                                label={c_layer.name}
+                                                                checked={c_layer.display}
+                                                                onChange={this.toggleLayerDisplay}
+                                                                className='m-1'
+                                                            ></Form.Check>
+                                                        </li>
+                                                    ))
+                                                    : <span>Single one</span>
+                                                }
+                                            </ul>
+                                        </Col>
+                                    </Row>
+                                </Form>
                             </div>
                         </span>
                          :<span></span> }

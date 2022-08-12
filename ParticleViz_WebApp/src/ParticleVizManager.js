@@ -63,6 +63,7 @@ class  ParticleVizManager extends React.Component{
         window.addEventListener('resize', function(){
             this.updateMapLocation()
             this.state.chardin.stop()
+            $("#layers").css("max-height", `${parseInt(window.innerHeight*.9)}px`)
         }.bind(this) )
         // TODO search a better place to do this part
         $("body").on('chardinJs:start', function(){ $("#intro_text").show() })

@@ -45,11 +45,11 @@
 }
 
 .my_round {
-  border-bottom: calc(0.3rem - 1px);
-  border-top-left-radius: calc(0.3rem - 1px);
-  border-top-right-radius: calc(0.3rem - 1px);
-  border-bottom-left-radius: calc(0.3rem - 1px);
-  border-bottom-right-radius: calc(0.3rem - 1px);
+  border-bottom: calc(0.5rem);
+  border-top-left-radius: calc(0.5rem);
+  border-top-right-radius: calc(0.5rem);
+  border-bottom-left-radius: calc(0.5rem);
+  border-bottom-right-radius: calc(0.5rem);
 }
 
 .pv-flipped{
@@ -91,7 +91,7 @@
   position: absolute;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 98%;
+  /*max-height: 98%;*/
   font-size: 12px;
 }
 

@@ -13,6 +13,11 @@
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
                 "subsample": { "desktop": 2, "mobile": 2 },
                 "color_scheme": "./data/color_schemes/ColorSchemeWorldLitterMPW.json"
+            },
+            {
+                "name": "Single Color",
+                "file_name": "./ExampleData/Global_Marine_Debris.nc",
+                "subsample": { "desktop": 2, "mobile": 2 }
             }
         ]
     },
