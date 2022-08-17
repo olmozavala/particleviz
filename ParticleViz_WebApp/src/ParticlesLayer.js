@@ -329,7 +329,7 @@ class  ParticlesLayer extends React.Component {
     allowFirstAnimation(){
         let wait_for = 1  // [0, 1] percentage to indicate when can we start animating. If 10 files and = .8 we start after rading 8 files
         let files_to_load = parseInt(this.state.selected_model.num_files * wait_for)
-        // console.log("Files to load: " + files_to_load)
+        console.log(`Loaded files: ${this.loaded_files}, Files to load: ${files_to_load}`)
         // If we need to read only one file or have loaded enough files, then we can start the animation
         let ready_to_animate = (this.loaded_files >= files_to_load) || (files_to_load === 1)
         return ready_to_animate
@@ -378,16 +378,13 @@ class  ParticlesLayer extends React.Component {
     readUnzippedFileStepTwo(data, name, file_number_str) {
         const file_number = parseInt(file_number_str)
         if(name === this.props.selected_model.file) {
-            // console.log(`Uncompressed file received, file number: ${file_number} Loaded files: ${this.loaded_files}`)
+            console.log(`Uncompressed file received, file number: ${file_number}`)
             const total_timesteps = data[data_key]["lat_lon"][0][0].length
             let color_scheme = this.state.color_scheme
 
             let files_to_load = parseInt(this.state.selected_model.num_files)
-            let startAnimation = this.allowFirstAnimation()
-
-            // We will wait for this percentage of files to be loaded
             this.loaded_files += 1
-
+            let startAnimation = this.allowFirstAnimation()
 
             const model_id = this.state.selected_model.id
             let current_data = this.state.data
@@ -411,7 +408,7 @@ class  ParticlesLayer extends React.Component {
             // Copy first location of the next adjacent file as the first location of the current file
             // we only do it once most of the files are being loaded
             if (startAnimation) {
-                // console.log("Done reading and uncompressed the minimum number of files!!!!")
+                console.log("Done reading and uncompressed the minimum number of files!!!!")
                 $(".btn").attr("disabled", false)  // Enable all the buttons
                 this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
