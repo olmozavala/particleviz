@@ -44,7 +44,8 @@
             {
                 "name": "World Cities",
                 "file": "extra_layers/capitals.geojson",
-                "color": "rgb(255,237,0)"
+                "color": "rgb(255,237,0)",
+                "text": "cities"
             }
         ]
     },

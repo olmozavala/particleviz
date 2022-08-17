@@ -20,7 +20,8 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import CircleStyle from "ol/style/Circle";
 import {GeoJSON} from "ol/format";
-import {Stroke, Style} from "ol/style";
+import {Stroke, Style, Fill, Text} from "ol/style";
+import _ from "underscore"
 
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
@@ -57,29 +58,66 @@ let map = new Map({
 })
 
 if (typeof extra_layers !== 'undefined'){
+    // TODO move this part to another component that is called by particlelayer
+    // we need to have access to the color_scheme if we want to turn on/off layers
     // console.log(ip_address+"/"+extra_layers[0].file)
-
-    for (const [, value] of Object.entries(extra_layers)) {
-        // console.log("Adding extra vector layer: ", value.name)
-        let color = value.color
+    for (const [, extra_layer_obj] of Object.entries(extra_layers)) {
+        console.log("Adding extra vector layer: ", extra_layer_obj)
+        let color = extra_layer_obj.color
         let extra_layer = new VectorLayer({
             source: new VectorSource({
-                url: `${ip_address}/data/${value.file}`,
+                url: `${ip_address}/data/${extra_layer_obj.file}`,
                 format: new GeoJSON(),
                 overlaps: false
             }),
-            style: function (feature) {
-                return new Style({
-                    image: new CircleStyle({
-                        radius: 5,
-                        fill: new Stroke({color: color, width: 1}),
-                        stroke: new Stroke({color: color, width: 1}),
+            // TODO it is only displaying Circles
+            style: function(feature){
+                let geometry = feature.getGeometry()
+                const type = geometry.getType()
+                let style
+                let circleRadius = 5
+
+                if (type === 'Point') {
+                    style = new Style({
+                        image: new CircleStyle({
+                            radius: circleRadius,
+                            fill: new Fill({ color: "red"}),
+                        }),
                     })
-                })
+                } else if (type === 'line') {
+                    style = new Style({
+                        stroke: new Stroke({
+                            color: color,
+                            width: 3,
+                        }),
+                    })
+                }
+                if(!_.isUndefined(extra_layer_obj.text)){
+                    //https://openlayers.org/en/latest/apidoc/module-ol_style_Text-Text.html
+                    style.setText(new Text({
+                        font: 'bold 16px sans-serif',
+                        text: feature.get(extra_layer_obj.text),
+                        textAlign: "start",
+                        // textBaseline: "hanging",
+                        fill: new Fill({ color: "black"}),
+                        // stroke: new Stroke({ color: "white"}),
+                        offsetX: circleRadius*2,
+                        // fill: new Fill({ color: "#2f363e"}),
+                        // padding: [0,0,0,1000],
+                        // backgroundFill: new Fill({ color: "lightgrey"}),
+                    }))
+                }
+                return style
             }
         })
         map.addLayer(extra_layer)
     }
+    map.on('click', function(evt){
+        const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+            return feature;
+        })
+        console.log(feature)
+    })
 }
 
 var intro_chardin = new chardinJs("body")

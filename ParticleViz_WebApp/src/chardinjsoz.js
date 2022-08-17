@@ -197,7 +197,7 @@ export class chardinJs{
     }
 
     _get_oz_position_offset (element) {
-        var positionString, _ref
+        var positionString
         var helpref = element.getAttribute(this.data_attribute)
         if (helpref[0] === '#' && this.data_helptext[helpref].position)
             positionString = this.data_helptext[helpref].position
