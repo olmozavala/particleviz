@@ -2,6 +2,11 @@
     "preprocessing": {
         "models": [
             {
+                "name": "Single Color",
+                "file_name": "./ExampleData/Global_Marine_Debris.nc",
+                "subsample": { "desktop": 2, "mobile": 2 }
+            },
+            {
                 "_name": "Color by Country",
                 "name": "Color by Country",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
@@ -13,11 +18,6 @@
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
                 "subsample": { "desktop": 2, "mobile": 2 },
                 "color_scheme": "./data/color_schemes/ColorSchemeWorldLitterMPW.json"
-            },
-            {
-                "name": "Single Color",
-                "file_name": "./ExampleData/Global_Marine_Debris.nc",
-                "subsample": { "desktop": 2, "mobile": 2 }
             }
         ]
     },
@@ -44,8 +44,9 @@
             {
                 "name": "World Cities",
                 "file": "extra_layers/capitals.geojson",
-                "color": "rgb(255,237,0)",
-                "text": "cities"
+                "color": "rgb(0,0,255)",
+                "text": "city",
+                "click": "city"
             }
         ]
     },
