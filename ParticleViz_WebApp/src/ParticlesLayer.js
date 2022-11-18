@@ -1199,7 +1199,7 @@ class  ParticlesLayer extends React.Component {
         this.drawAnimationFrame()
         this.setState({
             color_scheme: all_color_schemes,
-            display_all_layers: disp_all_layers,
+            toggle_all_layers_display: disp_all_layers,
             status: disp_all_layers? STATUS.playing: STATUS.paused
         })
     }
