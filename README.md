@@ -51,6 +51,17 @@ python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
 ```
 <img src="docs/media/quickstart.gif" alt="example" />
 
+## Docker
+You can run ParticleViz as a docker container. By default it will run using the example netcdf files. 
+If you want to change it, edit `entrypoint.sh` to point to a file inside the *particleviz* folder. 
+
+1. Install Docker
+2. `git clone https://github.com/olmozavala/particleviz.git`
+3. `cd particleviz`
+4. `docker build --pull --rm -f Dockerfile -t particleviz "."`
+5. `docker run --rm -it -p 3000:3000 particleviz:latest`
+6. `http://localhost:3000/`
+
 ## Intro video
 This is a presentation made at OceanSciences meeting about ParticleViz in March 2022.
 
