@@ -141,7 +141,6 @@ const initThreeJS = (ReactScope) => {
   camera.position.set(0, 5, 5);
   controls.update();
 
-
   ReactScope.animate = () => {
     controls.update();
     renderer.render(scene, camera);
@@ -161,37 +160,68 @@ const initThreeJS = (ReactScope) => {
     return { x, y, z };
   };
 
-  ReactScope.ThreeJSPoints = [];
 
-  const createPoint = (
-    /** @type {number}*/ x,
-    /** @type {number}*/ y,
-    /** @type {number}*/ z
-  ) => {
-    /* Using least number of segments for sphere to optimize performance. */
-    const geometry = new THREE.SphereGeometry(0.1, 3, 2);
-    const material = new THREE.MeshBasicMaterial({ color: `rgb(3, 252, 240)` });
-    const sphere = new THREE.Mesh(geometry, material);
-    sphere.position.x = x;
-    sphere.position.y = y;
-    sphere.position.z = z;
-    return sphere;
+  ReactScope.Point_Geometry = new THREE.BufferGeometry();
+
+  console.log(ReactScope.Point_Geometry)
+  
+  ReactScope.Point_Geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(10000, 3) ) );
+
+  ReactScope.Point_Material = new THREE.PointsMaterial({
+    color: 0x03fcf0,
+    size: 0.01,
+    opacity: 1,
+  });
+
+  ReactScope.Points = new THREE.Points(ReactScope.Point_Geometry, ReactScope.Point_Material);
+
+  ReactScope.ThreeJSPoints = [];
+  
+  ReactScope.RenderPoints = () => {
+    ReactScope.Point_Geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(ReactScope.ThreeJSPoints),3 ) );
   };
 
+  ReactScope.scene.add(ReactScope.Points);
+
+  // const createPoint = (
+  //   /** @type {number}*/ x,
+  //   /** @type {number}*/ y,
+  //   /** @type {number}*/ z
+  // ) => {
+  //   /* Using least number of segments for sphere to optimize performance. */
+  //   // const geometry = new THREE.SphereGeometry(0.1, 3, 2);
+  //   // const material = new THREE.MeshBasicMaterial({ color: `rgb(3, 252, 240)` });
+  //   // const sphere = new THREE.Mesh(geometry, material);
+
+  //   ReactScope.ThreeJSPoints.push(x);
+  //   ReactScope.ThreeJSPoints.push(y);
+  //   ReactScope.ThreeJSPoints.push(z);
+
+  //   // sphere.position.x = x;
+  //   // sphere.position.y = y;
+  //   // sphere.position.z = z;
+  //   // return sphere;
+  // };
+
   ReactScope.clearThreeJSPoints = () => {
-    ReactScope.ThreeJSPoints.forEach((element,i) => {
-      ReactScope.scene.remove(element);
-      if(i === ReactScope.ThreeJSPoints.length - 1) {
-        ReactScope.ThreeJSPoints = [];
-      }
+    return new Promise((res) => {
+      if (!ReactScope.ThreeJSPoints.length) res();
+      ReactScope.ThreeJSPoints.forEach((element, i) => {
+        ReactScope.scene.remove(element);
+
+        if (i === ReactScope.ThreeJSPoints.length - 1) {
+          ReactScope.ThreeJSPoints = [];
+          res();
+        }
+      });
     });
   };
 
-  ReactScope.RenderPoint = (lat, lon) => {
+  ReactScope.AddPointToBufferGeometry = (lat, lon) => {
     const { x, y, z } = ReactScope.getCoordinatesFromlatlong(lat, lon);
-    const point = createPoint(x, y, z);
-    ReactScope.ThreeJSPoints.push(point);
-    scene.add(point);
+    ReactScope.ThreeJSPoints.push(x);
+    ReactScope.ThreeJSPoints.push(y);
+    ReactScope.ThreeJSPoints.push(z);
   };
 
   document.body.appendChild(container);
@@ -913,18 +943,17 @@ class ParticlesLayer extends React.Component {
         if (cur_date === 0) {
           // Clear the canvas if it is the first date of the animation
           // --New Line --------------------------------
-          
-          this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         } else {
           // Make previous frame slightly transparent
           var prev = this.ctx.globalCompositeOperation;
-          this.ctx.globalCompositeOperation = "destination-out";
-          this.ctx.fillStyle = `rgba(255, 255, 255, ${
-            TRAIL_SIZE[this.state.trail_size]
-          })`;
-          this.ctx.fillRect(0, 0, canvas.width, canvas.height);
-          this.ctx.globalCompositeOperation = prev;
-          this.ctx.fill();
+          // this.ctx.globalCompositeOperation = "destination-out";
+          // this.ctx.fillStyle = `rgba(255, 255, 255, ${
+          // TRAIL_SIZE[this.state.trail_size]
+          // })`;
+          // this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+          // this.ctx.globalCompositeOperation = prev;
+          // this.ctx.fill();
         }
         // Draw next frame
         if (this.state.shape_type) {
@@ -958,11 +987,13 @@ class ParticlesLayer extends React.Component {
   /**
    * Draws the particles for a single day as squares
    */
-  drawParticlesAsSquares(cur_date_all_files) {
+  async drawParticlesAsSquares(cur_date_all_files) {
+    await this.clearThreeJSPoints();
     const square_size = parseInt(
       PARTICLE_SIZES[this.state.particle_size_index] + 1
     );
-    this.ctx.lineWidth = square_size;
+
+    // this.ctx.lineWidth = square_size;
     const model_id = this.state.selected_model.id;
     const available_files = Object.keys(this.state.data[model_id]);
     const file_number = Math.floor(
@@ -982,11 +1013,11 @@ class ParticlesLayer extends React.Component {
       if (has_nans) {
         let disp_part = 0;
         for (let scheme_id = 0; scheme_id < color_scheme.length; scheme_id++) {
-          this.ctx.beginPath();
+          // this.ctx.beginPath();
           let c_scheme = color_scheme[scheme_id];
           if (c_scheme.display) {
             let part_indxs = c_scheme.index;
-            this.ctx.fillStyle = c_scheme.color;
+            // this.ctx.fillStyle = c_scheme.color;
             for (
               let part_indxs_id = 0;
               part_indxs_id < part_indxs.length;
@@ -996,7 +1027,7 @@ class ParticlesLayer extends React.Component {
               clon = drawing_data["lat_lon"][1][part_id][cur_date];
               clat = drawing_data["lat_lon"][0][part_id][cur_date];
               // --New Line --------------------------------
-              this.RenderPoint(clon, clat);
+              this.AddPointToBufferGeometry(clon, clat);
               // disp_part = drawing_data["disp_info"][part_id][cur_date];
 
               // if (disp_part) {
@@ -1040,17 +1071,18 @@ class ParticlesLayer extends React.Component {
               //   }
               // }
             }
-            this.ctx.stroke();
-            this.ctx.closePath();
+            // this.ctx.stroke();
+            // this.ctx.closePath();
+            this.RenderPoints();
           }
         }
       } else {
         for (let scheme_id = 0; scheme_id < color_scheme.length; scheme_id++) {
-          this.ctx.beginPath();
+          // this.ctx.beginPath();
           let c_scheme = color_scheme[scheme_id];
           if (c_scheme.display) {
             let part_indxs = c_scheme.index;
-            this.ctx.fillStyle = c_scheme.color;
+            // this.ctx.fillStyle = c_scheme.color;
             for (
               let part_indxs_id = 0;
               part_indxs_id < part_indxs.length;
@@ -1060,7 +1092,7 @@ class ParticlesLayer extends React.Component {
               let clon = drawing_data["lat_lon"][1][part_id][cur_date];
               let clat = drawing_data["lat_lon"][0][part_id][cur_date];
               // --New Line --------------------------------
-              this.RenderPoint(clon, clat);
+              this.AddPointToBufferGeometry(clon, clat);
               // if (
               //   clon >= this.state.extent[0] &&
               //   clon <= this.state.extent[2]
@@ -1100,8 +1132,9 @@ class ParticlesLayer extends React.Component {
               //   }
               // }
             }
-            this.ctx.stroke();
-            this.ctx.closePath();
+            // this.ctx.stroke();
+            // this.ctx.closePath();
+            this.RenderPoints();
           }
         }
       }
@@ -1111,7 +1144,7 @@ class ParticlesLayer extends React.Component {
 
   drawParticlesAsLines(timestep_idx_org) {
     // console.log(`DrawLines: ${this.state.speed_hz}`)
-    this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
+    // this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index];
     const model_id = this.state.selected_model.id;
     const available_files = Object.keys(this.state.data[model_id]);
     const file_number = Math.floor(
@@ -1141,9 +1174,9 @@ class ParticlesLayer extends React.Component {
         for (let scheme_id = 0; scheme_id < color_scheme.length; scheme_id++) {
           let c_scheme = color_scheme[scheme_id];
           if (c_scheme.display) {
-            this.ctx.beginPath();
+            // this.ctx.beginPath();
             let part_indxs = c_scheme.index;
-            this.ctx.strokeStyle = c_scheme.color;
+            // this.ctx.strokeStyle = c_scheme.color;
             for (
               let part_indxs_id = 0;
               part_indxs_id < part_indxs.length;
@@ -1160,48 +1193,48 @@ class ParticlesLayer extends React.Component {
 
               // do not plot if NaN
               // if (disp_part) {
-                // Here we draw the 'normal' particles, those inside the limits of the globe
-                // if (
-                //   clon >= this.state.extent[0] &&
-                //   clon <= this.state.extent[2]
-                // ) {
-                //   oldpos = this.geoToCanvas(clon, clat);
-                //   newpos = this.geoToCanvas(nlon, nlat);
-                //   this.ctx.moveTo(oldpos[0], oldpos[1]);
-                //   this.ctx.lineTo(newpos[0], newpos[1]);
-                // }
-                // Draw the particles on the additional map on the east
-                // if (this.show_east_map) {
-                //   tlon = clon + 360;
-                //   tnlon = nlon + 360;
-                //   if (
-                //     tlon >= this.state.extent[0] &&
-                //     tnlon <= this.state.extent[2]
-                //   ) {
-                //     oldpos = this.geoToCanvas(tlon, clat);
-                //     newpos = this.geoToCanvas(tnlon, nlat);
-                //     this.ctx.moveTo(oldpos[0], oldpos[1]);
-                //     this.ctx.lineTo(newpos[0], newpos[1]);
-                //   }
-                // }
-                // Draw the particles on the additional map on the west
-                // if (this.show_west_map) {
-                //   tlon = clon - 360;
-                //   tnlon = nlon - 360;
-                //   if (
-                //     tlon >= this.state.extent[0] &&
-                //     tnlon <= this.state.extent[2]
-                //   ) {
-                //     oldpos = this.geoToCanvas(tlon, clat);
-                //     newpos = this.geoToCanvas(tnlon, nlat);
-                //     this.ctx.moveTo(oldpos[0], oldpos[1]);
-                //     this.ctx.lineTo(newpos[0], newpos[1]);
-                //   }
-                // }
+              // Here we draw the 'normal' particles, those inside the limits of the globe
+              // if (
+              //   clon >= this.state.extent[0] &&
+              //   clon <= this.state.extent[2]
+              // ) {
+              //   oldpos = this.geoToCanvas(clon, clat);
+              //   newpos = this.geoToCanvas(nlon, nlat);
+              //   this.ctx.moveTo(oldpos[0], oldpos[1]);
+              //   this.ctx.lineTo(newpos[0], newpos[1]);
+              // }
+              // Draw the particles on the additional map on the east
+              // if (this.show_east_map) {
+              //   tlon = clon + 360;
+              //   tnlon = nlon + 360;
+              //   if (
+              //     tlon >= this.state.extent[0] &&
+              //     tnlon <= this.state.extent[2]
+              //   ) {
+              //     oldpos = this.geoToCanvas(tlon, clat);
+              //     newpos = this.geoToCanvas(tnlon, nlat);
+              //     this.ctx.moveTo(oldpos[0], oldpos[1]);
+              //     this.ctx.lineTo(newpos[0], newpos[1]);
+              //   }
+              // }
+              // Draw the particles on the additional map on the west
+              // if (this.show_west_map) {
+              //   tlon = clon - 360;
+              //   tnlon = nlon - 360;
+              //   if (
+              //     tlon >= this.state.extent[0] &&
+              //     tnlon <= this.state.extent[2]
+              //   ) {
+              //     oldpos = this.geoToCanvas(tlon, clat);
+              //     newpos = this.geoToCanvas(tnlon, nlat);
+              //     this.ctx.moveTo(oldpos[0], oldpos[1]);
+              //     this.ctx.lineTo(newpos[0], newpos[1]);
+              //   }
+              // }
               // }
             }
-            this.ctx.stroke();
-            this.ctx.closePath();
+            // this.ctx.stroke();
+            // this.ctx.closePath();
           }
         }
       } else {
@@ -1261,8 +1294,8 @@ class ParticlesLayer extends React.Component {
               //   }
               // }
             }
-            this.ctx.stroke();
-            this.ctx.closePath();
+            // this.ctx.stroke();
+            // this.ctx.closePath();
           }
         }
       }
@@ -1397,7 +1430,7 @@ class ParticlesLayer extends React.Component {
     this.time_step = cur_time_step;
     this.time = 0; // THis will force to draw a frame when you move the slider
     let canvas = this.d3canvas.node();
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     this.drawAnimationFrame();
     this.updateRange();
   }
@@ -1423,14 +1456,14 @@ class ParticlesLayer extends React.Component {
     this.draw_until_day = true;
     this.time_step = Math.max(this.time_step - 1, 1);
     let canvas = this.d3canvas.node();
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     this.drawAnimationFrame();
     this.updateRange();
   }
 
   togglePlayDirection(e) {
     let canvas = this.d3canvas.node();
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     e.preventDefault();
     this.setState({
       play_backward: !this.state.play_backward,
@@ -1536,13 +1569,13 @@ class ParticlesLayer extends React.Component {
       color_scheme[id].display = disp_all_layers;
     }
     all_color_schemes[this.state.selected_model.id] = color_scheme;
-    let canvas = this.d3canvas.node();
-    var prev = this.ctx.globalCompositeOperation;
-    this.ctx.globalCompositeOperation = "destination-out";
-    this.ctx.fillStyle = "rgba(255, 255, 255, 255)";
-    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
-    this.ctx.globalCompositeOperation = prev;
-    this.ctx.fill();
+    // let canvas = this.d3canvas.node();
+    // var prev = this.ctx.globalCompositeOperation;
+    // this.ctx.globalCompositeOperation = "destination-out";
+    // this.ctx.fillStyle = "rgba(255, 255, 255, 255)";
+    // this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // this.ctx.globalCompositeOperation = prev;
+    // this.ctx.fill();
     this.drawAnimationFrame();
     this.setState({
       color_scheme: all_color_schemes,
