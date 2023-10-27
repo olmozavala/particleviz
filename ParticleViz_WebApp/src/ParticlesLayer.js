@@ -1027,7 +1027,7 @@ class ParticlesLayer extends React.Component {
               clon = drawing_data["lat_lon"][1][part_id][cur_date];
               clat = drawing_data["lat_lon"][0][part_id][cur_date];
               // --New Line --------------------------------
-              this.AddPointToBufferGeometry(clon, clat);
+              this.AddPointToBufferGeometry(clat,clon);
               // disp_part = drawing_data["disp_info"][part_id][cur_date];
 
               // if (disp_part) {
@@ -1092,7 +1092,7 @@ class ParticlesLayer extends React.Component {
               let clon = drawing_data["lat_lon"][1][part_id][cur_date];
               let clat = drawing_data["lat_lon"][0][part_id][cur_date];
               // --New Line --------------------------------
-              this.AddPointToBufferGeometry(clon, clat);
+              this.AddPointToBufferGeometry(clat,clon);
               // if (
               //   clon >= this.state.extent[0] &&
               //   clon <= this.state.extent[2]
