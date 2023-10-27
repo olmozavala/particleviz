@@ -229,7 +229,7 @@ class  ParticleVizManager extends React.Component{
                     </span>
                     {/* ---------- Particles menu ------------*/}
                     {/* ---------- All options from particles ------------*/}
-                    <span className="navbar-brand align-middle"> {/* data-intro="Particles" */}
+                    <span className="navbar-brand align-middle" style={{zIndex:200}}> {/* data-intro="Particles" */}
                         <ParticlesLayer map={this.props.map}
                                         url={this.props.url}
                                         chardin={this.state.chardin}

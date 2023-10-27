@@ -103,6 +103,7 @@ const initThreeJS = (ReactScope) => {
   container.style.position = "absolute";
   container.style.top = 0;
   container.style.left = 0;
+  container.style.zIndex = 100;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
@@ -129,8 +130,8 @@ const initThreeJS = (ReactScope) => {
 
   camera.position.z = 5;
 
-  const gridHelper = new THREE.GridHelper(10, 10);
-  scene.add(gridHelper);
+  // const gridHelper = new THREE.GridHelper(10, 10);
+  // scene.add(gridHelper);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -169,7 +170,7 @@ const initThreeJS = (ReactScope) => {
 
   ReactScope.Point_Material = new THREE.PointsMaterial({
     color: 0x03fcf0,
-    size: 0.01,
+    size: 0.005,
     opacity: 1,
   });
 
@@ -911,7 +912,7 @@ class ParticlesLayer extends React.Component {
    * Draws a single frame (timestep) using D3
    */
   drawAnimationFrame() {
-    this.animate();
+    // this.animate();
     let ctime = Date.now();
     // Verify if it is time to draw the next frame
     if (ctime - this.time > 1000 / this.state.speed_hz) {
@@ -979,6 +980,7 @@ class ParticlesLayer extends React.Component {
       }
     }
     cancelAnimationFrame(this.interval);
+    this.animate();
     if (this.state.status === STATUS.playing) {
       this.interval = requestAnimationFrame(this.drawAnimationFrame);
     }
@@ -1697,6 +1699,7 @@ class ParticlesLayer extends React.Component {
                 id="date_range"
                 className="navbar-brand mt-1"
                 data-position="bottom"
+                
               >
                 <input
                   type="range"
