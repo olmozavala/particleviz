@@ -204,3 +204,8 @@
     max-width: 100%;
   }
 }
+
+
+#threejs_holder {
+  transition: .3s;
+}
