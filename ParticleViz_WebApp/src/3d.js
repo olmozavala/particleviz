@@ -148,25 +148,13 @@ const initThreeJS = (ReactScope) => {
   };
 
   scene.add(Points);
-  
-  ReactScope.updateTrails = () =>{
-    console.log(ReactScope.state.trail_size);
-  }
 
-  
+  ReactScope.updateTrails = () => {
+    console.log(ReactScope.state.trail_size);
+  };
 
   ReactScope.clearThreeJSPoints = () => {
-    return new Promise((res) => {
-      if (!ThreeJSPoints.length) res(0);
-      ThreeJSPoints.forEach((element, i) => {
-        scene.remove(element);
-
-        if (i === ThreeJSPoints.length - 1) {
-          ThreeJSPoints = [];
-          res(0);
-        }
-      });
-    });
+    ThreeJSPoints = [];
   };
 
   ReactScope.AddPointToBufferGeometry = (lat, lon) => {
