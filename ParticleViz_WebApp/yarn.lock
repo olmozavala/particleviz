@@ -1142,6 +1142,45 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@babylonjs/core@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-6.28.1.tgz#db03cc1d35865fe090ca4725f995f46496585806"
+  integrity sha512-7D0L//yQDq0WU5Mj6os3fGNoy8dtCONgRJ2ji2PMNwZlQ6jH3e5OnoaMYss1QuNCoGeTrXbNuNa7z8RezuFrCQ==
+
+"@babylonjs/gui-editor@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/gui-editor/-/gui-editor-6.28.1.tgz#8f899500c7ac56a499e95ef94803149d30df5f73"
+  integrity sha512-880gIEskM61yRNXCMj5/yBRE7wH/C1UUp/VRwNvPmVkI8okGQ7jlzRoPk7nw10dSwsHDcssdWy89NXNmYIHnqg==
+
+"@babylonjs/gui@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/gui/-/gui-6.28.1.tgz#2fbe93bf497c67e96ef809a0af8ffb78c544c6dc"
+  integrity sha512-si8REM177m2Pk0DUn1d3xXyfKmOKosK4uY8Dw+eOL8FuCGvGQe5Yuw2qgkw2BbVMkFdg2qSib5vqxaLa97c1kg==
+
+"@babylonjs/inspector@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/inspector/-/inspector-6.28.1.tgz#29af24467db52e6d1b853a8df86b73fff502a7bc"
+  integrity sha512-TtFyUXPMwSR0WGt5/9fIcf3JNlOqNxRt7R6uHQ0+siOZYgzCpjBc3jSscSi+LzW0uO0PGHt7DhrgVAzRSG8Tcg==
+  dependencies:
+    "@fortawesome/fontawesome-svg-core" "^6.1.0"
+    "@fortawesome/free-regular-svg-icons" "^6.0.0"
+    "@fortawesome/free-solid-svg-icons" "^6.0.0"
+
+"@babylonjs/loaders@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/loaders/-/loaders-6.28.1.tgz#c70ab307672544169ec062fadcb8a2e520aa814a"
+  integrity sha512-MrvkQxNaWotVE1xnKHCW/mij80efBH4sCM1xybEw2abAxr0jGfdSpPAKnddsqRE3JsAqyp40QaeHd5ngSKIaQg==
+
+"@babylonjs/materials@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/materials/-/materials-6.28.1.tgz#0f902a20dc081b53e3033496ef68d3aa8a784373"
+  integrity sha512-RM5k4JlC2r5McnLg5js3hdi6MgVnrTYhwhy6ypYR3SXxHxKvEpGLygYjdURuffBKc10JhaF0OEdwbrFCqggRQg==
+
+"@babylonjs/serializers@^6.28.1":
+  version "6.28.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/serializers/-/serializers-6.28.1.tgz#5016f76412ca3143925cdc73ac1b085c9761adf5"
+  integrity sha512-FWwOrjnSyVU+YhQmQ9aSxLtj0QZ+8X0O9H6i028AzZPm35gLoFpOUqHlyZxP2Ycdp63ux6lLUqmLdtFMrV8GDw==
+
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -1300,14 +1339,21 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.4.2.tgz#1766039cad33f8ad87f9467b98e0d18fbc8f01c5"
   integrity sha512-1DgP7f+XQIJbLFCTX1V2QnxVmpLdKdzzo2k8EmvDOePfchaIGQ9eCHj2up3/jNEbZuBqel5OxiaOJf37TWauRA==
 
-"@fortawesome/fontawesome-svg-core@^6.1.2":
+"@fortawesome/fontawesome-svg-core@^6.1.0", "@fortawesome/fontawesome-svg-core@^6.1.2":
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.4.2.tgz#37f4507d5ec645c8b50df6db14eced32a6f9be09"
   integrity sha512-gjYDSKv3TrM2sLTOKBc5rH9ckje8Wrwgx1CxAPbN5N3Fm4prfi7NsJVWd1jklp7i5uSCVwhZS5qlhMXqLrpAIg==
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.4.2"
 
-"@fortawesome/free-solid-svg-icons@^6.1.2":
+"@fortawesome/free-regular-svg-icons@^6.0.0":
+  version "6.4.2"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-6.4.2.tgz#aee79ed76ce5dd04931352f9d83700761b8b1b25"
+  integrity sha512-0+sIUWnkgTVVXVAPQmW4vxb9ZTHv0WstOa3rBx9iPxrrrDH6bNLsDYuwXF9b6fGm+iR7DKQvQshUH/FJm3ed9Q==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "6.4.2"
+
+"@fortawesome/free-solid-svg-icons@^6.0.0", "@fortawesome/free-solid-svg-icons@^6.1.2":
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-6.4.2.tgz#33a02c4cb6aa28abea7bc082a9626b7922099df4"
   integrity sha512-sYwXurXUEQS32fZz9hVCUUv/xu49PEJEyUOsA51l6PU/qVgfbTb2glsTEaJngVVT8VqBATRIdh7XVgV1JF1LkA==
@@ -13505,6 +13551,7 @@ workbox-window@6.6.1:
     workbox-core "6.6.1"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==

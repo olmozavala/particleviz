@@ -112,8 +112,8 @@ class  ParticlesLayer extends React.Component {
             color_scheme: {},
             start_date: Date.now(),
             date_format: d3.timeFormat("%B %e, %Y "),
-            range_time_step: 0
-            
+            range_time_step: 0,
+            _3D_render:true
         }
 
         // This is repeated should go in a function
@@ -821,7 +821,6 @@ class  ParticlesLayer extends React.Component {
         const available_files = Object.keys(this.state.data[model_id])
         const file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
         const color_scheme = this.state.color_scheme[model_id]
-
         let clon = 0
         let clat = 0
         let nlon = 0
@@ -963,6 +962,7 @@ class  ParticlesLayer extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         // console.log("Updated component: ", this.state)
+        this.update3DCanvas();
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
