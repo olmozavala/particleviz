@@ -18,7 +18,7 @@ import {
     ListTask, ListStars
 } from 'react-bootstrap-icons'
 import JSZip from "jszip"
-import initThreeJS from './3d'
+import Globe from './Babylon'
 
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
@@ -951,7 +951,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidMount() {
-      initThreeJS(this);
+      Globe(this);
         let selected_model = this.props.selected_model
         for(let file_number in _.range(0, selected_model.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`

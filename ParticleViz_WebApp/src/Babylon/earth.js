@@ -1,8 +1,6 @@
-//@ts-check
 import {
   ArcRotateCamera,
   Color4,
-  Mesh,
   PointsCloudSystem,
   Scene,
   SceneLoader,
@@ -66,7 +64,7 @@ class Earth {
       "assets/earth.glb",
       this.scene,
       (mesh) => {
-        this.scene.createDefaultCameraOrLight(true,false,true);
+        this.scene.createDefaultCameraOrLight(true, false, true);
       }
     );
     return;

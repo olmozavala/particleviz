@@ -1,8 +1,7 @@
-//@ts-check
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Path3D, Scene } from "@babylonjs/core";
+import { Engine, Scene } from "@babylonjs/core";
 import Earth from "./earth";
 
 const METHODS_TO_OVERWRITE = [
@@ -11,6 +10,7 @@ const METHODS_TO_OVERWRITE = [
   "update3DCanvas",
   "clearThreeJSPoints",
   "updateTrails",
+  "updatePointsMaterial",
 ];
 
 class App {
@@ -85,13 +85,17 @@ class App {
   }
 
   clearThreeJSPoints() {
-    if(this.#previousPositions.length > 1) this.#previousPositions.shift(); 
+    if (this.#previousPositions.length > 1) this.#previousPositions.shift();
     this.#previousPositions.push(this.particlePositions);
     this.particlePositions = [];
   }
 
   updateTrails() {
     this.#trailSize = this.#mainAppScope.state.trail_size;
+  }
+
+  updatePointsMaterial() {
+    return;
   }
 
   interpolate(a, b, frac) {
