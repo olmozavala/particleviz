@@ -22,6 +22,7 @@
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-normalize": "^10.0.1",
     "postcss-preset-env": "^7.4.2",
+    "raw-loader": "^4.0.2",
     "react": "^18.2.0",
     "react-bootstrap": "2.5.0-beta.1",
     "react-bootstrap-icons": "^1.7.2",
@@ -55,6 +56,13 @@
     ]
   },
   "devDependencies": {
+    "@babylonjs/core": "^6.28.1",
+    "@babylonjs/gui": "^6.28.1",
+    "@babylonjs/gui-editor": "^6.28.1",
+    "@babylonjs/inspector": "^6.28.1",
+    "@babylonjs/loaders": "^6.28.1",
+    "@babylonjs/materials": "^6.28.1",
+    "@babylonjs/serializers": "^6.28.1",
     "cpx": "^1.5.0",
     "d3": "^7.6.1",
     "ol": "^6.15.1",

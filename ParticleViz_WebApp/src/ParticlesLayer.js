@@ -18,6 +18,8 @@ import {
     ListTask, ListStars
 } from 'react-bootstrap-icons'
 import JSZip from "jszip"
+import Globe from './Babylon'
+import Canvas from './Babylon/Component'
 
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
@@ -32,7 +34,7 @@ const STATUS = {
 }
 
 // magnitude of transparency
-const TRAIL_SIZE = {
+export const TRAIL_SIZE = {
     1: .01, // Longest trail
     2: .04,
     3: .15,
@@ -40,7 +42,7 @@ const TRAIL_SIZE = {
     5: .90  // Shortest trail
 }
 
-let PARTICLE_SIZES = {
+export let PARTICLE_SIZES = {
     1: .5,
     2: 1,
     3: 2,
@@ -111,7 +113,8 @@ class  ParticlesLayer extends React.Component {
             color_scheme: {},
             start_date: Date.now(),
             date_format: d3.timeFormat("%B %e, %Y "),
-            range_time_step: 0
+            range_time_step: 0,
+            _3D_render:true
         }
 
         // This is repeated should go in a function
@@ -535,6 +538,8 @@ class  ParticlesLayer extends React.Component {
         return this.d3canvas.node()
     }
 
+    
+
     clearPreviousLoop() {
         if (!_.isUndefined(this.interval)) {
             cancelAnimationFrame(this.interval)
@@ -676,6 +681,7 @@ class  ParticlesLayer extends React.Component {
                     this.ctx.fill()
                 }
                 // Draw next frame
+                this.clearThreeJSPoints();
                 if (this.state.shape_type) {
                     this.drawParticlesAsLines(cur_date)
                 } else {
@@ -733,32 +739,35 @@ class  ParticlesLayer extends React.Component {
                             clon = drawing_data["lat_lon"][1][part_id][cur_date]
                             clat = drawing_data["lat_lon"][0][part_id][cur_date]
                             disp_part = drawing_data["disp_info"][part_id][cur_date]
-
-                            if(disp_part){
-                                if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                    oldpos = this.geoToCanvas(clon, clat)
-                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                }
-                                // Draw the particles on the additional map on the east
-                                if (this.show_east_map) {
-                                    let tlon = clon + 360
-                                    if (tlon >= this.state.extent[0]) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                    }
-                                }
-                                // Draw the particles on the additional map on the west
-                                if (this.show_west_map){
-                                    let tlon = clon - 360
-                                    if (tlon >= this.state.extent[0]) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                    }
-                                }
+                            if(this.props._3D_render) this.AddPointToBufferGeometry(clat,clon);
+                            if(!this.props._3D_render){
+                              if(disp_part){
+                                  if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                      oldpos = this.geoToCanvas(clon, clat)
+                                      this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                  }
+                                  // Draw the particles on the additional map on the east
+                                  if (this.show_east_map) {
+                                      let tlon = clon + 360
+                                      if (tlon >= this.state.extent[0]) {
+                                          oldpos = this.geoToCanvas(tlon, clat)
+                                          this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                      }
+                                  }
+                                  // Draw the particles on the additional map on the west
+                                  if (this.show_west_map){
+                                      let tlon = clon - 360
+                                      if (tlon >= this.state.extent[0]) {
+                                          oldpos = this.geoToCanvas(tlon, clat)
+                                          this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                      }
+                                  }
+                              }
                             }
                         }
-                        this.ctx.stroke()
-                        this.ctx.closePath()
+                        if(!this.props._3D_render)this.ctx.stroke()
+                        if(!this.props._3D_render)this.ctx.closePath()
+                        if(this.props._3D_render)this.RenderPoints();
                     }
                 }
             }else{
@@ -772,29 +781,33 @@ class  ParticlesLayer extends React.Component {
                             let part_id = part_indxs[part_indxs_id]
                             let clon = drawing_data["lat_lon"][1][part_id][cur_date]
                             let clat = drawing_data["lat_lon"][0][part_id][cur_date]
-                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(clon, clat)
-                                this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                            }
-                            // Draw the particles on the additional map on the east
-                            if (this.show_east_map) {
-                                let tlon = clon + 360
-                                if (tlon >= this.state.extent[0]) {
-                                    oldpos = this.geoToCanvas(tlon, clat)
-                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                }
-                            }
-                            // Draw the particles on the additional map on the west
-                            if (this.show_west_map) {
-                                let tlon = clon - 360
-                                if (tlon >= this.state.extent[0]) {
-                                    oldpos = this.geoToCanvas(tlon, clat)
-                                    this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
-                                }
+                            if(this.props._3D_render) this.AddPointToBufferGeometry(clat,clon);
+                            if(!this.props._3D_render){
+                              if (this.state.extent.length && (clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                  oldpos = this.geoToCanvas(clon, clat)
+                                  this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                              }
+                              // Draw the particles on the additional map on the east
+                              if (this.show_east_map) {
+                                  let tlon = clon + 360
+                                  if (tlon >= this.state.extent[0]) {
+                                      oldpos = this.geoToCanvas(tlon, clat)
+                                      this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                  }
+                              }
+                              // Draw the particles on the additional map on the west
+                              if (this.show_west_map) {
+                                  let tlon = clon - 360
+                                  if (tlon >= this.state.extent[0]) {
+                                      oldpos = this.geoToCanvas(tlon, clat)
+                                      this.ctx.fillRect(oldpos[0], oldpos[1], square_size, square_size)
+                                  }
+                              }
                             }
                         }
-                        this.ctx.stroke()
-                        this.ctx.closePath()
+                        if(!this.props._3D_render) this.ctx.stroke()
+                        if(!this.props._3D_render) this.ctx.closePath()
+                        if(this.props._3D_render)this.RenderPoints();
                     }
                 }
             }
@@ -809,7 +822,6 @@ class  ParticlesLayer extends React.Component {
         const available_files = Object.keys(this.state.data[model_id])
         const file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
         const color_scheme = this.state.color_scheme[model_id]
-
         let clon = 0
         let clat = 0
         let nlon = 0
@@ -842,42 +854,45 @@ class  ParticlesLayer extends React.Component {
                             nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
                             nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
                             disp_part = drawing_data["disp_info"][part_id][timestep_idx] && drawing_data["disp_info"][part_id][timestep_idx + 1]
-
-                            // do not plot if NaN
-                            if(disp_part){
-                                // Here we draw the 'normal' particles, those inside the limits of the globe
-                                if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                    oldpos = this.geoToCanvas(clon, clat)
-                                    newpos = this.geoToCanvas(nlon, nlat)
-                                    this.ctx.moveTo(oldpos[0], oldpos[1])
-                                    this.ctx.lineTo(newpos[0], newpos[1])
-                                }
-                                // Draw the particles on the additional map on the east
-                                if (this.show_east_map) {
-                                    tlon = clon + 360
-                                    tnlon = nlon + 360
-                                    if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        newpos = this.geoToCanvas(tnlon, nlat)
-                                        this.ctx.moveTo(oldpos[0], oldpos[1])
-                                        this.ctx.lineTo(newpos[0], newpos[1])
-                                    }
-                                }
-                                // Draw the particles on the additional map on the west
-                                if (this.show_west_map){
-                                    tlon = clon - 360
-                                    tnlon = nlon - 360
-                                    if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                        oldpos = this.geoToCanvas(tlon, clat)
-                                        newpos = this.geoToCanvas(tnlon, nlat)
-                                        this.ctx.moveTo(oldpos[0], oldpos[1])
-                                        this.ctx.lineTo(newpos[0], newpos[1])
-                                    }
-                                }
+                            if(this.props._3D_render) this.AddPointToBufferGeometry(clat,clon);
+                            if(!this.props._3D_render){
+                              // do not plot if NaN
+                              if(disp_part){
+                                  // Here we draw the 'normal' particles, those inside the limits of the globe
+                                  if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                      oldpos = this.geoToCanvas(clon, clat)
+                                      newpos = this.geoToCanvas(nlon, nlat)
+                                      this.ctx.moveTo(oldpos[0], oldpos[1])
+                                      this.ctx.lineTo(newpos[0], newpos[1])
+                                  }
+                                  // Draw the particles on the additional map on the east
+                                  if (this.show_east_map) {
+                                      tlon = clon + 360
+                                      tnlon = nlon + 360
+                                      if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                          oldpos = this.geoToCanvas(tlon, clat)
+                                          newpos = this.geoToCanvas(tnlon, nlat)
+                                          this.ctx.moveTo(oldpos[0], oldpos[1])
+                                          this.ctx.lineTo(newpos[0], newpos[1])
+                                      }
+                                  }
+                                  // Draw the particles on the additional map on the west
+                                  if (this.show_west_map){
+                                      tlon = clon - 360
+                                      tnlon = nlon - 360
+                                      if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                          oldpos = this.geoToCanvas(tlon, clat)
+                                          newpos = this.geoToCanvas(tnlon, nlat)
+                                          this.ctx.moveTo(oldpos[0], oldpos[1])
+                                          this.ctx.lineTo(newpos[0], newpos[1])
+                                      }
+                                  }
+                            }
                             }
                         }
-                        this.ctx.stroke()
-                        this.ctx.closePath()
+                        if(!this.props._3D_render)this.ctx.stroke()
+                        if(!this.props._3D_render)this.ctx.closePath()
+                        if(this.props._3D_render) this.RenderPoints();
                     }
                 }
             }else{
@@ -893,39 +908,42 @@ class  ParticlesLayer extends React.Component {
                             clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
                             nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
                             nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
-
-                            // Here we draw the 'normal' particles, those inside the limits of the globe
-                            if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
-                                oldpos = this.geoToCanvas(clon, clat)
-                                newpos = this.geoToCanvas(nlon, nlat)
-                                this.ctx.moveTo(oldpos[0], oldpos[1])
-                                this.ctx.lineTo(newpos[0], newpos[1])
-                            }
-                            // Draw the particles on the additional map on the east
-                            if (this.show_east_map) {
-                                tlon = clon + 360
-                                tnlon = nlon + 360
-                                if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                    oldpos = this.geoToCanvas(tlon, clat)
-                                    newpos = this.geoToCanvas(tnlon, nlat)
-                                    this.ctx.moveTo(oldpos[0], oldpos[1])
-                                    this.ctx.lineTo(newpos[0], newpos[1])
-                                }
-                            }
-                            // Draw the particles on the additional map on the west
-                            if (this.show_west_map){
-                                tlon = clon - 360
-                                tnlon = nlon - 360
-                                if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
-                                    oldpos = this.geoToCanvas(tlon, clat)
-                                    newpos = this.geoToCanvas(tnlon, nlat)
-                                    this.ctx.moveTo(oldpos[0], oldpos[1])
-                                    this.ctx.lineTo(newpos[0], newpos[1])
-                                }
+                            if(this.props._3D_render) this.AddPointToBufferGeometry(clat,clon);
+                            if(!this.props._3D_render){
+                              // Here we draw the 'normal' particles, those inside the limits of the globe
+                              if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
+                                  oldpos = this.geoToCanvas(clon, clat)
+                                  newpos = this.geoToCanvas(nlon, nlat)
+                                  this.ctx.moveTo(oldpos[0], oldpos[1])
+                                  this.ctx.lineTo(newpos[0], newpos[1])
+                              }
+                              // Draw the particles on the additional map on the east
+                              if (this.show_east_map) {
+                                  tlon = clon + 360
+                                  tnlon = nlon + 360
+                                  if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                      oldpos = this.geoToCanvas(tlon, clat)
+                                      newpos = this.geoToCanvas(tnlon, nlat)
+                                      this.ctx.moveTo(oldpos[0], oldpos[1])
+                                      this.ctx.lineTo(newpos[0], newpos[1])
+                                  }
+                              }
+                              // Draw the particles on the additional map on the west
+                              if (this.show_west_map){
+                                  tlon = clon - 360
+                                  tnlon = nlon - 360
+                                  if ((tlon >= this.state.extent[0]) && (tnlon <= this.state.extent[2])) {
+                                      oldpos = this.geoToCanvas(tlon, clat)
+                                      newpos = this.geoToCanvas(tnlon, nlat)
+                                      this.ctx.moveTo(oldpos[0], oldpos[1])
+                                      this.ctx.lineTo(newpos[0], newpos[1])
+                                  }
+                              }
                             }
                         }
-                        this.ctx.stroke()
-                        this.ctx.closePath()
+                        if(!this.props._3D_render)this.ctx.stroke()
+                        if(!this.props._3D_render)this.ctx.closePath()
+                        if(this.props._3D_render)this.RenderPoints();
                     }
                 }
             }
@@ -934,6 +952,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidMount() {
+      Globe(this);
         let selected_model = this.props.selected_model
         for(let file_number in _.range(0, selected_model.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
@@ -944,6 +963,7 @@ class  ParticlesLayer extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         // console.log("Updated component: ", this.state)
+        this.update3DCanvas();
         this.updateAnimation()
         let picker = $('.pv-pcolor')
         if(this.state.display_picker){
@@ -995,6 +1015,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     increaseSize(e) {
+      this.updatePointsMaterial();
         const new_size = this.updateValue(this.state.particle_size_index, MODES.increase)
         this.setState({
             particle_size_index: new_size
@@ -1003,6 +1024,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     decreaseSize(e) {
+      this.updatePointsMaterial();
         const new_size = this.updateValue(this.state.particle_size_index, MODES.decrease)
         this.setState({
             particle_size_index: new_size
@@ -1011,6 +1033,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     increaseTransparency(e) {
+      this.updateTrails();
         let new_trans = this.state.trail_size
         if (new_trans < (Object.keys(TRAIL_SIZE).length)) {
             new_trans += 1
@@ -1022,6 +1045,7 @@ class  ParticlesLayer extends React.Component {
     }
 
     decreaseTransparency(e) {
+      this.updateTrails();
         let new_trans = this.state.trail_size
         if (new_trans > 0) {
             new_trans -= 1
@@ -1220,10 +1244,12 @@ class  ParticlesLayer extends React.Component {
     }
 
     render() {
+      
         // xs < 576,  >= 576 sm, >= 768 md, >= 992 lg , >= 1200 ex
         if(isMobile ||  window.innerWidth < 992){
             // if(true){
             return (
+              <>{<Canvas _3D_render={this.props._3D_render}/>}
                 <Container fluid>
                     {/*---- Trail size---------*/}
                     <Row>
@@ -1423,7 +1449,7 @@ class  ParticlesLayer extends React.Component {
                             }
                         </Form>
                     </div>
-                </Container>
+                </Container></>
             )
         }else {
             this.props.chardin.refresh()
@@ -1431,6 +1457,7 @@ class  ParticlesLayer extends React.Component {
             return (
                 <div>
                     {/*---- Size of Streamline ---------*/}
+                    {<Canvas _3D_render={this.props._3D_render}/>}
                     <span className="text-center" data-intro={"Path length"} data-oz-position={chardin_offset}>
                         <span className="me-1" style={{display: "inline-block", width: "25px"}}>
                             <ArrowRight
