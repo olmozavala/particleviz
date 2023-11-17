@@ -1,27 +1,13 @@
 precision highp float;
 
-// Samplers
-varying vec2 vUV;
+uniform sampler2D lastFrame;
 uniform sampler2D textureSampler;
+varying vec2 vUV;
+        //uniform float opacity;
 
-// Parameters
-uniform vec2 screenSize;
-uniform float highlightThreshold;
-
-float highlights(vec3 color)
-{
- return smoothstep(highlightThreshold, 1.0, dot(color, vec3(0.3, 0.59, 0.11)));
-}
-
-void main(void)
-{
- vec2 texelSize = vec2(1.0 / screenSize.x, 1.0 / screenSize.y);
- vec4 baseColor = texture2D(textureSampler, vUV + vec2(-1.0, -1.0) * texelSize) * 0.25;
- baseColor += texture2D(textureSampler, vUV + vec2(1.0, -1.0) * texelSize) * 0.25;
- baseColor += texture2D(textureSampler, vUV + vec2(1.0, 1.0) * texelSize) * 0.25;
- baseColor += texture2D(textureSampler, vUV + vec2(-1.0, 1.0) * texelSize) * 0.25;
- 
- baseColor.a = highlights(baseColor.rgb);
-
- gl_FragColor = baseColor;
+void main(void) {
+    vec4 curr = texture2D(textureSampler, vUV);
+    vec4 last = texture2D(lastFrame, vUV);
+    curr.rgb = mix(curr.rgb, last.rgb, 0.9);
+    gl_FragColor = curr;
 }

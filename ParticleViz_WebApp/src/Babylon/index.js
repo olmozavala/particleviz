@@ -24,7 +24,7 @@ const METHODS_TO_OVERWRITE = [
  */
 class App {
   /**
-   * The Babylon.js engine.
+   * The js engine.
    * @type {Engine}
    */
   #engine;
@@ -73,58 +73,62 @@ class App {
     this.#canvas = document.createElement("canvas");
     this.#canvas.style.width = this.getCanvasSize().w;
     this.#canvas.style.height = this.getCanvasSize().h;
+    this.#canvas.width = this.getCanvasSize().w;
+    this.#canvas.height = this.getCanvasSize().h;
     this.#canvas.style.position = "absolute";
     this.#canvas.style.left = "0px";
     this.#canvas.style.top = this.getCanvasSize().topMargin;
+    this.#canvas.style.zIndex = 10;
+
+    this.tempCanvas = document.createElement("canvas");
+    this.tempCanvas.style.pointerEvents = "none";
+    this.tempCanvas.style.width = this.getCanvasSize().w;
+    this.tempCanvas.style.height = this.getCanvasSize().h;
+    this.tempCanvas.width = +this.getCanvasSize().w.slice(0,-2);
+    this.tempCanvas.height = +this.getCanvasSize().h.slice(0,-2);
+    this.tempCanvas.style.position = "absolute";
+    this.tempCanvas.style.left = "0px";
+    this.tempCanvas.style.top = this.getCanvasSize().topMargin;
+    this.tempCanvas.style.zIndex = 20;
+    this.tempCanvas.style.filter = "blur(5px);";
+    // this.tempCanvas.style.opacity = 0.4;
+
 
     this.#canvas.id = "gameCanvas";
+    this.tempCanvas.id = "for_trails";
+
     this.#container?.appendChild(this.#canvas);
+    this.#container?.appendChild(this.tempCanvas);
 
     this.#canvasContext = this.#canvas.getContext("webgl");
+    this.tempCanvasCtx = this.tempCanvas.getContext("2d");
 
     this.#engine = new Engine(
       this.#canvas,
       true,
-      { antialias: true, powerPreference: "high-performance" },
+      {
+        antialias: true,
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: false,
+      },
       true
     );
-    var scene = new Scene(this.#engine);
-    this.#engine.displayLoadingUI();
+    let scene = new Scene(this.#engine);
+    // this.#engine.displayLoadingUI();
 
-    scene.whenReadyAsync();
-    this.#engine.hideLoadingUI();
+    scene.whenReadyAsync().then(() => {
+      this.#engine.hideLoadingUI();
 
-    this.#trailSize = this.#mainAppScope.state.trail_size;
+      this.#trailSize = this.#mainAppScope.state.trail_size;
 
-    this.Earth = new Earth(this.#engine, this.#canvas);
+      this.Earth = new Earth(this.#engine, this.#canvas);
 
-    this.particlePositions = [];
+      this.particlePositions = [];
 
-    this.Earth.buildMesh().then(() => {
-      this.#engine.runRenderLoop(() => {
-        try {
+      this.Earth.buildMesh().then(() => {
+        this.#engine.runRenderLoop(() => {
           this.Earth.scene.render();
-          const previousframe = this.#canvasContext.getImageData(
-            0,
-            0,
-            this.#canvas.width,
-            this.#canvas.height
-          );
-          for (var i = 3; i < previousframe.length; i += 4) {
-            previousframe[i] = 50;
-          }
-          // this.#canvas.globalAlpha = 0.9; //TRAIL_SIZE[this.#trailSize];
-          this.#canvasContext.putImage(
-            previousframe,
-            0,
-            0,
-            this.#canvas.width,
-            this.#canvas.height
-          );
-          // this.#canvas.restore();
-        } catch (error) {
-          // console.warn(error);
-        }
+        });
       });
     });
 
@@ -147,11 +151,35 @@ class App {
     this.particlePositions.push(...[x, y, z]);
   }
 
+  copyCanvas(sourceCanvas, targetCanvas, sourceContext, targetContext) {
+    this.tempCanvasCtx.globalAlpha =  TRAIL_SIZE[this.#mainAppScope.state.trail_size];
+    this.tempCanvasCtx.drawImage(
+      this.#canvas,
+      0,
+      0,
+      this.#canvas.width,
+      this.#canvas.height,
+      0,
+      0,
+      this.tempCanvas.width,
+      this.tempCanvas.height
+    );
+  }
+
   /**
    * Renders the points in the Earth scene.
    */
   RenderPoints() {
-    this.Earth.updateParticles(this.particlePositions,this.#mainAppScope.state.particle_size_index);
+    this.copyCanvas(
+      this.#canvas,
+      this.tempCanvas,
+      this.#canvasContext,
+      this.tempCanvasCtx
+    );
+    this.Earth.updateParticles(
+      this.particlePositions,
+      this.#mainAppScope.state.particle_size_index
+    );
   }
 
   /**
@@ -201,9 +229,18 @@ class App {
    * @private
    */
   #onWindowResize() {
+    this.#canvas.width = this.getCanvasSize().w;
+    this.#canvas.height = this.getCanvasSize().h;
+    this.#canvas.top = this.getCanvasSize().topMargin;
+    this.tempCanvas.width = +this.getCanvasSize().w.slice(0,-2);
+    this.tempCanvas.height = +this.getCanvasSize().h.slice(0,-2);
+    // this.tempCanvas.top = this.getCanvasSize().topMargin;
     this.#canvas.style.width = this.getCanvasSize().w;
     this.#canvas.style.height = this.getCanvasSize().h;
     this.#canvas.style.top = this.getCanvasSize().topMargin;
+    this.tempCanvas.style.width = this.getCanvasSize().w;
+    this.tempCanvas.style.height = this.getCanvasSize().h;
+    this.tempCanvas.style.top = this.getCanvasSize().topMargin;
     this.#engine.resize();
   }
 
