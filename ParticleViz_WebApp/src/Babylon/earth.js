@@ -8,6 +8,9 @@ import {
   VertexData,
 } from "@babylonjs/core";
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import trailsShader from "!!raw-loader!./Shaders/trail.frag";
+
 /**
  * Represents a 3D Earth model with stars and particles.
  * @class
@@ -62,6 +65,7 @@ class Earth {
    * @param {HTMLElement} canvas - The HTML canvas element.
    */
   constructor(engine, canvas) {
+    console.log(trailsShader);
     this.scene = new Scene(engine);
     this.scene.clearColor = new Color4(0, 0, 0, 1);
 
@@ -170,10 +174,21 @@ class Earth {
    * @param {number[]} positions - The new positions of particles.
    * @returns {Promise<void>}
    */
-  async updateParticles(positions) {
+  async updateParticles(positions, size) {
     var vertexData = new VertexData();
     vertexData.positions = positions;
-    if (this.particles.mesh) vertexData.applyToMesh(this.particles.mesh);
+
+    // this.particles = new PointsCloudSystem("particles", size, this.scene, {
+    //   updatable: true,
+    // });
+    // this.particleColor = new Color4(0.3, 0.5, 1, 1);
+
+    // this.particles.addPoints(20000, this.particleMaker.bind(this));
+    if (this.particles.mesh) {
+      vertexData.applyToMesh(this.particles.mesh);
+
+      this.particles.mesh.material.pointSize = size;
+    }
   }
 }
 

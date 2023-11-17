@@ -3,6 +3,7 @@ import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene } from "@babylonjs/core";
 import Earth from "./earth";
+import { TRAIL_SIZE } from "../ParticlesLayer";
 
 /**
  * List of methods to be overwritten in the main application scope.
@@ -33,6 +34,7 @@ class App {
    * @type {HTMLCanvasElement}
    */
   #canvas;
+  #canvasContext;
 
   /**
    * The HTML container element.
@@ -78,6 +80,8 @@ class App {
     this.#canvas.id = "gameCanvas";
     this.#container?.appendChild(this.#canvas);
 
+    this.#canvasContext = this.#canvas.getContext("webgl");
+
     this.#engine = new Engine(
       this.#canvas,
       true,
@@ -96,9 +100,31 @@ class App {
 
     this.particlePositions = [];
 
-    this.Earth.buildMesh().then((mesh) => {
+    this.Earth.buildMesh().then(() => {
       this.#engine.runRenderLoop(() => {
-        this.Earth.scene.render();
+        try {
+          this.Earth.scene.render();
+          const previousframe = this.#canvasContext.getImageData(
+            0,
+            0,
+            this.#canvas.width,
+            this.#canvas.height
+          );
+          for (var i = 3; i < previousframe.length; i += 4) {
+            previousframe[i] = 50;
+          }
+          // this.#canvas.globalAlpha = 0.9; //TRAIL_SIZE[this.#trailSize];
+          this.#canvasContext.putImage(
+            previousframe,
+            0,
+            0,
+            this.#canvas.width,
+            this.#canvas.height
+          );
+          // this.#canvas.restore();
+        } catch (error) {
+          // console.warn(error);
+        }
       });
     });
 
@@ -125,7 +151,7 @@ class App {
    * Renders the points in the Earth scene.
    */
   RenderPoints() {
-    this.Earth.updateParticles(this.particlePositions);
+    this.Earth.updateParticles(this.particlePositions,this.#mainAppScope.state.particle_size_index);
   }
 
   /**
