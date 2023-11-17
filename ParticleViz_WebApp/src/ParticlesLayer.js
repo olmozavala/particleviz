@@ -19,6 +19,7 @@ import {
 } from 'react-bootstrap-icons'
 import JSZip from "jszip"
 import Globe from './Babylon'
+import Canvas from './Babylon/Component'
 
 const config_pviz = require("./Config.json")
 const config_webapp = config_pviz.webapp
@@ -1248,7 +1249,7 @@ class  ParticlesLayer extends React.Component {
         if(isMobile ||  window.innerWidth < 992){
             // if(true){
             return (
-              <>{<div id="threejs_holder" style={{display : this.props._3D_render ? "block" : "none"}}/>}
+              <>{<Canvas _3D_render={this.props._3D_render}/>}
                 <Container fluid>
                     {/*---- Trail size---------*/}
                     <Row>
@@ -1456,7 +1457,7 @@ class  ParticlesLayer extends React.Component {
             return (
                 <div>
                     {/*---- Size of Streamline ---------*/}
-                    {<div id="threejs_holder" style={{display : this.props._3D_render ? "block" : "none"}}/>}
+                    {<Canvas _3D_render={this.props._3D_render}/>}
                     <span className="text-center" data-intro={"Path length"} data-oz-position={chardin_offset}>
                         <span className="me-1" style={{display: "inline-block", width: "25px"}}>
                             <ArrowRight

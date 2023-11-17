@@ -84,15 +84,16 @@ class App {
     this.tempCanvas.style.pointerEvents = "none";
     this.tempCanvas.style.width = this.getCanvasSize().w;
     this.tempCanvas.style.height = this.getCanvasSize().h;
-    this.tempCanvas.width = +this.getCanvasSize().w.slice(0,-2);
-    this.tempCanvas.height = +this.getCanvasSize().h.slice(0,-2);
+    this.tempCanvas.width = +this.getCanvasSize().w.slice(0, -2);
+    this.tempCanvas.height = +this.getCanvasSize().h.slice(0, -2);
     this.tempCanvas.style.position = "absolute";
     this.tempCanvas.style.left = "0px";
     this.tempCanvas.style.top = this.getCanvasSize().topMargin;
     this.tempCanvas.style.zIndex = 20;
     this.tempCanvas.style.filter = "blur(5px);";
-    // this.tempCanvas.style.opacity = 0.4;
 
+    this.tempCanvasOpacityMultiplier = 0;
+    // this.tempCanvas.style.opacity = 0.4;
 
     this.#canvas.id = "gameCanvas";
     this.tempCanvas.id = "for_trails";
@@ -136,6 +137,36 @@ class App {
       this.#onWindowResize();
     });
 
+    this.#canvas.addEventListener("wheel", () => {
+      
+      this.tempCanvasCtx.clearRect(
+        0,
+        0,
+        this.tempCanvas.width,
+        this.tempCanvas.height
+      );
+    });
+    this.#canvas.addEventListener("mousedown", () => {
+      this.tempCanvas.style.display = "none";
+      this.tempCanvasOpacityMultiplier = 1;
+      this.tempCanvasCtx.clearRect(
+        0,
+        0,
+        this.tempCanvas.width,
+        this.tempCanvas.height
+      );
+    });
+    this.#canvas.addEventListener("mouseup", () => {
+      this.tempCanvas.style.display = "block";
+      this.tempCanvasOpacityMultiplier = 0;
+      this.tempCanvasCtx.clearRect(
+        0,
+        0,
+        this.tempCanvas.width,
+        this.tempCanvas.height
+      );
+    });
+
     METHODS_TO_OVERWRITE.forEach((method) => {
       mainAppScope[method] = this[method].bind(this);
     });
@@ -152,7 +183,7 @@ class App {
   }
 
   copyCanvas(sourceCanvas, targetCanvas, sourceContext, targetContext) {
-    this.tempCanvasCtx.globalAlpha =  TRAIL_SIZE[this.#mainAppScope.state.trail_size];
+    this.tempCanvasCtx.globalAlpha = this.tempCanvasOpacityMultiplier + TRAIL_SIZE[this.#mainAppScope.state.trail_size];
     this.tempCanvasCtx.drawImage(
       this.#canvas,
       0,
@@ -232,8 +263,8 @@ class App {
     this.#canvas.width = this.getCanvasSize().w;
     this.#canvas.height = this.getCanvasSize().h;
     this.#canvas.top = this.getCanvasSize().topMargin;
-    this.tempCanvas.width = +this.getCanvasSize().w.slice(0,-2);
-    this.tempCanvas.height = +this.getCanvasSize().h.slice(0,-2);
+    this.tempCanvas.width = +this.getCanvasSize().w.slice(0, -2);
+    this.tempCanvas.height = +this.getCanvasSize().h.slice(0, -2);
     // this.tempCanvas.top = this.getCanvasSize().topMargin;
     this.#canvas.style.width = this.getCanvasSize().w;
     this.#canvas.style.height = this.getCanvasSize().h;
