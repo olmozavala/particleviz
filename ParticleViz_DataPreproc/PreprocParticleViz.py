@@ -56,6 +56,13 @@ class PreprocParticleViz:
             return ModelType.OPEN_DRIFT
         if np.any([x.find('parcels') != -1 for x in attrs]):
             return ModelType.OCEAN_PARCELS
+        
+        # Heuristics for zarr structure - check variable names
+        var_names = list(xr_ds.variables.keys())
+        if {'obs', 'traj', 'lon', 'lat', 'z', 'time'}.issubset(set(var_names)):
+            return ModelType.OCEAN_PARCELS
+        if {'trajectory', 'time', 'lon', 'lat'}.issubset(set(var_names)):
+            return ModelType.OPEN_DRIFT
         # TODO Throw an exception
 
     def getTotTimeStepsAndNumParticles(self, model_type, xr_ds):
