@@ -819,6 +819,7 @@ class  ParticlesLayer extends React.Component {
 
         const timestep_idx = timestep_idx_org % this.state.timesteps_per_file
 
+
         if (available_files.includes(file_number)) {
             // Retreive all the information from the first available file
             let drawing_data = this.state.data[model_id][file_number][data_key]
@@ -843,6 +844,11 @@ class  ParticlesLayer extends React.Component {
                             nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
                             disp_part = drawing_data["disp_info"][part_id][timestep_idx] && drawing_data["disp_info"][part_id][timestep_idx + 1]
 
+                              //NJ - 2025-11-04
+                            if (Math.abs(nlon - clon) > 180) {
+                                continue
+                            }
+                       
                             // do not plot if NaN
                             if(disp_part){
                                 // Here we draw the 'normal' particles, those inside the limits of the globe
@@ -893,6 +899,11 @@ class  ParticlesLayer extends React.Component {
                             clat = drawing_data["lat_lon"][0][part_id][timestep_idx]
                             nlon = drawing_data["lat_lon"][1][part_id][timestep_idx + 1]
                             nlat = drawing_data["lat_lon"][0][part_id][timestep_idx + 1]
+
+                              //NJ - 2025-11-04
+                            if (Math.abs(nlon - clon) > 180) {
+                                continue
+                            }
 
                             // Here we draw the 'normal' particles, those inside the limits of the globe
                             if ((clon >= this.state.extent[0]) && (clon <= this.state.extent[2])) {
