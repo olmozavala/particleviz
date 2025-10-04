@@ -14,6 +14,147 @@ from datetime import datetime, timedelta
 from dateutil.parser import isoparse
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
 from ParticleViz_DataPreproc.ColorByParticleUtils import updateColorScheme
+import pandas as pd
+
+
+#New Zarr File Format - Neeraj Jawahirani
+
+# ADD: Zarr/NC opener + long-table adapter
+def open_any(file_path: str) -> xr.Dataset:
+    if os.path.isdir(file_path) and file_path.lower().endswith(".zarr"):
+        return xr.open_zarr(file_path)
+    return xr.open_dataset(file_path)
+
+def infer_time_meta_from_datetimes(time_values: np.ndarray):
+    t = np.sort(pd.to_datetime(time_values).values)
+    start = pd.to_datetime(t[0]).to_pydatetime().astimezone(tz=None)  # keep ISO; viz uses ISO string
+    if len(t) > 1:
+        diffs = np.diff(t).astype('timedelta64[s]').astype(float) / 3600.0
+        delta_hours = float(np.median(diffs))
+    else:
+        delta_hours = 0.0
+    return start.isoformat(), "hours", delta_hours
+
+def longtable_to_wide(xr_ds: xr.Dataset,
+                      pid_var="particle_id", time_var="time",
+                      lat_var="lat", lon_var="lon"):
+    df = xr_ds[[pid_var, time_var, lat_var, lon_var]].to_dataframe().reset_index(drop=True)
+    df = df.dropna(subset=[pid_var, time_var, lat_var, lon_var]).copy()
+    df[time_var] = pd.to_datetime(df[time_var])
+
+    time_index = np.sort(df[time_var].unique())
+    pids = np.sort(df[pid_var].unique())
+
+    pid_to_row = {pid: i for i, pid in enumerate(pids)}
+    n_p, n_t = len(pids), len(time_index)
+    lat_2d = np.full((n_p, n_t), np.nan, dtype=np.float32)
+    lon_2d = np.full((n_p, n_t), np.nan, dtype=np.float32)
+
+    g = df.groupby(pid_var, sort=True)
+    for pid, sub in g:
+        r = pid_to_row[pid]
+        sub = sub.sort_values(time_var)
+        idx = np.searchsorted(time_index, sub[time_var].values)
+        lat_2d[r, idx] = sub[lat_var].values.astype(np.float32, copy=False)
+        lon_2d[r, idx] = sub[lon_var].values.astype(np.float32, copy=False)
+
+    return lat_2d, lon_2d, time_index, pids
+
+def load_particle_data_any(file_name: str):
+    """
+    Returns: lat_all (P×T), lon_all (P×T), times_all (T,),
+             meta dict with start_date (ISO), delta_t_str ('hours'),
+             delta_t (float hours), xr_ds
+    """
+    ds = open_any(file_name)
+
+    # -----------------------
+    # Case A: Zarr long-table
+    # -----------------------
+    if ("obs" in ds.dims) and all(v in ds.variables for v in ["particle_id","time","lat","lon"]):
+        lat_all, lon_all, time_index, _ = longtable_to_wide(ds)
+        start_iso, delta_t_str, delta_t = infer_time_meta_from_datetimes(time_index)
+        return lat_all, lon_all, np.array(time_index), {
+            "start_date": start_iso,
+            "delta_t_str": delta_t_str,
+            "delta_t": delta_t,
+            "xr_ds": ds,
+        }
+
+    # -------------------------------
+    # Case B: NetCDF classic 2-D (P×T)
+    # -------------------------------
+    lat_name = next((k for k in ds.variables if k.lower() in ("lat","latitude")), None)
+    lon_name = next((k for k in ds.variables if k.lower() in ("lon","longitude")), None)
+
+    if not (lat_name and lon_name):
+        raise ValueError("Could not find 'lat'/'lon' variables in dataset")
+
+    lat_da = ds[lat_name]
+    lon_da = ds[lon_name]
+
+    # infer particle vs time dims from the dataarray dims
+    particle_dim_candidates = ("traj","trajectory","particle","particles","npart","id")
+    time_dim_candidates     = ("time","obs","observation","step","t")
+
+    dims = tuple(lat_da.dims)  # e.g., ('traj','obs')
+    particle_dim = next((d for d in dims if d in particle_dim_candidates), None)
+    time_dim = next((d for d in dims if (d != particle_dim) and (d in time_dim_candidates)), None)
+
+    # fallback: if still missing and exactly 2 dims, assign by position
+    if particle_dim is None and len(dims) == 2:
+        particle_dim, time_dim = dims[0], dims[1]
+
+    if (particle_dim is None) or (time_dim is None):
+        raise ValueError(f"Could not infer particle/time dims from {dims}")
+
+    # transpose to (particles, time)
+    lat = lat_da.transpose(particle_dim, time_dim).data
+    lon = lon_da.transpose(particle_dim, time_dim).data
+
+    # derive a 1-D global time index
+    if "time" in ds.variables:
+        time_da = ds["time"]
+        if time_da.ndim == 2:
+            times_all = time_da.transpose(particle_dim, time_dim).isel({particle_dim: 0}).data
+        elif time_dim in time_da.dims:
+            times_all = time_da.data
+        else:
+            times_all = np.arange(lat.shape[1])
+    else:
+        times_all = np.arange(lat.shape[1])
+
+    # compute time metadata
+    if "time" in ds.variables and np.issubdtype(ds["time"].dtype, np.datetime64):
+        start_iso, delta_t_str, delta_t = infer_time_meta_from_datetimes(times_all)
+    elif "time" in ds.variables and "units" in ds["time"].attrs:
+        units = ds["time"].attrs["units"]  # e.g., "hours since 2020-01-01 00:00:00"
+        delta_t_str = units.split()[0] if units else "hours"
+        base_str = units.split("since", 1)[1].strip() if "since" in units else None
+        try:
+            base_dt = pd.to_datetime(base_str).to_pydatetime() if base_str else pd.to_datetime(times_all[0]).to_pydatetime()
+            tvals = ds["time"].transpose(particle_dim, time_dim).isel({particle_dim: 0}).values if ds["time"].ndim == 2 else ds["time"].values
+            diffs = np.diff(tvals)
+            if np.issubdtype(np.array(diffs).dtype, np.number):
+                delta_t = float(np.median(diffs))
+            else:
+                diffs_h = (diffs.astype("timedelta64[s]").astype(float)) / 3600.0
+                delta_t = float(np.median(diffs_h)) if diffs_h.size else 0.0
+            start_iso = base_dt.isoformat()
+        except Exception:
+            start_iso, delta_t_str, delta_t = infer_time_meta_from_datetimes(times_all)
+    else:
+        start_iso, delta_t_str, delta_t = infer_time_meta_from_datetimes(times_all)
+
+    return lat, lon, times_all, {
+        "start_date": start_iso,
+        "delta_t_str": delta_t_str,
+        "delta_t": delta_t,
+        "xr_ds": ds,
+    }
+
+
+############################################
 
 def set_start_date(start_date_str, start_time, units):
     """
@@ -89,15 +230,25 @@ class PreprocParticleViz:
         for id, c_model in enumerate(self._models):
             model_name = c_model["name"]
             file_name = c_model["file_name"]
+            
+            #### Neeraj jawahirani Changes
+            # Unified loader (supports .nc and .zarr)
+            lat_all, lon_all, times_all, meta = load_particle_data_any(file_name)
+            start_date  = meta["start_date"]      # ISO string (e.g., '2025-01-01T00:00:00Z')
+            delta_t_str = meta["delta_t_str"]     # usually 'hours'
+            delta_t     = meta["delta_t"]         # numeric step (e.g., 1.0)
+            glob_num_particles, tot_time_steps = lat_all.shape
+            ##############################
+            
             # Reading the output from Ocean Parcles
-            xr_ds = xr.open_dataset(file_name)
-            model_type = self.getOutputType(xr_ds)
+            #xr_ds = xr.open_dataset(file_name)
+            #model_type = self.getOutputType(xr_ds)
 
             # This is only used to access time units string (TODO move everything to the NetCDF4 or Xarray library)
-            ds = Dataset(file_name)
+            #ds = Dataset(file_name)
 
-            tot_time_steps, glob_num_particles = self.getTotTimeStepsAndNumParticles(model_type, xr_ds)
-            tot_files = tot_time_steps//timesteps_by_file + 1
+            #tot_time_steps, glob_num_particles = self.getTotTimeStepsAndNumParticles(model_type, xr_ds)
+            tot_files = (tot_time_steps + timesteps_by_file - 1) // timesteps_by_file
 
             # Here we update the total number of files generated for this
             advanced_dataset_model = {}
@@ -108,15 +259,15 @@ class PreprocParticleViz:
             print(F"Total number of timesteps: {tot_time_steps} Total number of particles: {glob_num_particles} ({tot_time_steps * glob_num_particles} positions, Number of files: {tot_files}) ")
 
             print("Verifying data boundaries...")
-            all_vars = xr_ds.variables
+            #all_vars = xr_ds.variables
             # Print variables (debugging)
             # print("----- Variables Inside file ----")
             # for name in all_vars.keys():
             #     print(name)
 
-            lat_all = all_vars['lat'].data
-            lon_all = all_vars['lon'].data
-            times_all = all_vars['time'].data
+            #lat_all = all_vars['lat'].data
+            #lon_all = all_vars['lon'].data
+            #times_all = all_vars['time'].data
 
             # Removing all values outside the 'earth' boundaries
             lat_all[lat_all > 91] = np.nan
@@ -124,23 +275,23 @@ class PreprocParticleViz:
             lon_all[lon_all < -361] = np.nan
             lon_all[lon_all > 361] = np.nan
 
-            time_units_str = ds.variables['time'].units.split(" ")
+            #time_units_str = ds.variables['time'].units.split(" ")
             # Compute the start date from the start unit and the first timestep
 
-            delta_t_str = time_units_str[0]
-            start_time = int(np.nanmin(ds['time']))  # Read the 'first time'
-            start_date = set_start_date(time_units_str[2], start_time, time_units_str[0])
-            # TODO here we assume we have at least 2 particles and the delta_t is constant
-            delta_t = 0.0
-            i_part = 0
-            print("Analyzing times of the particles....")
+            #delta_t_str = time_units_str[0]
+            #start_time = int(np.nanmin(ds['time']))  # Read the 'first time'
+            #start_date = set_start_date(time_units_str[2], start_time, time_units_str[0])
+            # here we assume we have at least 2 particles and the delta_t is constant
+            #delta_t = 0.0
+            #i_part = 0
+            #print("Analyzing times of the particles....")
             # We look for a time delta within the particles first couple of times.
-            while delta_t == 0.0:
-                if len(ds['time'].shape) > 1:
-                    delta_t = ds['time'][i_part,1] - ds['time'][i_part,0]
-                else:
-                    delta_t = ds['time'][1] - ds['time'][0]
-                i_part += 1
+            #while delta_t == 0.0:
+            #    if len(ds['time'].shape) > 1:
+            #        delta_t = ds['time'][i_part,1] - ds['time'][i_part,0]
+            #    else:
+            #        delta_t = ds['time'][1] - ds['time'][0]
+            #    i_part += 1
 
             # Iterate over the options to reduce the number of particles
             subsample_model = [2, 4]  # Default values are 2 and 4
@@ -169,42 +320,29 @@ class PreprocParticleViz:
                 # Subsampled locations
                 lat = lat_all[::subsample_data, :]
                 lon = lon_all[::subsample_data, :]
-                if len(ds['time'].shape) > 1:
-                    times = times_all[::subsample_data, :]
-                else:
-                    times = times_all  # All particles have the same time
+                
+                if hasattr(lat, "compute"):  # dask array
+                    lat = lat.compute()
+                if hasattr(lon, "compute"):
+                    lon = lon.compute()
 
+                lat = np.asarray(lat)
+                lon = np.asarray(lon)
+                #if len(ds['time'].shape) > 1:
+                #    times = times_all[::subsample_data, :]
+                #else:
+                #    times = times_all  # All particles have the same time
+                times = times_all
                 # ------ Fixing nans (replace nans with the last value of that particle)
                 # It only works if the nans are at the end
                 # Here it finds all the particles that finish with a nan value
                 print("Searching for nans...")
-                # Replacing some values with nans
-                HAS_NANS = np.isnan(lat).any().item()
+                HAS_NANS = bool(np.isnan(lat).any())
+                bit_display_array = np.logical_not(np.isnan(lat)).astype(np.bool_)
                 if HAS_NANS:
-                    # Here we align all the particles to have the same times. For those that start at a later time
-                    # we shift them to start at the first time, filling with nans all the previous timesteps
-                    # TODO this only works if ALL the particles 'move' with the same dt. If some particles move
-                    # at even days and other particles at odd days, then this will not work.
-                    print("Analyzing nan values ....")
-                    bit_display_array = np.ones(lat.shape, dtype=bool)
-
-                    # Now it verifies the time of the particle
-                    if len(ds['time'].shape) > 1:
-                        # Identify the start time for each particle (compare vs time of first particle)
-                        try:
-                            shifted_particles = np.where(times[:,0] > times[0,0])[0]
-                            for idx, c_part in enumerate(shifted_particles): # For each particle with nans
-                                shift_amount = np.argmax(np.where(times[c_part, 0] > times[0, :])[0]) + 1
-                                if idx % 1000 == 0:
-                                    print(F"Particle {c_part} of shifting {shift_amount} timesteps")
-                                # Re-align vectors so that the times matches between all the particles
-                                lat[c_part,:] = np.roll(lat[c_part, :], shift_amount)
-                                lon[c_part,:] = np.roll(lon[c_part, :], shift_amount)
-                        except Exception as e:
-                            print("No need to shift particles")
-
-                    bit_display_array = np.logical_not(np.isnan(lat))
-                    print("Done!")
+                    print("NaNs present — display mask will be written.")
+                else:
+                    print("No NaNs found.")
 
                 # TODO in our current solution, when particles do not share the same time (for example,
                 # particle 1 has times at 0 and 12 but particle 2 has times at 6 and 18, then we arbitrary
@@ -256,7 +394,7 @@ class PreprocParticleViz:
             # Updating config file inside ParticleViz WebAapp
             with open("Current_Config.json", 'w') as f:
                 json.dump(self._config_json, f, indent=4)
-            xr_ds.close()
+            #xr_ds.close()
 
     def testBinaryAndHeaderFiles(self, test_file):
         """
