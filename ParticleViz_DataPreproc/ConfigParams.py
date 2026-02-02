@@ -1,16 +1,17 @@
+from typing import Any, Dict, Optional, List
 import json
 import os
 from os.path import join, dirname, abspath
 
 parent_path = join(dirname(abspath(__file__)), os.pardir)
 
-def_config = {
+def_config: Dict[str, Any] = {
     "preprocessing": {
         "models": [
             {
                 "name": "Dataset 1",
                 "file_name": "../ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc",
-                "subsample": { "desktop":2, "mobile":4 }
+                "subsample": {"desktop": 2, "mobile": 4}
             }
         ],
         "output_folder": f"{join(parent_path, 'ParticleViz_WebApp', 'data')}"
@@ -39,56 +40,72 @@ def_config = {
         "file_prefix": "pviz",
     }
 }
-# The configuration file can only have up to 3 nested values so far
-class ConfigParams:
-    _config_json = {}
 
-    def __init__(self, config_json = None):
-        self._config_json = def_config
-        if config_json != None:
-            # Replace everything is inside config_json
+
+class ConfigParams:
+    """Handle configuration parameters for ParticleViz.
+
+    This class manages the default configuration and allows updating it
+    with user-defined values recursively.
+    """
+    _config_json: Dict[str, Any] = {}
+
+    def __init__(self, config_json: Optional[Dict[str, Any]] = None):
+        """Initialize ConfigParams with either default or merged config.
+
+        Args:
+            config_json: Optional user-defined configuration dictionary.
+        """
+        self._config_json = def_config.copy()
+        if config_json is not None:
+            # Replace everything inside config_json
             self._config_json = self.update_config(self._config_json, config_json)
 
     @classmethod
-    def update_config(cls, current_config, new_config):
-        '''
-        This function updates default parameters of the config file with the ones defined
-        in the ConfigFile of the user. It does it recursively.
-        :param current_config:
-        :param new_config:
-        :return:
-        '''
-        if isinstance(new_config, dict):  # We have a dictionary
+    def update_config(cls, current_config: Dict[str, Any], new_config: Any) -> Any:
+        """Update default parameters with user-defined ones recursively.
+
+        Args:
+            current_config: The dictionary to be updated.
+            new_config: The dictionary (or value) containing new settings.
+
+        Returns:
+            The updated configuration.
+        """
+        if isinstance(new_config, dict):
             for key, value in new_config.items():
                 try:
-                    if isinstance(value, list) or isinstance(value, dict):  # In this case we are in a leave
+                    if key in current_config and (isinstance(value, list) or isinstance(value, dict)):
                         current_config[key] = cls.update_config(current_config[key], value)
                     else:
                         current_config[key] = value
                 except Exception as e:
-                    print(F"Failed for Key: {key}  Value:{value}")  # Just for debugging
-                    # TODO Throw exception
-
-
-        else:  # We have an array or a single value
+                    print(f"Failed for Key: {key}  Value: {value}. Error: {e}")
+        else:
             return new_config
         return current_config
 
+    def get_config(self) -> Dict[str, Any]:
+        """Return the current configuration dictionary.
 
-    def get_config(self):
+        Returns:
+            The configuration as a dictionary.
+        """
         return self._config_json
 
-    def set_dataset(self, file_name):
-        '''
-        Used to set a single dataset into the configuration file
-        :return:
-        '''
-        # IT should already have a default dataset
+    def set_dataset(self, file_name: str) -> None:
+        """Set a single dataset into the configuration.
+
+        Args:
+            file_name: The path to the NetCDF file.
+        """
+        # It should already have a default dataset
         self._config_json["preprocessing"]["models"][0]["file_name"] = file_name
 
+
 if __name__ == "__main__":
-    config_file = "../ConfigExamples/Config_Simplest.json"
-    f = open(config_file)
-    config_json = json.load(f)
-    myparams = ConfigParams(config_json)
-    print(myparams.get_config())
+    CONFIG_FILE = "../ConfigExamples/Config_Simplest.json"
+    with open(CONFIG_FILE) as f_in:
+        config_data = json.load(f_in)
+    my_params = ConfigParams(config_data)
+    print(my_params.get_config())
