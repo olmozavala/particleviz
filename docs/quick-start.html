@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page not found | ParticleViz</title>
+  <title>Quick Start | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/particleviz/404.html" />
-<meta property="og:title" content="Page not found | ParticleViz" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/quick-start.html" />
+<meta property="og:title" content="Quick Start | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/particleviz/404.html" />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/quick-start.html" />
   <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,7 @@
           
           <li><a href="/particleviz/showcases.html">Showcases</a></li>
           
-          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          <li><a href="/particleviz/quick-start.html" class="is-active" aria-current="page">Quick Start</a></li>
           
           <li><a href="/particleviz/examples.html">Examples</a></li>
           
@@ -101,7 +101,9 @@
       <nav class="sidebar-nav">
         <p class="sidebar-nav__label">On this page</p>
         <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#quick-start">Quick Start</a></li>
+</ul>
 </div>
 
       </nav>
@@ -110,12 +112,24 @@
 
     <main id="main-content" class="content">
       <div class="content-inner">
-        <div style="text-align: center; padding: 2rem 0;">
-  <h1 style="font-size: 4rem; margin-bottom: 0.5rem;">404</h1>
-  <p><strong>Page not found</strong></p>
-  <p>The requested page could not be found.</p>
-  <p><a href="/particleviz/index.html">Return to documentation home</a></p>
-</div>
+        <h2 id="quick-start">Quick Start</h2>
+<p>Once you have installed the <a href="install.html">Python and JS dependencies</a>, the simplest way to
+use <strong>ParticleViz</strong> is to pass a trajectory dataset from the command line
+(a <code>.nc</code> NetCDF file or a Zarr store directory).
+You need to be patient the first time you run it because it will
+install all the Javascript dependencies. It will be much faster after that.
+This will generate the <em>default</em> web interface to display your data.</p>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file &lt;path to dataset&gt;
+</code></pre>
+<p>Test with the <em>Global_Marine_Debris.nc</em> example in <em>ExampleData</em>:</p>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
+</code></pre>
+<p>Or with a Zarr store:</p>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file /path/to/output.zarr
+</code></pre>
+<p><img src="/particleviz/media/quickstart.gif" alt="Quick start demonstration" class="demo-gif" /></p>
+<p>For custom maps, multiple experiments, and styling options, see <a href="configuration.html">Configuration</a> or the runnable <a href="examples.html">Examples</a> for <code>ConfigExamples/</code> scenarios.</p>
+<p>To run without a local Python/Node install, see <a href="install.html#docker">Docker</a> on the Install page.</p>
       </div>
     </main>
   </div>

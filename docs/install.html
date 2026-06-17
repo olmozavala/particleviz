@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install | ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/install.html" />
+<meta property="og:title" content="Install | ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/install.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/">Home</a></li>
+          
+          <li><a href="/particleviz/install.html" class="is-active" aria-current="page">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#python-environment-uv">Python environment (uv)</a><ul>
+<li><a href="#development-tests">Development / tests</a></li>
+<li><a href="#alternative-conda">Alternative: Conda</a></li>
+</ul>
+</li>
+<li><a href="#docker">Docker</a><ul>
+<li><a href="#build-and-run-default-example">Build and run (default example)</a></li>
+<li><a href="#use-your-own-dataset">Use your own dataset</a></li>
+<li><a href="#use-a-config-file">Use a config file</a></li>
+</ul>
+</li>
+<li><a href="#building-the-docs-site-locally">Building the docs site locally</a><ul>
+<li><a href="#preview-like-github-pages-particleviz-urls">Preview like GitHub Pages (/particleviz/ URLs)</a></li>
+<li><a href="#publishing-on-github-pages">Publishing on GitHub Pages</a></li>
+</ul>
+</li>
+<li><a href="#js-dependencies-npm">JS dependencies (npm)</a></li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <h2 id="python-environment-uv">Python environment (uv)</h2>
+<p>ParticleViz uses <a href="https://docs.astral.sh/uv/">uv</a> to manage its Python dependencies.</p>
+<ol>
+<li>Install uv (<a href="https://docs.astral.sh/uv/getting-started/installation/">installation guide</a>):</li>
+</ol>
+<pre><code class="language-shell">curl -LsSf https://astral.sh/uv/install.sh | sh
+</code></pre>
+<ol start="2">
+<li>From the repository root, create the virtual environment and install packages:</li>
+</ol>
+<pre><code class="language-shell">cd particleviz
+uv sync
+</code></pre>
+<p>This reads <code>pyproject.toml</code>, creates <code>.venv/</code>, and installs numpy, xarray, netCDF4, zarr, cartopy, and the other Python libraries needed for preprocessing.</p>
+<ol start="3">
+<li>Run commands through <code>uv run</code>:</li>
+</ol>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
+</code></pre>
+<h3 id="development-tests">Development / tests</h3>
+<pre><code class="language-shell">uv sync --extra dev
+uv run pytest tests/
+</code></pre>
+<h3 id="alternative-conda">Alternative: Conda</h3>
+<p>A legacy conda environment file is still available:</p>
+<pre><code class="language-shell">conda env create -f particleviz.yml
+conda activate particleviz
+</code></pre>
+<h2 id="docker">Docker</h2>
+<p>You can run ParticleViz in a container without installing Python or Node.js on your host. The image includes uv, the Python dependencies, <code>npm</code> packages for the web app, and the example data under <code>ExampleData/</code>.</p>
+<h3 id="build-and-run-default-example">Build and run (default example)</h3>
+<p>From the repository root:</p>
+<pre><code class="language-shell">git clone https://github.com/olmozavala/particleviz.git
+cd particleviz
+docker build --pull --rm -f Dockerfile -t particleviz .
+docker run --rm -it -p 3000:3000 particleviz:latest
+</code></pre>
+<p>The container runs preprocessing and starts the React dev server. Open <strong>http://localhost:3000/</strong> in your browser.</p>
+<p>The default command (in <code>entrypoint.sh</code>) uses the bundled example:</p>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
+</code></pre>
+<h3 id="use-your-own-dataset">Use your own dataset</h3>
+<p>Mount a NetCDF or Zarr store into the container and override the command:</p>
+<pre><code class="language-shell">docker run --rm -it -p 3000:3000 \
+  -v &quot;$(pwd)/path/to/output.nc:/app/data/output.nc:ro&quot; \
+  particleviz:latest \
+  uv run python ParticleViz.py --input_file /app/data/output.nc
+</code></pre>
+<p>For a Zarr directory:</p>
+<pre><code class="language-shell">docker run --rm -it -p 3000:3000 \
+  -v &quot;$(pwd)/path/to/output.zarr:/app/data/output.zarr:ro&quot; \
+  particleviz:latest \
+  uv run python ParticleViz.py --input_file /app/data/output.zarr
+</code></pre>
+<h3 id="use-a-config-file">Use a config file</h3>
+<p>Mount a config and run the full pipeline:</p>
+<pre><code class="language-shell">docker run --rm -it -p 3000:3000 \
+  -v &quot;$(pwd)/ConfigExamples/Config_Simplest.json:/app/config.json:ro&quot; \
+  particleviz:latest \
+  uv run python ParticleViz.py all --config_file /app/config.json
+</code></pre>
+<p>To change the default dataset baked into the image, edit <code>entrypoint.sh</code> before building, or pass a custom command as shown above.</p>
+<h2 id="building-the-docs-site-locally">Building the docs site locally</h2>
+<p>From the repository root:</p>
+<pre><code class="language-shell">uv sync --extra dev
+uv run python docs/build_site.py --local
+python -m http.server 4000 --directory docs
+</code></pre>
+<p>Open <strong>http://localhost:4000/</strong></p>
+<h3 id="preview-like-github-pages-particleviz-urls">Preview like GitHub Pages (<code>/particleviz/</code> URLs)</h3>
+<p>This matches the compiled site deployed to <strong>https://olmozavala.github.io/particleviz/</strong>:</p>
+<pre><code class="language-shell">./scripts/serve_docs_github.sh
+</code></pre>
+<p>Or manually:</p>
+<pre><code class="language-shell">uv run python docs/build_site.py
+ln -sfn docs particleviz
+python -m http.server 4000
+</code></pre>
+<p>Open <strong>http://localhost:4000/particleviz/</strong></p>
+<h3 id="publishing-on-github-pages">Publishing on GitHub Pages</h3>
+<p>Documentation is built and deployed automatically by GitHub Actions (<code>.github/workflows/docs.yml</code>) when changes are pushed to <code>main</code> under <code>docs/</code>.</p>
+<ol>
+<li>
+<p>In the repository settings, set <strong>GitHub Pages → Build and deployment → Source: GitHub Actions</strong>.</p>
+</li>
+<li>
+<p>Push changes to markdown, layouts, or assets in <code>docs/</code>. The workflow runs <code>uv run python docs/build_site.py</code> and publishes the result.</p>
+</li>
+</ol>
+<p>The site will be available at <strong>https://olmozavala.github.io/particleviz/</strong></p>
+<p>To build locally with production URLs (<code>/particleviz/...</code>):</p>
+<pre><code class="language-shell">uv run python docs/build_site.py
+</code></pre>
+<p>Source markdown (<code>.md</code>) and <code>build_site.py</code> stay in <code>docs/</code> for editing; only the built HTML and static assets are deployed.</p>
+<h2 id="js-dependencies-npm">JS dependencies (npm)</h2>
+<p>The web interface is a React app under <code>ParticleViz_WebApp/</code>. You need <a href="https://nodejs.org/">Node.js</a> installed on your system.</p>
+<p>The first time you run the web app, ParticleViz will call <code>npm install</code> automatically if <code>node_modules</code> is missing. You can also install manually:</p>
+<pre><code class="language-shell">cd ParticleViz_WebApp
+npm install
+</code></pre>
+<p><a href="/particleviz/">Back to documentation home</a></p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>

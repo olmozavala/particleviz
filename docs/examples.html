@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Examples | ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/examples.html" />
+<meta property="og:title" content="Examples | ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/examples.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/">Home</a></li>
+          
+          <li><a href="/particleviz/install.html">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html" class="is-active" aria-current="page">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#examples">Examples</a><ul>
+<li><a href="#oceanparcels-global_marine_debrisnc">OceanParcels — Global_Marine_Debris.nc</a></li>
+<li><a href="#one-line-cli-no-config-file">One-line CLI (no config file)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <h2 id="examples">Examples</h2>
+<p>These configurations use datasets shipped in <code>ExampleData/</code>. Each example below has been run with the commands shown; the animations are captured from the generated web interface.</p>
+<h3 id="oceanparcels-global_marine_debrisnc">OceanParcels — <code>Global_Marine_Debris.nc</code></h3>
+<h4 id="simplest-config">Simplest config</h4>
+<p>Minimal JSON: one experiment and the default subsampling.</p>
+<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Simplest.json
+</code></pre>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [{
+      &quot;name&quot;: &quot;Dataset 1&quot;,
+      &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+      &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 4 }
+    }]
+  }
+}
+</code></pre>
+<p><img src="/particleviz/media/example_simplest.gif" alt="Simplest Global Marine Debris example" class="demo-gif" /></p>
+<h4 id="colored-particles-config_globallitterjson">Colored particles (<code>Config_GlobalLitter.json</code>)</h4>
+<p>Same dataset with a per-particle color scheme for country-based styling.</p>
+<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_GlobalLitter.json
+</code></pre>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [{
+      &quot;name&quot;: &quot;January 2010&quot;,
+      &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+      &quot;subsample&quot;: { &quot;desktop&quot;: 1, &quot;mobile&quot;: 1 },
+      &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitter.json&quot;
+    }]
+  }
+}
+</code></pre>
+<p>The color scheme maps particle indexes to RGBA colors by country. Excerpt from <code>data/color_schemes/ColorSchemeWorldLitter.json</code> (indexes truncated):</p>
+<pre><code class="language-json">{
+  &quot;Countries&quot;: [
+    {
+      &quot;name&quot;: &quot;Albania&quot;,
+      &quot;color&quot;: &quot;rgb(216.8, 65.0, 65.0, 255.0)&quot;,
+      &quot;index&quot;: &quot;2726,2731,2732,2733,2742,...&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Algeria&quot;,
+      &quot;color&quot;: &quot;rgb(53.3, 108.4, 242.2, 255.0)&quot;,
+      &quot;index&quot;: &quot;2040,2041,2049,2062,2091,...&quot;
+    }
+  ]
+}
+</code></pre>
+<p><img src="/particleviz/media/example_global_litter.gif" alt="Global litter color scheme example" class="demo-gif" /></p>
+<h4 id="advanced-multi-experiment-config_advanced_examplejson">Advanced multi-experiment (<code>Config_Advanced_Example.json</code>)</h4>
+<p>Three experiments on the same file: single color, color by country, and color by mismanaged plastic waste (MPW).</p>
+<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
+</code></pre>
+<p>Full config: <a href="https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json"><code>ConfigExamples/Config_Advanced_Example.json</code></a></p>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [
+      {
+        &quot;name&quot;: &quot;Single Color&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 2 }
+      },
+      {
+        &quot;name&quot;: &quot;Color by Country&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 1, &quot;mobile&quot;: 9 },
+        &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitterCountries.json&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Color by MPW&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 2 },
+        &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitterMPW.json&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<p>The file also includes <code>webapp</code> (title, map extent, logos, extra layers) and <code>advanced</code> (timesteps, file prefix, port) sections — see the <a href="https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json">full config on GitHub</a>.</p>
+<p>Use the <strong>Experiment</strong> dropdown in the navbar to switch between the three views.</p>
+<p><img src="/particleviz/media/example_advanced.gif" alt="Advanced multi-experiment example" class="demo-gif" /></p>
+<h3 id="one-line-cli-no-config-file">One-line CLI (no config file)</h3>
+<p>Equivalent to the simplest example:</p>
+<pre><code class="language-shell">uv run python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
+</code></pre>
+<p>See <a href="quick-start.html">Quick Start</a> for a walkthrough and <a href="configuration.html">Configuration</a> to customize the web map.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/" />
+<meta property="og:title" content="ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/" class="is-active" aria-current="page">Home</a></li>
+          
+          <li><a href="/particleviz/install.html">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#welcome-to-particleviz">Welcome to ParticleViz</a></li>
+<li><a href="#supported-input-formats">Supported input formats</a></li>
+<li><a href="#status">Status</a></li>
+<li><a href="#get-started">Get started</a></li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <section class="page-hero" aria-labelledby="hero-title">
+  <img
+    class="page-hero__logo"
+    src="/particleviz/logos/28012022_ParticleViz.png"
+    alt="ParticleViz"
+    width="288"
+    height="auto"
+  >
+  <p id="hero-title" class="page-hero__tagline">
+    Visualizing Lagrangian model outputs the easy way.
+  </p>
+  <div class="page-hero__actions">
+    <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">Live Demo</a>
+    <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+</section>
+
+<h2 id="welcome-to-particleviz">Welcome to ParticleViz</h2>
+<p class="hero-lead">
+ParticleViz is an Open Source software that is used to
+visualize large number of particles inside dynamic web maps.
+It is designed mostly for Earth Science scientists
+that simulate different processes using Lagrangian models.
+</p>
+
+<p>The objectives of this software are:
+* Provide efficient visualizations that can help analyze and understand research made
+through lagrangian modelling in the Earth Sciences, in a fast and easy way. 
+* Make it easy to share this research with other colleagues with selfcontained
+websites. </p>
+<p><strong>ParticleViz</strong> reads particle trajectory data in <strong>NetCDF</strong> or <strong>Zarr</strong> format. Inputs from <a href="https://oceanparcels.org/">OceanParcels</a> and <a href="https://opendrift.github.io/">OpenDrift</a> are recognized automatically; any dataset that follows the same variable naming convention also works.</p>
+<h2 id="supported-input-formats">Supported input formats</h2>
+<p>ParticleViz expects Lagrangian particle trajectories with latitude, longitude, and time coordinates. You can point <code>file_name</code> (in a config file) or <code>--input_file</code> (CLI) at:</p>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Example path</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NetCDF</td>
+<td><code>model_output.nc</code></td>
+<td><code>.nc</code> files from OceanParcels, OpenDrift, or compatible exports</td>
+</tr>
+<tr>
+<td>Zarr</td>
+<td><code>model_output.zarr/</code></td>
+<td>Zarr store directory (e.g. OceanParcels Zarr output)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>OceanParcels convention:</strong> variables such as <code>lon</code>, <code>lat</code>, <code>time</code>, <code>obs</code>, and <code>traj</code> (or <code>trajectory</code> for some Zarr exports).</p>
+<p><strong>OpenDrift convention:</strong> variables such as <code>lon</code>, <code>lat</code>, <code>time</code>, and <code>trajectory</code>.</p>
+<p>If global metadata does not identify the model, ParticleViz falls back to these variable-name patterns. Custom outputs that match the same layout can be visualized without extra configuration.</p>
+<h2 id="status">Status</h2>
+<div class="status-badges">
+<a href="https://github.com/olmozavala/particleviz/stargazers"><img src="https://img.shields.io/github/stars/olmozavala/particleviz?style=social" alt="GitHub stars"></a>
+<a href="https://github.com/olmozavala/particleviz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/olmozavala/particleviz" alt="License"></a>
+<a href="https://github.com/olmozavala/particleviz/releases"><img src="https://img.shields.io/github/downloads/olmozavala/particleviz/total" alt="Downloads"></a>
+<a href="https://github.com/olmozavala/particleviz/issues"><img src="https://img.shields.io/github/issues/olmozavala/particleviz" alt="Issues"></a>
+<a href="https://github.com/olmozavala/particleviz/pulse"><img src="https://img.shields.io/github/commit-activity/m/olmozavala/particleviz" alt="Commit activity"></a>
+</div>
+
+<h2 id="get-started">Get started</h2>
+<div class="doc-cards">
+
+<a class="doc-card" href="/particleviz/install.html">
+  <h3>Install</h3>
+  <p>Set up Python (uv), Node.js, and optional development tools.</p>
+</a>
+
+<a class="doc-card" href="/particleviz/quick-start.html">
+  <h3>Quick Start</h3>
+  <p>Run ParticleViz on an example dataset in a few commands.</p>
+</a>
+
+<a class="doc-card" href="/particleviz/showcases.html">
+  <h3>Showcases</h3>
+  <p>Explore published research visualizations built with ParticleViz.</p>
+</a>
+
+<a class="doc-card" href="/particleviz/examples.html">
+  <h3>Examples</h3>
+  <p>Run bundled ConfigExamples with Global_Marine_Debris.nc and OpenDrift.nc.</p>
+</a>
+
+<a class="doc-card" href="/particleviz/configuration.html">
+  <h3>Configuration</h3>
+  <p>Customize preprocessing and the web interface with JSON config files.</p>
+</a>
+
+</div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>

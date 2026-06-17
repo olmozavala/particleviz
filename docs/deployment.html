@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page not found | ParticleViz</title>
+  <title>Deployment | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/particleviz/404.html" />
-<meta property="og:title" content="Page not found | ParticleViz" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/deployment.html" />
+<meta property="og:title" content="Deployment | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/particleviz/404.html" />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/deployment.html" />
   <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,7 +61,7 @@
           
           <li><a href="/particleviz/parameters.html">Parameters</a></li>
           
-          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          <li><a href="/particleviz/deployment.html" class="is-active" aria-current="page">Deployment</a></li>
           
           <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
           
@@ -101,7 +101,10 @@
       <nav class="sidebar-nav">
         <p class="sidebar-nav__label">On this page</p>
         <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#documentation-site-github-pages">Documentation site (GitHub Pages)</a></li>
+<li><a href="#server-deployment">Server Deployment</a></li>
+</ul>
 </div>
 
       </nav>
@@ -110,12 +113,29 @@
 
     <main id="main-content" class="content">
       <div class="content-inner">
-        <div style="text-align: center; padding: 2rem 0;">
-  <h1 style="font-size: 4rem; margin-bottom: 0.5rem;">404</h1>
-  <p><strong>Page not found</strong></p>
-  <p>The requested page could not be found.</p>
-  <p><a href="/particleviz/index.html">Return to documentation home</a></p>
-</div>
+        <h2 id="documentation-site-github-pages">Documentation site (GitHub Pages)</h2>
+<p>The docs at <a href="https://olmozavala.github.io/particleviz/">olmozavala.github.io/particleviz</a> are built with <code>docs/build_site.py</code> and served as static HTML from the <code>docs/</code> folder (<code>.nojekyll</code> disables Jekyll).</p>
+<p>After editing markdown under <code>docs/</code>, rebuild and commit the generated HTML:</p>
+<pre><code class="language-shell">uv run python docs/build_site.py
+</code></pre>
+<p>Optional: enable <strong>Settings → Pages → Build and deployment → GitHub Actions</strong> so <code>.github/workflows/docs.yml</code> deploys on push without committing HTML.</p>
+<h2 id="server-deployment">Server Deployment</h2>
+<p>If you want to share your visualization with the world, you will need to deploy your site on
+a computer with a public ip address or in an existing web server. The proper way to do it is
+to build an optimized version ready for production and add it into an existing web server.</p>
+<p>Here are the most common steps to do this:</p>
+<ol>
+<li>Build your optimized build with <code>npm</code>. Inside the <code>ParticleViz_WebApp</code> folder, use the following command
+to generate this build (inside a <code>build</code> folder).</li>
+</ol>
+<pre><code class="language-shell">cd ParticleViz_WebApp
+npm run-script build
+</code></pre>
+<ol start="2">
+<li>Copy your <em>build</em> folder into you web server. For example, if you have an <a href="https://httpd.apache.org/">Apache</a>
+web server at <code>/var/www/html</code> you could copy your project to <code>/var/www/html/myawesomemodel</code>. If you don't
+know what I'm talking about ask your IT guy to help you.</li>
+</ol>
       </div>
     </main>
   </div>

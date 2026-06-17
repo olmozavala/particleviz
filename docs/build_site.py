@@ -296,7 +296,7 @@ def main() -> None:
         (DOCS_DIR / "parameters.md", output_dir / "parameters.html"),
         (DOCS_DIR / "deployment.md", output_dir / "deployment.html"),
         (DOCS_DIR / "intro-video.md", output_dir / "intro-video.html"),
-        (DOCS_DIR / "404.html", output_dir / "404.html"),
+        (DOCS_DIR / "404.md", output_dir / "404.html"),
     ]
 
     for source, output in pages:

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuration | ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/configuration.html" />
+<meta property="og:title" content="Configuration | ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/configuration.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/">Home</a></li>
+          
+          <li><a href="/particleviz/install.html">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html" class="is-active" aria-current="page">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#advanced-configuration">Advanced Configuration</a></li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <h2 id="advanced-configuration">Advanced Configuration</h2>
+<p>ParticleViz generates websites in two steps:</p>
+<ul>
+<li><strong>Preprocessing</strong>. This first step transforms the lagrangian outputs
+into multiple binary files that can be transferred efficiently by the internet.</li>
+<li><strong>App builder</strong>. The second step generates a website (react app) that reads binary
+ outputs from the <strong>preprocessing</strong> step.</li>
+</ul>
+<p>All the customizations of these two steps are made through
+a json file. There are several examples at the <code>ConfigExamples</code> folder.
+The simplest config file you can generate will have just information on the location
+of your dataset, like this:</p>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [{
+        &quot;name&quot;: &quot;Dataset 1&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_debris.nc&quot;}]
+    }
+}
+</code></pre>
+<p>To run <em>ParticleViz</em> from a config file you can do it with the following options:</p>
+<pre><code>  ParticleViz.py  all --config_file &lt;config_file&gt;
+  ParticleViz.py  preproc --config_file &lt;config_file&gt;
+  ParticleViz.py  webapp --config_file &lt;config_file&gt;
+</code></pre>
+<p>To run both steps, <strong>Preprocessing</strong> and <strong>App builder</strong>, you will use the <code>all</code> command.
+To only preprocess your data you will use <code>preproc</code> and
+to only generate the website you will use <code>webapp</code> (you need to run <code>preproc</code> at least once before
+running <strong>webapp</strong>).</p>
+<p>A configuration file example with <strong>all</strong> the possible options is the following:</p>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [
+      {
+        &quot;name&quot;: &quot;January 2010&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 4 }
+      },
+      {
+        &quot;name&quot;: &quot;January 2010&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 6, &quot;mobile&quot;: 8 }
+      }
+    ],
+    &quot;output_folder&quot;: &quot;./ParticleViz_WebApp/data/&quot;
+  },
+  &quot;webapp&quot;: {
+    &quot;data_folder&quot;: &quot;./data&quot;,
+    &quot;title&quot;: &quot;Marine Plastic Debris Advanced&quot;,
+    &quot;particles_color&quot;: &quot;rgba(255,105,0)&quot;,
+    &quot;intro_image&quot;: &quot;&quot;,
+    &quot;url&quot;: &quot;https://www.coaps.fsu.edu/our-expertise/global-model-for-marine-litter&quot;,
+    &quot;intro&quot;: &quot;This is an example of a ParticleViz visualization of Marine Debris. Try other example configuration files and then with your own data!!!! &quot;,
+    &quot;zoom-levels&quot;: [ 0.24, 0.12, 0.045, 0.01125, 0.0028125 ],
+    &quot;def-zoom&quot;: 1,
+    &quot;map-extent&quot;: [ -180, -90, 180, 90 ],
+    &quot;map-center&quot;: [ 0, 0 ],
+    &quot;logos&quot;: [{
+      &quot;img&quot;: &quot;logos/logo_example.png&quot;,
+      &quot;url&quot;: &quot;https://olmozavala.com&quot;
+    }],
+    &quot;extra_layers&quot;: [
+      {
+        &quot;name&quot;: &quot;World Cities&quot;,
+        &quot;file&quot;: &quot;extra_layers/capitals.geojson&quot;,
+        &quot;color&quot;: &quot;rgb(255,237,0)&quot;
+      }
+    ]
+  },
+  &quot;advanced&quot;: {
+    &quot;timesteps_by_file&quot;: 200,
+    &quot;file_prefix&quot;: &quot;GlobalLitter&quot;,
+    &quot;port&quot;: 3000
+  }
+}
+</code></pre>
+<p>You can test this <em>advanced</em> configuration file with:</p>
+<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
+</code></pre>
+<p><img src="/particleviz/media/advanced.gif" alt="Advanced configuration demonstration" class="demo-gif" /></p>
+<p>See <a href="parameters.html">Parameters</a> for the full list of configuration keys and their default values.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>

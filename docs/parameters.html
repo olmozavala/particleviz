@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parameters | ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/parameters.html" />
+<meta property="og:title" content="Parameters | ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/parameters.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/">Home</a></li>
+          
+          <li><a href="/particleviz/install.html">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html" class="is-active" aria-current="page">Parameters</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <h2 id="parameters">Parameters</h2>
+<p>Even though most of the parameters are self-explanatory, the meaning of each
+of them for the <em>Preprocessing</em> section is the following. Default values come from
+<code>ParticleViz_DataPreproc/ConfigParams.py</code> unless noted.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>experiments</strong> (array)</td>
+<td>True</td>
+<td>1</td>
+<td>One built-in experiment (see below)</td>
+<td>List of experiments; each will appear in a dropdown in the visualization.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>True</td>
+<td>2</td>
+<td><code>"Dataset 1"</code></td>
+<td>Experiment name shown in the dropdown.</td>
+</tr>
+<tr>
+<td>file_name</td>
+<td>True</td>
+<td>2</td>
+<td>Required; no default</td>
+<td>Path to the experiment output: NetCDF (<code>.nc</code>) or Zarr store (<code>.zarr</code>).</td>
+</tr>
+<tr>
+<td>subsample</td>
+<td>False</td>
+<td>2</td>
+<td><code>{"desktop": 2, "mobile": 4}</code></td>
+<td>Subsampling factors for desktop and mobile clients.</td>
+</tr>
+<tr>
+<td>desktop</td>
+<td>True*</td>
+<td>3</td>
+<td><code>2</code></td>
+<td>Keep every <em>n</em>th particle (<code>2</code> = half the particles).</td>
+</tr>
+<tr>
+<td>mobile</td>
+<td>True*</td>
+<td>3</td>
+<td><code>4</code></td>
+<td>Mobile subsample factor (<code>4</code> = one quarter of the particles).</td>
+</tr>
+<tr>
+<td>color_scheme</td>
+<td>False</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>JSON file defining per-particle colors; preprocessed for each subsample level.</td>
+</tr>
+</tbody>
+</table>
+<p>*Required when <code>subsample</code> is present.</p>
+<p>The <em>advanced</em> section controls preprocessing output and the local development server:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>timesteps_by_file</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>50</code></td>
+<td>Number of timesteps stored in each binary chunk file.</td>
+</tr>
+<tr>
+<td><strong>file_prefix</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>"pviz"</code></td>
+<td>Prefix for generated data files (e.g. <code>pviz_myexperiment_00.zip</code>).</td>
+</tr>
+<tr>
+<td><strong>port</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>3000</code></td>
+<td>TCP port for the local development server (<code>npm start</code>). Open <code>http://localhost:&lt;port&gt;/</code> in your browser.</td>
+</tr>
+</tbody>
+</table>
+<p>The list of parameters for the <em>webapp</em> section is the following:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title</td>
+<td>1</td>
+<td><code>"ParticleViz Title"</code></td>
+<td>Title displayed on the map.</td>
+</tr>
+<tr>
+<td>particles_color</td>
+<td>1</td>
+<td><code>"rgba(255,105,0)"</code></td>
+<td>Default particle color when no color scheme is used.</td>
+</tr>
+<tr>
+<td>data_folder</td>
+<td>1</td>
+<td><code>ParticleViz_WebApp/data</code></td>
+<td>Root folder for logos, extra layers, and other static assets.</td>
+</tr>
+<tr>
+<td>intro_image</td>
+<td>1</td>
+<td><code>""</code> (empty)</td>
+<td>Relative path (from <code>data_folder</code>) for an intro splash image.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>1</td>
+<td><code>https://olmozavala.github.io/particleviz/</code></td>
+<td>URL opened by the home icon.</td>
+</tr>
+<tr>
+<td>intro</td>
+<td>1</td>
+<td><code>"This is an example intro text for ParticleViz. Customize it through the config file."</code></td>
+<td>Intro text on the splash page.</td>
+</tr>
+<tr>
+<td>zoom-levels</td>
+<td>1</td>
+<td><code>[0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625]</code></td>
+<td>Allowed map resolutions, largest to smallest.</td>
+</tr>
+<tr>
+<td>def-zoom</td>
+<td>1</td>
+<td><code>1</code></td>
+<td>Index into <code>zoom-levels</code> for the initial zoom (0-based).</td>
+</tr>
+<tr>
+<td>map-extent</td>
+<td>1</td>
+<td><code>[-360, -90, 360, 90]</code></td>
+<td>Pan limits: <code>[min_lon, min_lat, max_lon, max_lat]</code>.</td>
+</tr>
+<tr>
+<td>map-center</td>
+<td>1</td>
+<td><code>[0, 0]</code></td>
+<td>Initial map center <code>[lon, lat]</code>.</td>
+</tr>
+<tr>
+<td>particle_size</td>
+<td>1</td>
+<td><code>3</code></td>
+<td>Default particle size (integer 1–5).</td>
+</tr>
+<tr>
+<td>trail_size</td>
+<td>1</td>
+<td><code>3</code></td>
+<td>Default trail opacity/size (integer 1–5).</td>
+</tr>
+<tr>
+<td>background</td>
+<td>1</td>
+<td><code>4</code></td>
+<td>Default basemap: <code>1</code>=empty, <code>2</code>=OSM, <code>3</code>=Stamen, <code>4</code>=Nature, <code>5</code>=Dark.</td>
+</tr>
+<tr>
+<td>shape_type</td>
+<td>1</td>
+<td><code>0</code></td>
+<td>Particle shape: <code>0</code>=squares/dots, <code>1</code>=lines.</td>
+</tr>
+<tr>
+<td>logos (array)</td>
+<td>1</td>
+<td><code>[]</code></td>
+<td>Additional logos in the header.</td>
+</tr>
+<tr>
+<td>img</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Logo image path, relative to <code>data_folder</code>.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>URL opened when the logo is clicked.</td>
+</tr>
+<tr>
+<td>extra_layers (array)</td>
+<td>1</td>
+<td><code>[]</code></td>
+<td>Extra <a href="https://geojson.org/">GeoJSON</a> overlays on the map.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Display name for the extra layer.</td>
+</tr>
+<tr>
+<td>file</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>GeoJSON path, relative to <code>data_folder</code>.</td>
+</tr>
+<tr>
+<td>color</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Stroke/fill color for the extra layer.</td>
+</tr>
+</tbody>
+</table>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>
