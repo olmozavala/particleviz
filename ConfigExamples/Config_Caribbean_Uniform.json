@@ -1,0 +1,48 @@
+{
+    "preprocessing": {
+        "experiments": [
+            {
+                "name": "MPW",
+                "file_name": "ExampleData/caribbean-marine-litter-mpw.nc",
+                "subsample": {
+                    "desktop": 3,
+                    "mobile": 5
+                },
+                "color_scheme": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/data/color_schemes/color_scheme_mpw_twelve_releases.json"
+            },
+            {
+                "name": "Uniform",
+                "file_name": "ExampleData/caribbean-marine-litter-uniform.nc",
+                "subsample": {
+                    "desktop": 3,
+                    "mobile": 5
+                },
+                "color_scheme": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/data/color_schemes/color_scheme_uniform_twelve_releases.json"
+            }
+        ]
+    },
+    "webapp": {
+        "data_folder": "./data",
+        "title": "Caribbean Marine Litter",
+        "url": "https://github.com/philippemiron",
+        "intro": "This map shows the trajectory of marine debris in the Caribbean. ",
+        "zoom-levels": [
+            0.7,
+            0.18,
+            0.09,
+            0.045,
+            0.0225,
+            0.01125,
+            0.005625,
+            0.0028125,
+            0.00140625
+        ],
+        "def-zoom": 3,
+        "map-extent_": [ -150, 20, -50, 90 ],
+        "map-center": [ -82, 18 ],
+        "particle_size": 2,
+        "trail_size": 2,
+        "background": 4,
+        "shape_type": 1
+    }
+}

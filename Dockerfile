@@ -1,29 +1,33 @@
-FROM mambaorg/micromamba
+FROM python:3.12-bookworm-slim
 
-USER $MAMBA_USER
-COPY --chown=$MAMBA_USER:$MAMBA_USER particleviz.yml /tmp/env.yaml
-RUN micromamba create --yes --name particleviz -f /tmp/env.yaml && \
-    micromamba clean --all --yes
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
 
-COPY --chown=$MAMBA_USER ParticleViz_WebApp /home/$MAMBA_USER/app/ParticleViz_WebApp
-COPY ParticleViz_DataPreproc /home/$MAMBA_USER/app/ParticleViz_DataPreproc
-COPY ExampleData /home/$MAMBA_USER/app/ExampleData
-COPY ConfigExamples /home/$MAMBA_USER/app/ConfigExamples
-COPY --chmod=0755 entrypoint.sh /home/$MAMBA_USER/app/
-COPY ParticleViz.py /home/$MAMBA_USER/app/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    nodejs \
+    npm \
+    libgeos-dev \
+    libproj-dev \
+    libnetcdf-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/$MAMBA_USER/app/
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
-RUN eval "$(micromamba shell hook --shell=bash)" &&\
-    micromamba activate particleviz &&\
-    cd ParticleViz_WebApp && npm install
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+
+COPY ParticleViz_WebApp /app/ParticleViz_WebApp
+COPY ParticleViz_DataPreproc /app/ParticleViz_DataPreproc
+COPY ExampleData /app/ExampleData
+COPY ConfigExamples /app/ConfigExamples
+COPY --chmod=0755 entrypoint.sh /app/
+COPY ParticleViz.py /app/
+
+RUN cd ParticleViz_WebApp && npm install
 
 EXPOSE 3000
 
-# if no entrypoint is specified, the default is to run the command from arguments
-
-# for micromamba image, there is a default entrypoint
-# take activate the environment so python is available
-#ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]  # default of micromamba image
-# or using CMD will append the arguments to the entrypoint
 CMD ["./entrypoint.sh"]

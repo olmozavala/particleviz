@@ -1,0 +1,168 @@
+{
+    "preprocessing": {
+        "experiments": [
+            {
+                "name": "All Farms",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/merged_data.nc",
+                "color_scheme": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/data/color_schemes/sea_clearly_color_scheme.json",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From FR_0025 France",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_FR_0025.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards FR_0025 France",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_FR_0025.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            },{
+                "name": "From GR_O108 Papadopoulos, Grece",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_GR_0108.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards GR_O108 Papadopoulos, Grece",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_GR_0108.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From GR_0157 Tsaridis, Greece",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_GR_0157.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards GR_0157 Tsaridis, Greece",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_GR_0157.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From IT_0017 Cooperativa, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_IT_0017.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards IT_0017 Cooperativa, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_IT_0017.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From IT_0039 Laudamar, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_IT_0039.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards IT_0039 Laudamar, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_IT_0039.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From IT_0053 Civitacozza, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_IT_0053.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards IT_0053 Civitacozza, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_IT_0053.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "From IT_0096 Pescatory, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/bwd_IT_0096.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            } ,{
+                "name": "Towards IT_0096 Pescatory, Italy",
+                "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/ExampleData/SeaClearly/fwd_IT_0096.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 2
+                }
+            }
+        ]
+    },
+    "webapp": {
+        "data_folder": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Blue-Code_Hack/ParticleViz-SeaClearly/data/",
+        "title": "Sea Clearly",
+        "particles_color": "rgba(255,105,0)",
+        "intro_image": "logos/main.png",
+        "url": "https://github.com/VictorOnink/Blue-Cloud-Sea-Clearly",
+        "intro": "Back-tracking the pathways of anthropogenic (innate) pollutants from aquaculture cages to beaches or rivers in the Mediterranean. ",
+        "zoom-levels": [
+            0.36,
+            0.18,
+            0.09,
+            0.045,
+            0.0225,
+            0.01125,
+            0.005625,
+            0.0028125,
+            0.00140625
+        ],
+        "particle_size": 5,
+        "trail_size": 1,
+        "background": 5,
+        "shape_type": 0,
+        "def-zoom": 5,
+        "map-extent": [
+            -180,
+            -90,
+            180,
+            90
+        ],
+        "map-center": [
+            13.5,
+            40.5
+        ],
+        "logos": [
+            {
+                "img": "logos/eu_flag_sm.jpg",
+                "url": "https://european-union.europa.eu/index_en"
+            },
+            {
+                "img": "logos/uu-logo_sm.png",
+                "url": "https://www.uu.nl/en"
+            }
+        ],
+        "extra_layers": [
+            {
+                "name": "ShellFish",
+                "file": "extra_layers/shellfish.geojson",
+                "color": "rgb(56,223,229)"
+            }
+        ]
+    },
+    "advanced": {
+        "timesteps_by_file": 50,
+        "file_prefix": "seaclearly"
+    }
+}

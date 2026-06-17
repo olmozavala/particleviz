@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 __pycache__/
+.venv/
 
 ParticleViz_WebApp/node_modules/
 ParticleViz_WebApp/particleviz/
@@ -49,3 +50,6 @@ ParticleViz_WebApp/build
 /ConfigExamples/Config_Blue_Hack.json
 /ParticleViz_WebApp/BK.json
 /ParticleViz_WebApp/src/Config.json
+.pviz_instances/
+/particleviz
+docs/.bundle/

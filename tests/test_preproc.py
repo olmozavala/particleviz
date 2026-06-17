@@ -6,8 +6,21 @@ import os
 import shutil
 import json
 from datetime import datetime
-from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz, set_start_date
+from ParticleViz_DataPreproc.DatasetLoader import (
+    set_start_date,
+    open_particle_dataset,
+    normalize_trajectory_dims,
+    get_time_metadata,
+    is_zarr_store,
+    parse_time_units,
+)
+from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
+
+ZARR_SAMPLE = (
+    "/home/olmozavala/Dropbox/TutorialsByMe/Python/PythonExamples/"
+    "Python/OceanParcels/output/EddyParticles.zarr"
+)
 
 def test_set_start_date():
     start_date_str = "2020-01-01T00:00:00"
@@ -25,7 +38,7 @@ def test_set_start_date():
     assert dt_day == datetime(2020, 1, 2, 0, 0, 0)
 
 def test_get_output_type():
-    preproc = PreprocParticleViz({"preprocessing": {"models": [], "output_folder": ""}, "advanced": {"timesteps_by_file": 50, "file_prefix": "pviz"}})
+    preproc = PreprocParticleViz({"preprocessing": {"experiments": [], "output_folder": ""}, "advanced": {"timesteps_by_file": 50, "file_prefix": "pviz"}})
     
     # OceanParcels mock
     ds_parcels = MagicMock(spec=xr.Dataset)
@@ -41,21 +54,73 @@ def test_get_output_type():
     ds_heuristics = MagicMock(spec=xr.Dataset)
     ds_heuristics.attrs = {}
     ds_heuristics.variables.keys.return_value = ["obs", "traj", "lon", "lat", "z", "time"]
+    ds_heuristics.dims = ["obs", "traj"]
     assert preproc.getOutputType(ds_heuristics) == ModelType.OCEAN_PARCELS
 
+def test_parse_time_units():
+    assert parse_time_units("days since 2021-12-01:00") == ("days", "2021-12-01:00")
+    assert parse_time_units("seconds") == ("seconds", "1970-01-01T00:00:00")
+
+def test_zarr_loader():
+    if not os.path.exists(ZARR_SAMPLE):
+        pytest.skip("OceanParcels Zarr sample not found")
+
+    assert is_zarr_store(ZARR_SAMPLE)
+    xr_ds = normalize_trajectory_dims(open_particle_dataset(ZARR_SAMPLE))
+    assert "traj" in xr_ds.dims
+    assert xr_ds.sizes["obs"] == 144
+
+    time_meta = get_time_metadata(xr_ds)
+    assert time_meta.unit == "seconds"
+    assert time_meta.delta_t == 3600.0
+    xr_ds.close()
+
+def test_create_binary_file_from_zarr(tmp_path):
+    if not os.path.exists(ZARR_SAMPLE):
+        pytest.skip("OceanParcels Zarr sample not found")
+
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+
+    config = {
+        "preprocessing": {
+            "experiments": [
+                {
+                    "name": "ZarrModel",
+                    "file_name": ZARR_SAMPLE,
+                    "subsample": {"desktop": 1, "mobile": 2},
+                }
+            ],
+            "output_folder": str(output_dir),
+        },
+        "advanced": {
+            "timesteps_by_file": 50,
+            "file_prefix": "test_pviz",
+        },
+    }
+
+    preproc = PreprocParticleViz(config)
+    preproc.createBinaryFileMultiple()
+
+    desktop_dir = output_dir / "1"
+    assert desktop_dir.exists()
+    assert (desktop_dir / "test_pviz_zarrmodel_00.txt").exists()
+    assert (desktop_dir / "test_pviz_zarrmodel_00.zip").exists()
+
 def test_get_tot_time_steps_and_num_particles():
-    preproc = PreprocParticleViz({"preprocessing": {"models": [], "output_folder": ""}, "advanced": {"timesteps_by_file": 50, "file_prefix": "pviz"}})
+    preproc = PreprocParticleViz({"preprocessing": {"experiments": [], "output_folder": ""}, "advanced": {"timesteps_by_file": 50, "file_prefix": "pviz"}})
     
     ds = MagicMock()
-    ds.trajectory.size = 10
-    ds.time.size = 100
+    ds.sizes = {"traj": 10, "time": 100, "obs": 200, "trajectory": 10}
     ds.obs.size = 200
     ds.traj.size = 20
+    ds.trajectory.size = 10
+    ds.time.size = 100
     
-    # OpenDrift
+    # OpenDrift (traj x time layout)
     steps, parts = preproc.getTotTimeStepsAndNumParticles(ModelType.OPEN_DRIFT, ds)
-    assert steps == 10
-    assert parts == 100
+    assert steps == 100
+    assert parts == 10
     
     # OceanParcels
     steps, parts = preproc.getTotTimeStepsAndNumParticles(ModelType.OCEAN_PARCELS, ds)
@@ -74,7 +139,7 @@ def test_create_binary_file_multiple(tmp_path):
         
     config = {
         "preprocessing": {
-            "models": [
+            "experiments": [
                 {
                     "name": "TestModel",
                     "file_name": sample_file,

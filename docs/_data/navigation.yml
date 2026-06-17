@@ -1,5 +1,27 @@
-docs:
-  - title: Getting Started
-    children:
-      - title: "Quick-Start Guide"
-        url: /docs/quick-start-guide/
+main:
+  - title: Home
+    url: "/"
+  - title: Install
+    url: "/install.html"
+  - title: Showcases
+    url: "/showcases.html"
+  - title: Quick Start
+    url: "/quick-start.html"
+  - title: Examples
+    url: "/examples.html"
+  - title: Configuration
+    url: "/configuration.html"
+  - title: Parameters
+    url: "/parameters.html"
+  - title: Deployment
+    url: "/deployment.html"
+  - title: Intro Video
+    url: "/intro-video.html"
+
+actions:
+  - title: Live Demo
+    url: https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/
+    style: demo
+  - title: GitHub
+    url: https://github.com/olmozavala/particleviz
+    style: github

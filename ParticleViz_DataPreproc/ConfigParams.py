@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Dict, Optional, List
 import json
 import os
@@ -7,7 +8,7 @@ parent_path = join(dirname(abspath(__file__)), os.pardir)
 
 def_config: Dict[str, Any] = {
     "preprocessing": {
-        "models": [
+        "experiments": [
             {
                 "name": "Dataset 1",
                 "file_name": "../ExampleData/Particle_AZO_grid100000p_wtides_0615_hourly.nc",
@@ -38,6 +39,7 @@ def_config: Dict[str, Any] = {
     "advanced": {
         "timesteps_by_file": 50,
         "file_prefix": "pviz",
+        "port": 3000,
     }
 }
 
@@ -56,9 +58,8 @@ class ConfigParams:
         Args:
             config_json: Optional user-defined configuration dictionary.
         """
-        self._config_json = def_config.copy()
+        self._config_json = deepcopy(def_config)
         if config_json is not None:
-            # Replace everything inside config_json
             self._config_json = self.update_config(self._config_json, config_json)
 
     @classmethod
@@ -97,10 +98,10 @@ class ConfigParams:
         """Set a single dataset into the configuration.
 
         Args:
-            file_name: The path to the NetCDF file.
+            file_name: The path to the NetCDF or Zarr dataset.
         """
         # It should already have a default dataset
-        self._config_json["preprocessing"]["models"][0]["file_name"] = file_name
+        self._config_json["preprocessing"]["experiments"][0]["file_name"] = file_name
 
 
 if __name__ == "__main__":

@@ -1,0 +1,36 @@
+{
+    "preprocessing": {
+        "experiments": [
+            {
+                "name": "2018-01-01",
+                "file_name": "ExampleData/cm_mpw_2018-01-01.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 8
+                },
+                "color_scheme": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/data/color_schemes/ColorSchemeCaribbeanMPW_2018-01-01.json"
+            },
+            {
+                "name": "2021-12-01",
+                "file_name": "ExampleData/cm_mpw_2021-12-01.nc",
+                "subsample": {
+                    "desktop": 1,
+                    "mobile": 8
+                },
+                "color_scheme": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/Particle_viz/data/color_schemes/ColorSchemeCaribbeanMPW_2021-12-01.json"
+            }
+        ]
+    },
+    "webapp": {
+        "data_folder": "./data",
+        "title": "Marine Debris in the Caribbean",
+        "url": "https://github.com/philippemiron",
+        "intro": "This map shows the trajectory of marine debris in the Caribbean. ",
+        "zoom-levels": [ 0.24, 0.12, 0.045, 0.01125, 0.0028125 ],
+        "def-zoom": 2,
+        "map-center": [
+            -82,
+            18
+        ]
+    }
+}

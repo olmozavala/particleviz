@@ -16,7 +16,7 @@ const config_adv = config_pviz.advanced
 const datasets = config_adv["datasets"]
 const default_size = 15 // fontsize
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
-let models = []
+let experiments = []
 
 // console.log(datasets)
 // This index is TIGHTLY related with the index generated at the preprocessing
@@ -28,7 +28,7 @@ for (const c_obj of datasets) {
         if (isMobile) {
             folder = c_dataset["subsample"]["mobile"]
         }
-        models.push({
+        experiments.push({
             id: id_dataset,
             name: capitalize(c_dataset["name"]),
             file: `data/${folder}/${c_dataset["file_name"]}`,
@@ -48,11 +48,11 @@ class  ParticleVizManager extends React.Component{
         this.updateMapLocation = this.updateMapLocation.bind(this)
         this.toggleHelp= this.toggleHelp.bind(this)
         this.toogleMobileMenu = this.toogleMobileMenu.bind(this)
-        this.updateSelectedModel = this.updateSelectedModel.bind(this)
+        this.updateSelectedExperiment = this.updateSelectedExperiment.bind(this)
 
         this.state = {
             countries: {},
-            selected_model: models[0],
+            selected_experiment: experiments[0],
             chardin: this.props.chardin,
             particle_color:  config_webapp['particles_color'],
             show_menu: false
@@ -107,20 +107,19 @@ class  ParticleVizManager extends React.Component{
         return countries
     }
 
-    updateSelectedModel(e){
+    updateSelectedExperiment(e){
         /**
-         * Select one of the available models
+         * Select one of the available experiments
          */
-        let new_selected_model = []
-        for(let i = 0; i < models.length; i++){
-            if(models[i].name.toLowerCase().trim() === e.target.text.toLowerCase().trim()){
-                new_selected_model = models[i]
+        let new_selected_experiment = []
+        for(let i = 0; i < experiments.length; i++){
+            if(experiments[i].name.toLowerCase().trim() === e.target.text.toLowerCase().trim()){
+                new_selected_experiment = experiments[i]
                 break
             }
         }
-        // console.log("New model",new_selected_model)
         this.setState({
-            selected_model: new_selected_model,
+            selected_experiment: new_selected_experiment,
         })
         e.preventDefault()
     }
@@ -175,15 +174,15 @@ class  ParticleVizManager extends React.Component{
                                 </Col>
                             </Row>
                             <Row className={`bg-light px-2 py-1`} >
-                                {/* ---------- Model selection ------------*/}
-                                <Col xs={7}> <span className={"m-1"}>Model</span> </Col>
+                                {/* ---------- Experiment selection ------------*/}
+                                <Col xs={7}> <span className={"m-1"}>Experiment</span> </Col>
                                 <Col xs={{span:4}}>
                                     <Dropdown className="mt-2 d-inline" title="Release month">
                                         <Dropdown.Toggle variant="info" size="sm">
-                                            {this.state.selected_model.name}
+                                            {this.state.selected_experiment.name}
                                         </Dropdown.Toggle>
-                                        <Dropdown.Menu onClick={this.updateSelectedModel}>
-                                            {models.map((item, index) => (
+                                        <Dropdown.Menu onClick={this.updateSelectedExperiment}>
+                                            {experiments.map((item, index) => (
                                                 <Dropdown.Item eventKey={item.name}
                                                                key={index}>{item.name} </Dropdown.Item>
                                             ))}
@@ -198,7 +197,7 @@ class  ParticleVizManager extends React.Component{
                                                     url={this.props.url}
                                                     chardin={this.state.chardin}
                                                     particle_color={this.state.particle_color}
-                                                    selected_model={this.state.selected_model}
+                                                    selected_experiment={this.state.selected_experiment}
                                     />
                                 </Col>
                             </Row>
@@ -234,7 +233,7 @@ class  ParticleVizManager extends React.Component{
                                         url={this.props.url}
                                         chardin={this.state.chardin}
                                         particle_color={this.state.particle_color}
-                                        selected_model={this.state.selected_model}/>
+                                        selected_experiment={this.state.selected_experiment}/>
                     </span>
                     {/* ---------- Background selection ------------*/}
                     <span className="navbar-brand align-middle" data-intro="Map Style" data-oz-position={chardin_offset} >
@@ -250,15 +249,15 @@ class  ParticleVizManager extends React.Component{
                     {/*            </button>*/}
                     {/*        </div>*/}
                     {/*    </span>*/}
-                    {/* ---------- Model selection ------------*/}
+                    {/* ---------- Experiment selection ------------*/}
                     <span className="navbar-brand align-middle" >
-                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_mod_sel" {...props}> Datasets</Tooltip>)}>
-                            <Dropdown className="d-inline me-1" data-intro="Model Selection" data-oz-position={chardin_offset + 10} >
+                        <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_exp_sel" {...props}> Experiments</Tooltip>)}>
+                            <Dropdown className="d-inline me-1" data-intro="Experiment Selection" data-oz-position={chardin_offset + 10} >
                                 <Dropdown.Toggle variant="info" size="sm">
-                                    {this.state.selected_model.name}
+                                    {this.state.selected_experiment.name}
                                 </Dropdown.Toggle>
-                                <Dropdown.Menu onClick={this.updateSelectedModel}>
-                                    {models.map((item, index) => (
+                                <Dropdown.Menu onClick={this.updateSelectedExperiment}>
+                                    {experiments.map((item, index) => (
                                         <Dropdown.Item eventKey={item.name}
                                                        key={index}>{item.name}
                                         </Dropdown.Item>

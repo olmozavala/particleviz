@@ -1,6 +1,6 @@
 {
     "preprocessing": {
-        "models": [
+        "experiments": [
             {
                 "name": "Single Color",
                 "file_name": "./ExampleData/Global_Marine_Debris.nc",
@@ -34,7 +34,7 @@
         "map-center": [ 0, 0 ],
         "particle_size": 1,
         "trail_size": 5,
-        "background": 4,
+        "background": 2,
         "shape_type": 1,
         "logos": [{
             "img": "logos/logo_example.png",
@@ -52,6 +52,7 @@
     },
     "advanced": {
         "timesteps_by_file": 200,
-        "file_prefix": "GlobalLitter"
+        "file_prefix": "GlobalLitter",
+        "port": 3000
     }
 }

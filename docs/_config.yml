@@ -1,54 +1,30 @@
 email: ozavala@coaps.fsu.edu
 
-baseurl: "/particleviz/" # the subpath of your site, e.g. /blog
-url: "https://olmozavala.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/particleviz/"
+url: "https://olmozavala.github.io/"
 
 # Build settings
-theme: jekyll-theme-dinky
-# theme: minimal-mistakes-jekyll
-# remote_theme: pages-themes/cayman@v0.2.0
-# theme: minima
-
 plugins:
   - jekyll-feed
-  - jekyll-remote-theme
 
 include:
-  install.md
-  ../README.md
+  - ../README.md
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
 
 # ---------- General
 description: "Visualizing Lagrangian model outputs the easy way."
 title: ParticleViz
 
-# ---------- Cayman theme
+repository: olmozavala/particleviz
+github:
+  repository_url: https://github.com/olmozavala/particleviz
 
-# ---------- Dinky theme
-#github_username:  olmozavala
-
-# ---------- Minimal-mistakes theme
-#minimal_mistakes_skin: "air"  # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
-#name: "Olmo Zavala "
-##masthead_title: "Welcome to ParticleViz"
-#subtitle: "Version 0.1"
-#repository: "olmozavala/particleviz"
-#logo: "/logos/logo.png"
-#search: true
-
-#author:
-#  name    : "Olmo Zavala"
-#  avatar  : "image"
-#  bio     : ""
-#  location: "Tallahassee, FL"
-#  links:
-#      - label: "GitHub"
-#        icon: "fab fa-fw fa-github"
-#        url: "https://github.com/olmozavala"
-
-#sidebar:
-#  - title: "Title"
-#    image: http://placehold.it/350x250
-#    image_alt: "image"
-#    text: "Some text here."
-#  - title: "Another Title"
-#    text: "More text here."
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge

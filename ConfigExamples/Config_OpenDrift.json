@@ -1,0 +1,16 @@
+{
+  "preprocessing": {
+    "experiments": [{
+      "name": "OpenDrift demo",
+      "file_name": "./ExampleData/OpenDrift.nc",
+      "subsample": { "desktop": 2, "mobile": 4 }
+    }]
+  },
+  "webapp": {
+    "title": "OpenDrift demo",
+    "intro": "Particle trajectories from an OpenDrift simulation."
+  },
+  "advanced": {
+    "file_prefix": "pviz"
+  }
+}

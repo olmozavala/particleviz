@@ -1,3 +1,5 @@
+# Legacy conda environment (optional).
+# Prefer uv + pyproject.toml for new installs (see README.md).
 name: particleviz
 channels:
     - conda-forge
@@ -13,3 +15,4 @@ dependencies:
     - netcdf4=*.*
     - docopt=*.*
     - cartopy=*.*
+    - zarr=*.*

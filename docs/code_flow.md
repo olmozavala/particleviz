@@ -1,6 +1,6 @@
 # ParticleViz Code Flow
 
-ParticleViz is a tool designed to visualize Lagrangian particle data (e.g., from OceanParcels or OpenDrift) on the web. The process involves three main stages: Configuration, Preprocessing, and Web App Deployment.
+ParticleViz is a tool designed to visualize Lagrangian particle data (from OceanParcels, OpenDrift, or convention-compatible NetCDF/Zarr outputs) on the web. The process involves three main stages: Configuration, Preprocessing, and Web App Deployment.
 
 ## 1. Entry Point: `ParticleViz.py`
 The main CLI tool uses `docopt` to handle different modes:
@@ -11,11 +11,11 @@ The main CLI tool uses `docopt` to handle different modes:
 ## 2. Configuration Management
 - **`ConfigParams.py`**: Defines default settings for both preprocessing and the web app.
 - **Merge Logic**: User-provided configuration files are merged with the defaults recursively. This ensures that even a minimal config can be used, with the system filling in the blanks.
-- **Dynamic Configuration**: If a user provides only a NetCDF file (`--input_file`), ParticleViz generates a temporary configuration on the fly.
+- **Dynamic Configuration**: If a user provides only a dataset path (`--input_file`), ParticleViz generates a temporary configuration on the fly.
 
 ## 3. Preprocessing: `PreprocParticleViz.py`
 This is where the heavy lifting happens for data conversion.
-- **Model Detection**: Automatically detects if the input file is from **OceanParcels** or **OpenDrift** based on NetCDF attributes and variable names.
+- **Model Detection**: Automatically detects **OceanParcels** vs **OpenDrift** from dataset attributes and variable names (works for NetCDF and Zarr).
 - **Subsampling**: To ensure performance on different devices, it generates two versions of the data:
     - **Desktop**: A higher-resolution subsample.
     - **Mobile**: A lower-resolution subsample for better performance on mobile browsers.
@@ -33,7 +33,7 @@ This is where the heavy lifting happens for data conversion.
     - Generated data chunks are copied to the web app's `public/data` directory.
 - **Server Initialization**:
     - Checks for `node_modules` and runs `npm install` if necessary.
-    - Runs `npm start` to launch the React/Vite-based web application.
+    - Runs `npm start` to launch the React development server on the port set in `advanced.port` (default `3000`).
 
 ## Summary Diagram
 
@@ -43,7 +43,7 @@ graph TD
     B -->|preproc/all| C[PreprocParticleViz]
     B -->|webapp/all| D[Web App Setup]
     
-    C --> C1[Load NetCDF]
+    C --> C1[Load NetCDF or Zarr]
     C1 --> C2[Subsample Particles]
     C2 --> C3[Partition Timesteps]
     C3 --> C4[Save Binary & Zip]

@@ -1,72 +1,98 @@
 <!doctype html>
-<html lang="{{ site.lang | default: "en-US" }}">
+<html lang="{{ site.lang | default: 'en-US' }}">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   {% seo %}
-  <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-  <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <!--[if lt IE 9]>
-  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">-->
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   {% include head-custom.html %}
 </head>
 <body>
-<div class="wrapper">
-  <header>
-    <h1 class="header">{{ site.title | default: site.github.repository_name }}</h1>
-    <p class="header">{{ site.description | default: site.github.project_tagline }}</p>
-    <div  class="ulcontainer">
-      <ul>
-        <li class="lioz" ><a href="#">Home</a></li>
-        <li class="lioz" ><a href="#install">Install</a></li>
-        <li class="lioz" ><a href="#quick-start">Quick Start</a></li>
-        <li class="lioz" ><a href="#advanced-configuration">Adv. Config.</a></li>
-        <li class="lioz" ><a href="#parameters">Parameters</a></li>
-        <li class="lioz" ><a href="#server-deployment">Server Deployment</a></li>
-        <li class="lioz" ><a href="#intro-video">Intro Video</a></li>
-      </ul>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ '/' | relative_url }}">
+        <img
+          class="brand-logo"
+          src="{{ '/logos/logo_sm.png' | relative_url }}"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          {% for item in site.data.navigation.main %}
+          <li><a href="{{ item.url | nav_url }}">{{ item.title }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="site-nav__actions">
+          {% for item in site.data.navigation.actions %}
+          <li>
+            <a class="btn btn--{{ item.style }}" href="{{ item.url }}"{% if item.url contains 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>
+              {{ item.title }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
     </div>
-    <ul>
-      {% if site.show_downloads %}
-      <li class="download"><a class="buttons" href="{{ site.github.zip_url }}">Download ZIP</a></li>
-      <li class="download"><a class="buttons" href="{{ site.github.tar_url }}">Download TAR</a></li>
-      {% endif %}
-      <li><a class="buttonsoz " href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/">Live Demo!</a></li>
-      <li><a class="buttons github" href="{{ site.github.repository_url }}">View On GitHub</a></li>
-    </ul>
-    {% if site.github.is_user_page %}
-    <ul>
-      <li><a class="buttons github" href="{{ site.github.owner_url }}">GitHub Profile</a></li>
-    </ul>
-    {% endif %}
   </header>
 
-  <div class="container-fluid">
-    <div class="row warning">
-      <div class="col-2 info"> a </div>
-      <div class="col-2 info-dark"> b </div>
-    </div>
-    <div class="row">
-      <div class="col-2">
+  <div class="page-layout{% unless page.toc %} page-layout--no-sidebar{% endunless %}">
+    {% if page.toc %}
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
 
-      </div> <!-- col-2 menu -->
-      <div class="col-10">
-        <section>
-          {{ content }}
-        </section>
-      </div>  <!-- main -->
-    </div><!-- row -->
-  </div><!-- container -->
-  <footer>
-    <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a><br>
-      Logo design by <a href="https://www.behance.net/elizabethhuerta?isa0=1">Elizabeth Huerta</a></small></p>
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        {{ page.toc }}
+      </nav>
+    </aside>
+    {% endif %}
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        {{ content }}
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">{{ site.description | default: site.github.project_tagline }}</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
   </footer>
-  <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+  <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
 </body>
 </html>

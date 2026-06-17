@@ -4,49 +4,25 @@ import os
 import json
 import zipfile
 from os.path import join
-from datetime import datetime, timedelta
-from dateutil.parser import isoparse
 import numpy as np
-from netCDF4 import Dataset
-import xarray as xr
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
+import xarray as xr
 
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
 from ParticleViz_DataPreproc.ColorByParticleUtils import updateColorScheme
-
-__author__ = "Olmo S. Zavala Romero"
-
-
-def set_start_date(start_date_str: str, start_time: int, units: str) -> datetime:
-    """Set the initial start date/time of the model.
-
-    Takes into account the 'units' property of the NetCDF and the minimum value
-    in the 'time' variable of the NetCDF.
-
-    Args:
-        start_date_str: Initial date string from NetCDF units.
-        start_time: Offset value from the NetCDF time variable.
-        units: Unit of the offset (seconds, hours, days).
-
-    Returns:
-        The calculated start datetime object.
-    """
-    base_date = isoparse(start_date_str)
-    if units == 'seconds':
-        return base_date + timedelta(seconds=float(start_time))
-    if units == 'hours':
-        return base_date + timedelta(hours=float(start_time))
-    if units == 'days':
-        return base_date + timedelta(days=float(start_time))
-    return base_date
+from ParticleViz_DataPreproc.DatasetLoader import (
+    open_particle_dataset,
+    normalize_trajectory_dims,
+    get_time_metadata,
+)
 
 
 class PreprocParticleViz:
     """Preprocessor for ParticleViz data.
 
-    Converts NetCDF particle data (OceanParcels/OpenDrift) into optimized
-    binary formats for web visualization.
+    Converts particle trajectory data (NetCDF or Zarr, OceanParcels/OpenDrift)
+    into optimized binary formats for web visualization.
     """
 
     def __init__(self, config_json: Dict[str, Any]):
@@ -58,7 +34,7 @@ class PreprocParticleViz:
         config = config_json["preprocessing"]
         config_adv = config_json["advanced"]
         self._config_json = config_json
-        self._models = config["models"]
+        self._experiments = config["experiments"]
         self._output_folder = config["output_folder"]
         self._timesteps_by_file = config_adv["timesteps_by_file"]
         self._file_prefix = config_adv["file_prefix"]
@@ -79,8 +55,10 @@ class PreprocParticleViz:
             return ModelType.OCEAN_PARCELS
 
         # Heuristics for zarr or other structures
-        var_names = set(xr_ds.variables.keys())
+        var_names = set(xr_ds.variables.keys()) | set(xr_ds.dims)
         if {'obs', 'traj', 'lon', 'lat', 'z', 'time'}.issubset(var_names):
+            return ModelType.OCEAN_PARCELS
+        if {'obs', 'trajectory', 'lon', 'lat', 'z', 'time'}.issubset(var_names):
             return ModelType.OCEAN_PARCELS
         if {'trajectory', 'time', 'lon', 'lat'}.issubset(var_names):
             return ModelType.OPEN_DRIFT
@@ -99,7 +77,11 @@ class PreprocParticleViz:
             A tuple (total_timesteps, global_num_particles).
         """
         if model_type == ModelType.OPEN_DRIFT:
-            return xr_ds.trajectory.size, xr_ds.time.size
+            if "traj" in xr_ds.sizes:
+                return int(xr_ds.sizes["time"]), int(xr_ds.sizes["traj"])
+            if "trajectory" in xr_ds.sizes:
+                return int(xr_ds.sizes["time"]), int(xr_ds.sizes["trajectory"])
+            return int(xr_ds.sizes["time"]), 1
 
         if model_type == ModelType.OCEAN_PARCELS:
             return xr_ds.obs.size, xr_ds.traj.size
@@ -109,37 +91,36 @@ class PreprocParticleViz:
     def createBinaryFileMultiple(self) -> None:
         """Create binary and text files for subsampled particle data.
 
-        Iterates over models, subsamples them for Desktop/Mobile, and saves
+        Iterates over experiments, subsamples them for Desktop/Mobile, and saves
         partitioned binary chunks ready for the web app.
         """
         timesteps_by_file = self._timesteps_by_file
         self._config_json["advanced"]["datasets"] = []
 
         print("Reading data...")
-        for id_m, c_model in enumerate(self._models):
-            model_name = c_model["name"]
-            file_name = c_model["file_name"]
+        for id_m, c_experiment in enumerate(self._experiments):
+            experiment_name = c_experiment["name"]
+            file_name = c_experiment["file_name"]
 
-            xr_ds = xr.open_dataset(file_name)
+            xr_ds = normalize_trajectory_dims(open_particle_dataset(file_name))
             model_type = self.getOutputType(xr_ds)
-            ds = Dataset(file_name)
+            time_meta = get_time_metadata(xr_ds)
 
             tot_time_steps, glob_num_particles = self.getTotTimeStepsAndNumParticles(model_type, xr_ds)
             tot_files = (tot_time_steps // timesteps_by_file) + 1
 
-            advanced_dataset_model = {
+            advanced_dataset_entry = {
                 "total_files": tot_files,
-                "name": model_name,
-                "file_name": f"{self._file_prefix}_{model_name.strip().lower()}"
+                "name": experiment_name,
+                "file_name": f"{self._file_prefix}_{experiment_name.strip().lower()}"
             }
 
             print(f"Total timesteps: {tot_time_steps}, Particles: {glob_num_particles}, Files: {tot_files}")
 
             print("Verifying data boundaries...")
-            all_vars = xr_ds.variables
-            lat_all = all_vars['lat'].data
-            lon_all = all_vars['lon'].data
-            times_all = all_vars['time'].data
+            lat_all = np.asarray(xr_ds["lat"].values)
+            lon_all = np.asarray(xr_ds["lon"].values)
+            times_all = np.asarray(xr_ds["time"].values)
 
             # Earth boundaries check
             lat_all[lat_all > 91] = np.nan
@@ -147,51 +128,39 @@ class PreprocParticleViz:
             lon_all[lon_all < -361] = np.nan
             lon_all[lon_all > 361] = np.nan
 
-            time_var = ds.variables['time']
-            time_units_str = time_var.units.split(" ")
-            start_time = int(np.nanmin(ds['time']))
-            start_date = set_start_date(time_units_str[2], start_time, time_units_str[0])
+            start_date = time_meta.start_date
+            delta_t = time_meta.delta_t
 
-            delta_t = 0.0
-            i_part = 0
-            print("Analyzing times of the particles....")
-            while delta_t == 0.0:
-                if len(ds['time'].shape) > 1:
-                    delta_t = ds['time'][i_part, 1] - ds['time'][i_part, 0]
-                else:
-                    delta_t = ds['time'][1] - ds['time'][0]
-                i_part += 1
+            subsample_levels = [c_experiment['subsample'].get('desktop', 2),
+                               c_experiment['subsample'].get('mobile', 4)]
 
-            subsample_model = [c_model['subsample'].get('desktop', 2),
-                               c_model['subsample'].get('mobile', 4)]
-
-            if 'color_scheme' in c_model:
-                updateColorScheme(id_m, c_model['color_scheme'], subsample_model,
+            if 'color_scheme' in c_experiment:
+                updateColorScheme(id_m, c_experiment['color_scheme'], subsample_levels,
                                   self._output_folder, num_part=len(lat_all))
-                advanced_dataset_model["color_scheme"] = f"{id_m}_{os.path.basename(c_model['color_scheme'])}"
+                advanced_dataset_entry["color_scheme"] = f"{id_m}_{os.path.basename(c_experiment['color_scheme'])}"
 
-            advanced_dataset_model["subsample"] = {
-                "desktop": subsample_model[0],
-                "mobile": subsample_model[1]
+            advanced_dataset_entry["subsample"] = {
+                "desktop": subsample_levels[0],
+                "mobile": subsample_levels[1]
             }
-            self._config_json["advanced"]["datasets"].append({model_name: advanced_dataset_model})
+            self._config_json["advanced"]["datasets"].append({experiment_name: advanced_dataset_entry})
 
             print("Subsampling for desktop and mobile versions..")
-            for subsample_data in subsample_model:
+            for subsample_data in subsample_levels:
                 final_output_folder = join(self._output_folder, str(subsample_data))
                 if not os.path.exists(final_output_folder):
                     os.makedirs(final_output_folder)
 
                 lat = lat_all[::subsample_data, :]
                 lon = lon_all[::subsample_data, :]
-                times = times_all[::subsample_data, :] if len(ds['time'].shape) > 1 else times_all
+                times = times_all[::subsample_data, :] if time_meta.is_per_particle else times_all
 
                 print("Searching for nans...")
                 has_nans = np.isnan(lat).any().item()
                 bit_display_array = None
                 if has_nans:
                     print("Analyzing nan values ....")
-                    if len(ds['time'].shape) > 1:
+                    if time_meta.is_per_particle:
                         try:
                             # Shift particles that don't start at time 0
                             shifted_particles = np.where(times[:, 0] > times[0, 0])[0]
@@ -210,7 +179,10 @@ class PreprocParticleViz:
                     next_step = min(cur_chunk + timesteps_by_file, tot_time_steps)
 
                     bindata = b''
-                    header_txt = f"{len(lat)}, {next_step - cur_chunk}, {start_date}, {time_units_str[0]}, {delta_t}, {has_nans}\n"
+                    header_txt = (
+                        f"{len(lat)}, {next_step - cur_chunk}, {start_date}, "
+                        f"{time_meta.unit}, {delta_t}, {has_nans}\n"
+                    )
 
                     # Convert to int16 (scaled by 100)
                     bindata += (lat[:, cur_chunk:next_step] * 100).astype(np.int16).tobytes()
@@ -219,7 +191,7 @@ class PreprocParticleViz:
                     if has_nans and bit_display_array is not None:
                         bindata += np.packbits(bit_display_array[:, cur_chunk:next_step]).tobytes()
 
-                    out_name = advanced_dataset_model["file_name"]
+                    out_name = advanced_dataset_entry["file_name"]
                     header_file = join(final_output_folder, f"{out_name}_{ichunk:02d}.txt")
                     binary_file = join(final_output_folder, f"{out_name}_{ichunk:02d}.bin")
                     zip_file_path = join(final_output_folder, f"{out_name}_{ichunk:02d}.zip")
@@ -237,7 +209,6 @@ class PreprocParticleViz:
             with open("Current_Config.json", 'w') as f_conf:
                 json.dump(self._config_json, f_conf, indent=4)
             xr_ds.close()
-            ds.close()
 
     def testBinaryAndHeaderFiles(self, test_file_base: str) -> None:
         """Read and visualize a processed binary file.

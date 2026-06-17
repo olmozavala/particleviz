@@ -1,0 +1,31 @@
+[project]
+name = "particleviz"
+version = "0.0.1"
+description = "Animate large numbers of Lagrangian particles in dynamic web maps."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "cartopy>=0.22",
+    "docopt>=0.6",
+    "matplotlib>=3.8",
+    "netcdf4>=1.6",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "python-dateutil>=2.8",
+    "xarray>=2024.1",
+    "zarr>=2.16",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jinja2>=3.1",
+    "markdown>=3.5",
+    "pytest>=8.0",
+    "selenium>=4.27",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

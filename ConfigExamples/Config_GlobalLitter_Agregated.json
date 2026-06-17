@@ -1,0 +1,15 @@
+{
+    "preprocessing": {
+        "experiments": [
+            {
+                "name": "2017",
+                "file_name": "/nexsan/people/pmiron/projects_mars/global-marine-litter/yearly/global-marine-litter-2017.nc",
+                "subsample": {
+                    "desktop": 10,
+                    "mobile": 20
+                },
+                "color_scheme": "./data/color_schemes/ColorSchemeWorldLitter.json"
+            }
+        ]
+    }
+}

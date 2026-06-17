@@ -12,7 +12,7 @@ Options:
   -h --help         Show this screen.
   --version         Show version.
   <config_file>     The configuration file to use [default: Config.json]
-  <input_file>      NetCDF file to use. Output of your lagrangian model.
+  <input_file>      NetCDF (.nc) or Zarr store path. OceanParcels, OpenDrift, or convention-compatible output.
 """
 from typing import Dict, Any, Optional
 import os
@@ -103,8 +103,14 @@ def main() -> None:
         if not os.path.exists(node_modules):
             subprocess.call(f"cd {join(base_path, app_dir)} && npm install", shell=True)
 
-        print("Starting web server...")
-        subprocess.call(f"cd {join(base_path, app_dir)} && npm start", shell=True)
+        port = config_json.get("advanced", {}).get("port", 3000)
+        print(f"Starting web server on http://localhost:{port}/ ...")
+        webapp_env = {**os.environ, "PORT": str(port)}
+        subprocess.call(
+            f"cd {join(base_path, app_dir)} && npm start",
+            shell=True,
+            env=webapp_env,
+        )
         print("Done!")
 
 

@@ -91,14 +91,14 @@ class  ParticlesLayer extends React.Component {
             trail_size:  trail_size,  // Size of particle trail
             status: STATUS.loading,  // Status of animation
             particle_size_index: particle_size,  // Size of the particle
-            selected_model: this.props.selected_model,  // selected model
+            selected_experiment: this.props.selected_experiment,  // selected model
             canvas_layer: -1,
             data: {},
             extent: null,  // Current extent of the window
             domain: null,
             ol_canvas_size: null,
             total_timesteps: {},
-            timesteps_per_file:this.props.selected_model.time_steps,
+            timesteps_per_file:this.props.selected_experiment.time_steps,
             shape_type: _.isBoolean(shape_type)? shape_type: false,  // true for lines, false for dots
             particle_color: this.props.particle_color,
             display_picker: false,
@@ -222,7 +222,7 @@ class  ParticlesLayer extends React.Component {
 
         // Then it reads the corresponding zip file
         let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
-        let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.zip`
+        let url = `${this.props.url}/${this.props.selected_experiment.file}_${file_number_str}.zip`
         // console.log("This is the url: " + url)
         d3.blob(url).then((blob) => {
             let zip = new JSZip()
@@ -290,7 +290,7 @@ class  ParticlesLayer extends React.Component {
                 // Particles are draw by files and we repeat this step to read
                 // read files on-demand and async
                 data[data_key]["lat_lon"] = [lats_by_part, lons_by_part]
-                this.readUnzippedFileStepTwo(data, this.props.selected_model.file, file_number)
+                this.readUnzippedFileStepTwo(data, this.props.selected_experiment.file, file_number)
             })
         })
     }
@@ -299,17 +299,17 @@ class  ParticlesLayer extends React.Component {
      * Initializes the reading of a color scheme from a new model
      * Called after each update when the color_scheme is undefined
     */
-    processNewColorScheme(selected_model){
-        if( selected_model.color_scheme !== undefined){
+    processNewColorScheme(selected_experiment){
+        if( selected_experiment.color_scheme !== undefined){
             let color_scheme_url = ""
             // These files are harcoded by the preproc module of ParticleViz
             if(isMobile) {
-                color_scheme_url = `${this.props.url}/data/${selected_model.color_scheme.replace('.json','_Mobile.json')}`
+                color_scheme_url = `${this.props.url}/data/${selected_experiment.color_scheme.replace('.json','_Mobile.json')}`
             }else{
-                color_scheme_url = `${this.props.url}/data/${selected_model.color_scheme.replace('.json','_Desktop.json')}`
+                color_scheme_url = `${this.props.url}/data/${selected_experiment.color_scheme.replace('.json','_Desktop.json')}`
             }
             // console.log(color_scheme_url) // For debugging
-            // console.log("Reading new color scheme for model: ", this.state.selected_model.name)
+            // console.log("Reading new color scheme for model: ", this.state.selected_experiment.name)
             // console.log("Color scheme:", this.state.color_scheme)
             // console.log("Color scheme name:", this.state.color_scheme_name)
             this.color_promise_status = "pending"
@@ -336,7 +336,7 @@ class  ParticlesLayer extends React.Component {
     /** This function verifies we are allowed to start our first animation, based on the number of files received **/
     allowFirstAnimation(){
         let wait_for = 1  // [0, 1] percentage to indicate when can we start animating. If 10 files and = .8 we start after rading 8 files
-        let files_to_load = parseInt(this.state.selected_model.num_files * wait_for)
+        let files_to_load = parseInt(this.state.selected_experiment.num_files * wait_for)
         // If we need to read only one file or have loaded enough files, then we can start the animation
         let ready_to_animate = (this.loaded_files >= files_to_load) || (files_to_load === 1)
         return ready_to_animate
@@ -365,8 +365,8 @@ class  ParticlesLayer extends React.Component {
 
         let cur_color_scheme = this.state.color_scheme
         let cur_color_scheme_name = this.state.color_scheme_name
-        cur_color_scheme[this.state.selected_model.id] = color_scheme[scheme_name]
-        cur_color_scheme_name[this.state.selected_model.id] = scheme_name
+        cur_color_scheme[this.state.selected_experiment.id] = color_scheme[scheme_name]
+        cur_color_scheme_name[this.state.selected_experiment.id] = scheme_name
         // console.log("3) New color scheme state variable: ", cur_color_scheme)
         this.color_promise_status = "finished"
         this.setState({
@@ -384,34 +384,34 @@ class  ParticlesLayer extends React.Component {
      */
     readUnzippedFileStepTwo(data, name, file_number_str) {
         const file_number = parseInt(file_number_str)
-        if(name === this.props.selected_model.file) {
+        if(name === this.props.selected_experiment.file) {
             // console.log(`1) Uncompressed file received, file number: ${file_number} Loaded files: ${this.loaded_files}`)
             const total_timesteps = data[data_key]["lat_lon"][0][0].length
             let color_scheme = this.state.color_scheme
 
-            let files_to_load = parseInt(this.state.selected_model.num_files)
+            let files_to_load = parseInt(this.state.selected_experiment.num_files)
             this.loaded_files += 1
             let startAnimation = this.allowFirstAnimation()
 
-            const model_id = this.state.selected_model.id
+            const experiment_id = this.state.selected_experiment.id
             let current_data = this.state.data
-            let model_timesteps = this.state.total_timesteps
-            // console.log("Model time steps:", model_timesteps)
+            let experiment_timesteps = this.state.total_timesteps
+            // console.log("Model time steps:", experiment_timesteps)
 
             // Verify we have already read at least one file for this model
-            if(_.isUndefined(current_data[model_id])){
-                current_data[model_id] = {}
-                model_timesteps[model_id] = {}
-                model_timesteps[model_id] = total_timesteps
+            if(_.isUndefined(current_data[experiment_id])){
+                current_data[experiment_id] = {}
+                experiment_timesteps[experiment_id] = {}
+                experiment_timesteps[experiment_id] = total_timesteps
             }else{
-                model_timesteps[model_id] += total_timesteps
+                experiment_timesteps[experiment_id] += total_timesteps
             }
 
             // Here we append a new location at the end of each file (if is still not there) to fix the
             // problem of drawing a location at the last timestep of each file.
             let has_nans = data[data_key]['disp_info'] !== undefined? true: false
 
-            current_data[model_id][file_number] = data
+            current_data[experiment_id][file_number] = data
             // Copy first location of the next adjacent file as the first location of the current file
             // we only do it once most of the files are being loaded
             if (startAnimation) {
@@ -420,17 +420,17 @@ class  ParticlesLayer extends React.Component {
                 this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
                     // make sure the next file is loaded
-                    if(!_.isUndefined(current_data[model_id][c_file_number+1])) {
-                        let next_file_data = current_data[model_id][c_file_number+1]
-                        let num_part = current_data[model_id][c_file_number][data_key]['lat_lon'][0].length
-                        let time_steps = current_data[model_id][c_file_number][data_key]['lat_lon'][0][0].length
+                    if(!_.isUndefined(current_data[experiment_id][c_file_number+1])) {
+                        let next_file_data = current_data[experiment_id][c_file_number+1]
+                        let num_part = current_data[experiment_id][c_file_number][data_key]['lat_lon'][0].length
+                        let time_steps = current_data[experiment_id][c_file_number][data_key]['lat_lon'][0][0].length
                         if(time_steps === this.state.timesteps_per_file){// Check we haven't 'fixed' this file already
                             for(let c_part=0; c_part < num_part; c_part++) {
                                 // add first location of next file as the first of the current file
-                                current_data[model_id][c_file_number][data_key]['lat_lon'][0][c_part].push(next_file_data[data_key]['lat_lon'][0][c_part][0])
-                                current_data[model_id][c_file_number][data_key]['lat_lon'][1][c_part].push(next_file_data[data_key]['lat_lon'][1][c_part][0])
+                                current_data[experiment_id][c_file_number][data_key]['lat_lon'][0][c_part].push(next_file_data[data_key]['lat_lon'][0][c_part][0])
+                                current_data[experiment_id][c_file_number][data_key]['lat_lon'][1][c_part].push(next_file_data[data_key]['lat_lon'][1][c_part][0])
                                 if(has_nans){
-                                    current_data[model_id][c_file_number][data_key]['disp_info'][c_part].push(next_file_data[data_key]['disp_info'][c_part][0])
+                                    current_data[experiment_id][c_file_number][data_key]['disp_info'][c_part].push(next_file_data[data_key]['disp_info'][c_part][0])
                                 }
                             }
                         }
@@ -453,7 +453,7 @@ class  ParticlesLayer extends React.Component {
                     })
                     this.props.map.addLayer(canv_lay)
                 }
-                if( this.props.selected_model.color_scheme === undefined){
+                if( this.props.selected_experiment.color_scheme === undefined){
                     // In this case we need to set a default color with the full index of the particles
                     this.readColorScheme({
                             "default": [
@@ -468,14 +468,14 @@ class  ParticlesLayer extends React.Component {
                 this.setState({
                     canvas_layer: canv_lay,
                     data: {...current_data},
-                    total_timesteps: {...model_timesteps},
+                    total_timesteps: {...experiment_timesteps},
                     status: startAnimation? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
             }else{
                 this.setState({
                     data: {...current_data},
-                    total_timesteps: {...model_timesteps},
+                    total_timesteps: {...experiment_timesteps},
                     status: startAnimation? STATUS.playing : STATUS.decompressing,
                     color_scheme: color_scheme
                 })
@@ -549,28 +549,28 @@ class  ParticlesLayer extends React.Component {
         this.clearPreviousLoop()
         // Verify if the update was caused by the parent component
         // and we have updated the file to read.
-        if (this.state.selected_model !== this.props.selected_model) {
-            this.color_promise_status = "newmodel"  // It is used to avoid requesting the color scheme multiple times
-            // In this case the data of the selected model has not been loaded
+        if (this.state.selected_experiment !== this.props.selected_experiment) {
+            this.color_promise_status = "newexperiment"  // It is used to avoid requesting the color scheme multiple times
+            // In this case the data of the selected experiment has not been loaded
 
             let display_color_menu = true
-            if( this.props.selected_model.color_scheme !== undefined){
+            if( this.props.selected_experiment.color_scheme !== undefined){
                 display_color_menu = false
             }
-            if(_.isUndefined(this.state.data[this.props.selected_model.id])){
+            if(_.isUndefined(this.state.data[this.props.selected_experiment.id])){
                 $(".btn").attr("disabled", true)  // Enable all the buttons
                 // In this case is a new file, we need to reset almost everything
                 this.time_step= 0
                 this.loaded_files = 0
                 this.setState({
-                    selected_model: this.props.selected_model,
+                    selected_experiment: this.props.selected_experiment,
                     status: STATUS.loading,
                     display_color_menu: display_color_menu
                 })
                 // Single file version
-                for(let file_number in _.range(0, this.props.selected_model.num_files)){
+                for(let file_number in _.range(0, this.props.selected_experiment.num_files)){
                     let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
-                    let url = `${this.props.url}/${this.props.selected_model.file}_${file_number_str}.txt`
+                    let url = `${this.props.url}/${this.props.selected_experiment.file}_${file_number_str}.txt`
                     d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
                 }
                 $(".loading_perc").text("0 %")
@@ -579,12 +579,12 @@ class  ParticlesLayer extends React.Component {
             }else{  // In this case the file was loaded previously
                 this.time_step= 0  // reset time to 0
                 this.setState({
-                    selected_model: this.props.selected_model,
+                    selected_experiment: this.props.selected_experiment,
                     cur_state: STATUS.playing,
                     display_color_menu: display_color_menu
                 })
             }
-        } else { // In this case the data for this model has already been loaded we just need to update the animation
+        } else { // In this case the data for this experiment has already been loaded we just need to update the animation
             if ((this.state.status === STATUS.loading) || (this.state.status === STATUS.decompressing)) {
                 // console.log("SHOWING!")
                 $(".loading-div").show() // In this case we are still loading something
@@ -607,10 +607,10 @@ class  ParticlesLayer extends React.Component {
         }
 
         // Verify we need to update the color scheme
-        if(_.isUndefined(this.state.color_scheme[this.state.selected_model.id])){
+        if(_.isUndefined(this.state.color_scheme[this.state.selected_experiment.id])){
             if( this.color_promise_status !== 'pending') {
                 this.color_promise_status = "pending"
-                this.processNewColorScheme(this.props.selected_model)
+                this.processNewColorScheme(this.props.selected_experiment)
             }
         }
     }
@@ -621,9 +621,9 @@ class  ParticlesLayer extends React.Component {
      */
     changeParticleColor(color){
         const rgb = color.rgb
-        const model_id = this.state.selected_model.id
+        const experiment_id = this.state.selected_experiment.id
         let color_scheme_all = this.state.color_scheme
-        let color_scheme = color_scheme_all[model_id]
+        let color_scheme = color_scheme_all[experiment_id]
         if(_.isUndefined(color_scheme.length)){ // It means it only has one color for all the dataset
             color_scheme.color = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + rgb.a + ")"
         }else {
@@ -631,7 +631,7 @@ class  ParticlesLayer extends React.Component {
                 color_scheme[scheme_id].color = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + rgb.a + ")"
             }
         }
-        color_scheme_all[model_id] = color_scheme
+        color_scheme_all[experiment_id] = color_scheme
         this.setState({
             color_scheme: color_scheme_all,
             display_picker: false
@@ -654,7 +654,7 @@ class  ParticlesLayer extends React.Component {
             let to_date = this.time_step
             if (this.draw_until_day) { // This is just to draw more than one day (necessary when updating the screen)
                 if(this.state.play_backward){
-                    cur_date = Math.min(this.time_step + DRAW_LAST_TIMESTEPS, this.state.total_timesteps[this.state.selected_model.id])
+                    cur_date = Math.min(this.time_step + DRAW_LAST_TIMESTEPS, this.state.total_timesteps[this.state.selected_experiment.id])
                 }else{
                     cur_date = Math.max(this.time_step - DRAW_LAST_TIMESTEPS, 0)
                 }
@@ -686,9 +686,9 @@ class  ParticlesLayer extends React.Component {
             if (this.state.status === STATUS.playing) {
                 // This can only happen when playing backward
                 if(cur_date === -1){
-                    cur_date = this.state.total_timesteps[this.state.selected_model.id]-1
+                    cur_date = this.state.total_timesteps[this.state.selected_experiment.id]-1
                 }
-                this.time_step = cur_date % this.state.total_timesteps[this.state.selected_model.id]
+                this.time_step = cur_date % this.state.total_timesteps[this.state.selected_experiment.id]
                 if(this.time_step % 10 === 0){ // Update the range bar every 10 timesteps
                     this.updateRange()
                 }
@@ -706,17 +706,17 @@ class  ParticlesLayer extends React.Component {
     drawParticlesAsSquares(cur_date_all_files) {
         const square_size = parseInt(PARTICLE_SIZES[this.state.particle_size_index] + 1)
         this.ctx.lineWidth = square_size
-        const model_id = this.state.selected_model.id
-        const available_files = Object.keys(this.state.data[model_id])
+        const experiment_id = this.state.selected_experiment.id
+        const available_files = Object.keys(this.state.data[experiment_id])
         const file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
-        const color_scheme = this.state.color_scheme[model_id]
+        const color_scheme = this.state.color_scheme[experiment_id]
 
         const cur_date = cur_date_all_files % this.state.timesteps_per_file
         if (available_files.includes(file_number)) {
             let clat = 0
             let clon = 0
             // Retrieve all the information from the first available file
-            let drawing_data = this.state.data[model_id][file_number][data_key]
+            let drawing_data = this.state.data[experiment_id][file_number][data_key]
             let oldpos = [0, 0]
             const has_nans = drawing_data['disp_info'] !== undefined ? true: false
 
@@ -805,10 +805,10 @@ class  ParticlesLayer extends React.Component {
     drawParticlesAsLines(timestep_idx_org) {
         // console.log(`DrawLines: ${this.state.speed_hz}`)
         this.ctx.lineWidth = PARTICLE_SIZES[this.state.particle_size_index]
-        const model_id = this.state.selected_model.id
-        const available_files = Object.keys(this.state.data[model_id])
+        const experiment_id = this.state.selected_experiment.id
+        const available_files = Object.keys(this.state.data[experiment_id])
         const file_number = (Math.floor(this.time_step / this.state.timesteps_per_file)).toString()
-        const color_scheme = this.state.color_scheme[model_id]
+        const color_scheme = this.state.color_scheme[experiment_id]
 
         let clon = 0
         let clat = 0
@@ -822,7 +822,7 @@ class  ParticlesLayer extends React.Component {
 
         if (available_files.includes(file_number)) {
             // Retreive all the information from the first available file
-            let drawing_data = this.state.data[model_id][file_number][data_key]
+            let drawing_data = this.state.data[experiment_id][file_number][data_key]
             //console.log(`local global ${local_global_cur_time} global end ${global_end_time} c_time ${c_time} next_time ${next_time}` )
             let oldpos = [0, 0]
             let newpos = [0, 0]
@@ -945,10 +945,10 @@ class  ParticlesLayer extends React.Component {
     }
 
     componentDidMount() {
-        let selected_model = this.props.selected_model
-        for(let file_number in _.range(0, selected_model.num_files)){
+        let selected_experiment = this.props.selected_experiment
+        for(let file_number in _.range(0, selected_experiment.num_files)){
             let file_number_str = `${file_number < 10 ? '0' + file_number : file_number}`
-            let url = `${this.props.url}/${selected_model.file}_${file_number_str}.txt`
+            let url = `${this.props.url}/${selected_experiment.file}_${file_number_str}.txt`
             d3.text(url).then( (blob) => this.readZipStepOne(blob, file_number))
         }
     }
@@ -1075,7 +1075,7 @@ class  ParticlesLayer extends React.Component {
 
     nextDay(e) {
         e.preventDefault()
-        this.time_step = Math.min(this.time_step + 1, this.state.total_timesteps[this.state.selected_model.id])
+        this.time_step = Math.min(this.time_step + 1, this.state.total_timesteps[this.state.selected_experiment.id])
         this.drawAnimationFrame(this.d3canvas.node())
         this.updateRange()
     }
@@ -1195,11 +1195,11 @@ class  ParticlesLayer extends React.Component {
         e.preventDefault()
         const disp_all_layers = !this.state.toggle_all_layers_display
         let all_color_schemes = this.state.color_scheme
-        let color_scheme = all_color_schemes[this.state.selected_model.id]
+        let color_scheme = all_color_schemes[this.state.selected_experiment.id]
         for(let id=0; id < color_scheme.length; id++) {
             color_scheme[id].display = disp_all_layers
         }
-        all_color_schemes[this.state.selected_model.id] = color_scheme
+        all_color_schemes[this.state.selected_experiment.id] = color_scheme
         let canvas = this.d3canvas.node()
         var prev = this.ctx.globalCompositeOperation
         this.ctx.globalCompositeOperation = "destination-out"
@@ -1220,10 +1220,10 @@ class  ParticlesLayer extends React.Component {
         e.preventDefault()
         let id = parseInt(e.target.id)
         let all_color_schemes = this.state.color_scheme
-        let color_scheme = all_color_schemes[this.state.selected_model.id]
+        let color_scheme = all_color_schemes[this.state.selected_experiment.id]
         
         color_scheme[id].display = !color_scheme[id].display
-        all_color_schemes[this.state.selected_model.id] = color_scheme
+        all_color_schemes[this.state.selected_experiment.id] = color_scheme
         this.setState({
             color_scheme: all_color_schemes,
             status: STATUS.playing
@@ -1293,7 +1293,7 @@ class  ParticlesLayer extends React.Component {
                                                 value={this.time_step}
                                                 min="0" max={(this.state.status === STATUS.loading ||
                                                 this.state.status === STATUS.decompressing) ? 0 :
-                                                this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                                this.state.total_timesteps[this.state.selected_experiment.id] - 2}
                                                 custom="true"
                                          />
                             </span>
@@ -1406,12 +1406,12 @@ class  ParticlesLayer extends React.Component {
                                     </Button>
                                 </Col>
                             </Row>
-                            {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) ?
+                            {!_.isUndefined(this.state.color_scheme[this.state.selected_experiment.id]) ?
                                 <Row  className='bg-light'>
                                     <Col>
                                         <ul className="pv-layerslist">
-                                            {this.state.color_scheme[this.state.selected_model.id].length ?
-                                                this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                            {this.state.color_scheme[this.state.selected_experiment.id].length ?
+                                                this.state.color_scheme[this.state.selected_experiment.id].map(c_layer => (
                                                     <li key={c_layer.id}>
                                                         <Form.Check
                                                             type="switch"
@@ -1530,7 +1530,7 @@ class  ParticlesLayer extends React.Component {
                                 value={this.time_step}
                                 min="0" max={(this.state.status === STATUS.loading ||
                                 this.state.status === STATUS.decompressing) ? 0 :
-                                this.state.total_timesteps[this.state.selected_model.id] - 2}
+                                this.state.total_timesteps[this.state.selected_experiment.id] - 2}
                                 custom="true" disabled={this.state.status === STATUS.loading}
                             />
                         </OverlayTrigger>
@@ -1617,7 +1617,7 @@ class  ParticlesLayer extends React.Component {
                     </span>
 
                     {/*---- Layers Selection --------*/}
-                    {!_.isUndefined(this.state.color_scheme[this.state.selected_model.id]) && this.state.color_scheme[this.state.selected_model.id].length > 1 ?
+                    {!_.isUndefined(this.state.color_scheme[this.state.selected_experiment.id]) && this.state.color_scheme[this.state.selected_experiment.id].length > 1 ?
                         <span>
                             <span>
                                 <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => ( <Tooltip id="tooltip_layerlist" {...props}> Layers list</Tooltip>)}>
@@ -1652,8 +1652,8 @@ class  ParticlesLayer extends React.Component {
                                     <Row className='bg-light'>
                                         <Col>
                                             <ul className="pv-layerslist">
-                                                {this.state.color_scheme[this.state.selected_model.id].length ?
-                                                    this.state.color_scheme[this.state.selected_model.id].map(c_layer => (
+                                                {this.state.color_scheme[this.state.selected_experiment.id].length ?
+                                                    this.state.color_scheme[this.state.selected_experiment.id].map(c_layer => (
                                                         <li key={c_layer.id}>
                                                             <Form.Check
                                                                 key={c_layer.id}

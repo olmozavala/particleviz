@@ -6,7 +6,7 @@ import copy
 import numpy as np
 
 
-def updateColorScheme(model_id: int, json_file: str, subsample: List[int],
+def updateColorScheme(experiment_id: int, json_file: str, subsample: List[int],
                       output_folder: str, num_part: int) -> None:
     """Generate specific color schemes for the subsampled data.
 
@@ -14,7 +14,7 @@ def updateColorScheme(model_id: int, json_file: str, subsample: List[int],
     particle indexes based on the subsampling level.
 
     Args:
-        model_id: The ID of the model.
+        experiment_id: The ID of the experiment.
         json_file: Path to the JSON file with the color scheme.
         subsample: List with two integers [desktop_subsample, mobile_subsample].
         output_folder: Directory where the new color schemes will be saved.
@@ -59,8 +59,8 @@ def updateColorScheme(model_id: int, json_file: str, subsample: List[int],
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    desktop_filename = f"{model_id}_{basename(json_file).replace('.json', '')}_Desktop.json"
-    mobile_filename = f"{model_id}_{basename(json_file).replace('.json', '')}_Mobile.json"
+    desktop_filename = f"{experiment_id}_{basename(json_file).replace('.json', '')}_Desktop.json"
+    mobile_filename = f"{experiment_id}_{basename(json_file).replace('.json', '')}_Mobile.json"
 
     with open(join(output_folder, desktop_filename), 'w') as f_out:
         json.dump(desktop_json, f_out, indent=4)
