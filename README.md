@@ -1,5 +1,8 @@
 
 #  <img src="docs/logos/logo_sm.png" width="200px" style="border:none"> Welcome to ParticleViz  
+
+**Documentation:** [https://olmozavala.github.io/particleviz/](https://olmozavala.github.io/particleviz/)
+
 ParticleViz is an Open Source software that is used to animate large number of particles inside dynamic web maps.
 It is designed mostly for Earth Science scientists that simulate different processes using Lagrangian models.
 

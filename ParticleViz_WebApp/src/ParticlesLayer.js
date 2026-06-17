@@ -217,7 +217,8 @@ class  ParticlesLayer extends React.Component {
         // Reads the header file (txt)
         file_number = parseInt(file_number)
         let header_data = d3.csvParseRows(text, function(d) { // In ParticleViz it should only be one line
-            return [parseInt(d[0]), parseInt(d[1]), d[2], d[3], parseInt(d[4]), JSON.parse(d[5].toLowerCase())]
+            let ragged = d.length > 6 ? JSON.parse(d[6].toLowerCase()) : false
+            return [parseInt(d[0]), parseInt(d[1]), d[2], d[3], parseInt(d[4]), JSON.parse(d[5].toLowerCase()), ragged]
         });
 
         // Then it reads the corresponding zip file
@@ -234,9 +235,9 @@ class  ParticlesLayer extends React.Component {
                     return zipobj.async("arraybuffer")
                 }
             }).then((binarydata) => { // This function receives the binary data
-                let buf_off = 0
                 let line = header_data[0]
                 let has_nans  = line[5]
+                let ragged = line[6]
                 let num_part = line[0]
                 let tot_timesteps = line[1]
 
@@ -254,41 +255,62 @@ class  ParticlesLayer extends React.Component {
                 // console.log(`Num particles: ${num_part} timesteps ${tot_timesteps}`)
                 let data = {}
                 data[data_key] = {}
-                // All latitudes and longitudes in the file
-                let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
-                let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
-                let all_display = []
-
-                // when there are NaN, adds information on when to display particles
-                if(has_nans){
-                    let main_i = 0
-                    let byte_idx = 0
-                    let bin_mask = 0
-                    let data_int = new Uint8Array(binarydata, buf_off + (num_part * tot_timesteps * 4), parseInt(Math.ceil(num_part*tot_timesteps/8)))
-                    for(let c_part=0; c_part < num_part; c_part++){
-                        let c_part_display = new Array(tot_timesteps)
-                        for(let c_time=0; c_time < tot_timesteps; c_time++) {
-                            byte_idx = Math.floor(((c_part*tot_timesteps) + c_time) / 8)
-                            bin_mask = 2**(7 - (main_i % 8))
-                            c_part_display[c_time] = (data_int[byte_idx] & bin_mask) > 0
-                            main_i += 1
-                        }
-                        all_display.push(c_part_display)
-                    }
-                    data[data_key]["disp_info"] = all_display
-                }
-                // Adding information on when to display a particle, If we need to include the array of nans
-                // Split locations by particles
                 let lats_by_part = []
                 let lons_by_part = []
-                for(let c_part=0; c_part < num_part; c_part++){
-                    let cur_part_lats = _.range(tot_timesteps).map((i) =>  all_lat[c_part*tot_timesteps + i]/100)
-                    let cur_part_lons = _.range(tot_timesteps).map((i) =>  all_lon[c_part*tot_timesteps + i]/100)
-                    lats_by_part.push(cur_part_lats)
-                    lons_by_part.push(cur_part_lons)
+                let all_display = []
+
+                if (ragged) {
+                    let offset = 0
+                    const view = new DataView(binarydata)
+                    for (let c_part = 0; c_part < num_part; c_part++) {
+                        lats_by_part.push(new Array(tot_timesteps).fill(NaN))
+                        lons_by_part.push(new Array(tot_timesteps).fill(NaN))
+                        all_display.push(new Array(tot_timesteps).fill(false))
+                    }
+                    for (let c_time = 0; c_time < tot_timesteps; c_time++) {
+                        let visible_count = view.getUint32(offset, true)
+                        offset += 4
+                        for (let entry = 0; entry < visible_count; entry++) {
+                            let part_id = view.getUint16(offset, true)
+                            offset += 2
+                            let lat_value = view.getInt16(offset, true) / 100
+                            offset += 2
+                            let lon_value = view.getInt16(offset, true) / 100
+                            offset += 2
+                            lats_by_part[part_id][c_time] = lat_value
+                            lons_by_part[part_id][c_time] = lon_value
+                            all_display[part_id][c_time] = true
+                        }
+                    }
+                    data[data_key]["disp_info"] = all_display
+                } else {
+                    let buf_off = 0
+                    let all_lat = new Float32Array(new Int16Array(binarydata, buf_off, num_part*tot_timesteps))
+                    let all_lon = new Float32Array(new Int16Array(binarydata, buf_off+(num_part*tot_timesteps*2), num_part*tot_timesteps))
+
+                    if(has_nans){
+                        let main_i = 0
+                        let byte_idx = 0
+                        let bin_mask = 0
+                        let data_int = new Uint8Array(binarydata, buf_off + (num_part * tot_timesteps * 4), parseInt(Math.ceil(num_part*tot_timesteps/8)))
+                        for(let c_part=0; c_part < num_part; c_part++){
+                            let c_part_display = new Array(tot_timesteps)
+                            for(let c_time=0; c_time < tot_timesteps; c_time++) {
+                                byte_idx = Math.floor(((c_part*tot_timesteps) + c_time) / 8)
+                                bin_mask = 2**(7 - (main_i % 8))
+                                c_part_display[c_time] = (data_int[byte_idx] & bin_mask) > 0
+                                main_i += 1
+                            }
+                            all_display.push(c_part_display)
+                        }
+                        data[data_key]["disp_info"] = all_display
+                    }
+                    for(let c_part=0; c_part < num_part; c_part++){
+                        lats_by_part.push(_.range(tot_timesteps).map((i) =>  all_lat[c_part*tot_timesteps + i]/100))
+                        lons_by_part.push(_.range(tot_timesteps).map((i) =>  all_lon[c_part*tot_timesteps + i]/100))
+                    }
                 }
-                // Particles are draw by files and we repeat this step to read
-                // read files on-demand and async
+
                 data[data_key]["lat_lon"] = [lats_by_part, lons_by_part]
                 this.readUnzippedFileStepTwo(data, this.props.selected_experiment.file, file_number)
             })
@@ -302,11 +324,14 @@ class  ParticlesLayer extends React.Component {
     processNewColorScheme(selected_experiment){
         if( selected_experiment.color_scheme !== undefined){
             let color_scheme_url = ""
+            const scheme_folder = selected_experiment.data_folder
+                ? `${this.props.url}/data/${selected_experiment.data_folder}/`
+                : `${this.props.url}/data/`
             // These files are harcoded by the preproc module of ParticleViz
             if(isMobile) {
-                color_scheme_url = `${this.props.url}/data/${selected_experiment.color_scheme.replace('.json','_Mobile.json')}`
+                color_scheme_url = `${scheme_folder}${selected_experiment.color_scheme.replace('.json','_Mobile.json')}`
             }else{
-                color_scheme_url = `${this.props.url}/data/${selected_experiment.color_scheme.replace('.json','_Desktop.json')}`
+                color_scheme_url = `${scheme_folder}${selected_experiment.color_scheme.replace('.json','_Desktop.json')}`
             }
             // console.log(color_scheme_url) // For debugging
             // console.log("Reading new color scheme for model: ", this.state.selected_experiment.name)

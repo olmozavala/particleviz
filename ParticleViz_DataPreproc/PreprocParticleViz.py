@@ -1,5 +1,4 @@
-from typing import Dict, Any, Tuple, Optional, List
-import struct
+from typing import Dict, Any, Tuple
 import os
 import json
 import zipfile
@@ -9,6 +8,14 @@ import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import xarray as xr
 
+from ParticleViz_DataPreproc.BinaryFormat import (
+    decode_chunk,
+    encode_dense_chunk,
+    encode_ragged_chunk,
+    experiment_slug,
+    format_header,
+    parse_header,
+)
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
 from ParticleViz_DataPreproc.ColorByParticleUtils import updateColorScheme
 from ParticleViz_DataPreproc.DatasetLoader import (
@@ -109,10 +116,13 @@ class PreprocParticleViz:
             tot_time_steps, glob_num_particles = self.getTotTimeStepsAndNumParticles(model_type, xr_ds)
             tot_files = (tot_time_steps // timesteps_by_file) + 1
 
+            slug = experiment_slug(experiment_name)
+            experiment_output_folder = join(self._output_folder, slug)
             advanced_dataset_entry = {
                 "total_files": tot_files,
                 "name": experiment_name,
-                "file_name": f"{self._file_prefix}_{experiment_name.strip().lower()}"
+                "data_folder": slug,
+                "file_name": f"{self._file_prefix}_{slug}"
             }
 
             print(f"Total timesteps: {tot_time_steps}, Particles: {glob_num_particles}, Files: {tot_files}")
@@ -136,7 +146,7 @@ class PreprocParticleViz:
 
             if 'color_scheme' in c_experiment:
                 updateColorScheme(id_m, c_experiment['color_scheme'], subsample_levels,
-                                  self._output_folder, num_part=len(lat_all))
+                                  experiment_output_folder, num_part=len(lat_all))
                 advanced_dataset_entry["color_scheme"] = f"{id_m}_{os.path.basename(c_experiment['color_scheme'])}"
 
             advanced_dataset_entry["subsample"] = {
@@ -147,7 +157,7 @@ class PreprocParticleViz:
 
             print("Subsampling for desktop and mobile versions..")
             for subsample_data in subsample_levels:
-                final_output_folder = join(self._output_folder, str(subsample_data))
+                final_output_folder = join(experiment_output_folder, str(subsample_data))
                 if not os.path.exists(final_output_folder):
                     os.makedirs(final_output_folder)
 
@@ -177,19 +187,25 @@ class PreprocParticleViz:
                 for ichunk, cur_chunk in enumerate(range(0, tot_time_steps, timesteps_by_file)):
                     print(f"Working with file {ichunk}...")
                     next_step = min(cur_chunk + timesteps_by_file, tot_time_steps)
+                    chunk_steps = next_step - cur_chunk
+                    lat_chunk = lat[:, cur_chunk:next_step]
+                    lon_chunk = lon[:, cur_chunk:next_step]
+                    use_ragged = has_nans and bit_display_array is not None
+                    if use_ragged:
+                        visible_chunk = bit_display_array[:, cur_chunk:next_step]
+                        bindata = encode_ragged_chunk(lat_chunk, lon_chunk, visible_chunk)
+                    else:
+                        bindata = encode_dense_chunk(lat_chunk, lon_chunk)
 
-                    bindata = b''
-                    header_txt = (
-                        f"{len(lat)}, {next_step - cur_chunk}, {start_date}, "
-                        f"{time_meta.unit}, {delta_t}, {has_nans}\n"
+                    header_txt = format_header(
+                        len(lat),
+                        chunk_steps,
+                        start_date,
+                        time_meta.unit,
+                        delta_t,
+                        has_nans,
+                        use_ragged,
                     )
-
-                    # Convert to int16 (scaled by 100)
-                    bindata += (lat[:, cur_chunk:next_step] * 100).astype(np.int16).tobytes()
-                    bindata += (lon[:, cur_chunk:next_step] * 100).astype(np.int16).tobytes()
-
-                    if has_nans and bit_display_array is not None:
-                        bindata += np.packbits(bit_display_array[:, cur_chunk:next_step]).tobytes()
 
                     out_name = advanced_dataset_entry["file_name"]
                     header_file = join(final_output_folder, f"{out_name}_{ichunk:02d}.txt")
@@ -220,34 +236,16 @@ class PreprocParticleViz:
         bin_file = f"{test_file_base}.bin"
 
         with open(header_file, 'r') as f_h:
-            header_line = f_h.readlines()[0]
+            num_particles, time_steps, _, _, _, has_nans, ragged = parse_header(f_h.readline())
 
-        parts = header_line.split(',')
-        num_particles = int(parts[0])
-        time_steps = int(parts[1])
-        has_nans = "True" in parts[5]
-
-        data_size = num_particles * time_steps
         with open(bin_file, 'rb') as f_d:
-            lats_bin = f_d.read(data_size * 2)
-            lons_bin = f_d.read(data_size * 2)
-
-            lats = np.array(struct.unpack(f"{data_size}h", lats_bin)).reshape(num_particles, time_steps) / 100
-            lons = np.array(struct.unpack(f"{data_size}h", lons_bin)).reshape(num_particles, time_steps) / 100
-
-            disp_arr = np.ones((num_particles, time_steps), dtype=bool)
-            if has_nans:
-                read_size = int(np.ceil(data_size / 8))
-                disp_bin = f_d.read(read_size)
-                data_int = struct.unpack(f"{read_size}B", disp_bin)
-
-                main_i = 0
-                for c_part in range(num_particles):
-                    for c_time in range(time_steps):
-                        byte_idx = ((c_part * time_steps) + c_time) // 8
-                        bin_mask = 2 ** (7 - (main_i % 8))
-                        disp_arr[c_part][c_time] = (data_int[byte_idx] & bin_mask) > 0
-                        main_i += 1
+            lats, lons, disp_arr = decode_chunk(
+                f_d.read(),
+                num_particles,
+                time_steps,
+                has_nans,
+                ragged,
+            )
 
         for c_time in range(time_steps):
             c_lons = lons[:, c_time][disp_arr[:, c_time]]

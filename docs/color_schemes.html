@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Examples | ParticleViz</title>
+  <title>Color Schemes | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/particleviz/examples.html" />
-<meta property="og:title" content="Examples | ParticleViz" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/color_schemes.html" />
+<meta property="og:title" content="Color Schemes | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/particleviz/examples.html" />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/color_schemes.html" />
   <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
           
           <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
           
-          <li><a href="/particleviz/examples.html" class="is-active" aria-current="page">Examples</a></li>
+          <li><a href="/particleviz/examples.html">Examples</a></li>
           
           <li><a href="/particleviz/configuration.html">Configuration</a></li>
           
@@ -63,7 +63,7 @@
           
           <li><a href="/particleviz/binary_format.html">Binary Format</a></li>
           
-          <li><a href="/particleviz/color_schemes.html">Color Schemes</a></li>
+          <li><a href="/particleviz/color_schemes.html" class="is-active" aria-current="page">Color Schemes</a></li>
           
           <li><a href="/particleviz/deployment.html">Deployment</a></li>
           
@@ -106,9 +106,13 @@
         <p class="sidebar-nav__label">On this page</p>
         <div class="toc">
 <ul>
-<li><a href="#examples">Examples</a><ul>
-<li><a href="#oceanparcels-global_marine_debrisnc">OceanParcels — Global_Marine_Debris.nc</a></li>
-<li><a href="#one-line-cli-no-config-file">One-line CLI (no config file)</a></li>
+<li><a href="#color-scheme-json-format">Color scheme JSON format</a><ul>
+<li><a href="#top-level-structure">Top-level structure</a></li>
+<li><a href="#layer-fields">Layer fields</a></li>
+<li><a href="#index-formats">Index formats</a></li>
+<li><a href="#preprocessing-output">Preprocessing output</a></li>
+<li><a href="#example-files">Example files</a></li>
+<li><a href="#configuration-reference">Configuration reference</a></li>
 </ul>
 </li>
 </ul>
@@ -120,93 +124,118 @@
 
     <main id="main-content" class="content">
       <div class="content-inner">
-        <h2 id="examples">Examples</h2>
-<p>These configurations use datasets shipped in <code>ExampleData/</code>. Each example below has been run with the commands shown; the animations are captured from the generated web interface.</p>
-<h3 id="oceanparcels-global_marine_debrisnc">OceanParcels — <code>Global_Marine_Debris.nc</code></h3>
-<h4 id="simplest-config">Simplest config</h4>
-<p>Minimal JSON: one experiment and the default subsampling.</p>
-<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Simplest.json
-</code></pre>
-<pre><code class="language-json">{
-  &quot;preprocessing&quot;: {
-    &quot;experiments&quot;: [{
-      &quot;name&quot;: &quot;Dataset 1&quot;,
-      &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
-      &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 4 }
-    }]
-  }
-}
-</code></pre>
-<p><img src="/particleviz/media/example_simplest.gif" alt="Simplest Global Marine Debris example" class="demo-gif" /></p>
-<h4 id="colored-particles-config_globallitterjson">Colored particles (<code>Config_GlobalLitter.json</code>)</h4>
-<p>Same dataset with a per-particle color scheme for country-based styling.</p>
-<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_GlobalLitter.json
-</code></pre>
-<pre><code class="language-json">{
-  &quot;preprocessing&quot;: {
-    &quot;experiments&quot;: [{
-      &quot;name&quot;: &quot;January 2010&quot;,
-      &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
-      &quot;subsample&quot;: { &quot;desktop&quot;: 1, &quot;mobile&quot;: 1 },
-      &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitter.json&quot;
-    }]
-  }
-}
-</code></pre>
-<p>The color scheme maps particle indexes to RGBA colors by country. Excerpt from <code>data/color_schemes/ColorSchemeWorldLitter.json</code> (indexes truncated):</p>
+        <h2 id="color-scheme-json-format">Color scheme JSON format</h2>
+<p>Color schemes assign per-particle colors in the web app. Provide a JSON file in
+the preprocessing <code>color_scheme</code> field; ParticleViz adjusts particle indexes for
+each subsample level and writes <code>_Desktop.json</code> and <code>_Mobile.json</code> variants into
+the experiment data folder.</p>
+<h3 id="top-level-structure">Top-level structure</h3>
+<p>The file contains exactly one top-level key — the scheme name shown in the layer
+menu:</p>
 <pre><code class="language-json">{
   &quot;Countries&quot;: [
     {
       &quot;name&quot;: &quot;Albania&quot;,
       &quot;color&quot;: &quot;rgb(216.8, 65.0, 65.0, 255.0)&quot;,
-      &quot;index&quot;: &quot;2726,2731,2732,2733,2742,...&quot;
+      &quot;index&quot;: &quot;2726,2731,2732&quot;
     },
     {
       &quot;name&quot;: &quot;Algeria&quot;,
       &quot;color&quot;: &quot;rgb(53.3, 108.4, 242.2, 255.0)&quot;,
-      &quot;index&quot;: &quot;2040,2041,2049,2062,2091,...&quot;
+      &quot;index&quot;: &quot;2040-2099&quot;
     }
   ]
 }
 </code></pre>
-<p><img src="/particleviz/media/example_global_litter.gif" alt="Global litter color scheme example" class="demo-gif" /></p>
-<h4 id="advanced-multi-experiment-config_advanced_examplejson">Advanced multi-experiment (<code>Config_Advanced_Example.json</code>)</h4>
-<p>Three experiments on the same file: single color, color by country, and color by mismanaged plastic waste (MPW).</p>
-<pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
+<h3 id="layer-fields">Layer fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>yes</td>
+<td>Label shown in the layer toggle menu</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>yes</td>
+<td>CSS color string (<code>rgb(...)</code>, <code>rgba(...)</code>, or named color)</td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>yes</td>
+<td>Particle indexes covered by this layer</td>
+</tr>
+</tbody>
+</table>
+<h3 id="index-formats">Index formats</h3>
+<p><strong>Range</strong> — inclusive start and end, separated by a hyphen:</p>
+<pre><code class="language-json">&quot;index&quot;: &quot;0-1000&quot;
 </code></pre>
-<p>Full config: <a href="https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json"><code>ConfigExamples/Config_Advanced_Example.json</code></a></p>
+<p><strong>List</strong> — comma-separated particle indexes:</p>
+<pre><code class="language-json">&quot;index&quot;: &quot;12,48,96,144&quot;
+</code></pre>
+<p>During preprocessing, indexes are remapped to match subsampled particles. For a
+desktop subsample factor of <code>2</code>, particle <code>100</code> in the original dataset becomes
+particle <code>50</code> in the desktop color scheme.</p>
+<h3 id="preprocessing-output">Preprocessing output</h3>
+<p>For experiment id <code>0</code> and input file <code>ColorSchemeWorldLitter.json</code>, preprocessing
+writes:</p>
+<pre><code class="language-text">ParticleViz_WebApp/data/global_litter/0_ColorSchemeWorldLitter_Desktop.json
+ParticleViz_WebApp/data/global_litter/0_ColorSchemeWorldLitter_Mobile.json
+</code></pre>
+<p>The web app loads the variant that matches the active client (desktop or mobile).</p>
+<h3 id="example-files">Example files</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/color_schemes/ColorScheme_Example.json</code></td>
+<td>Minimal two-layer example</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitter.json</code></td>
+<td>Country-based global litter</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitterCountries.json</code></td>
+<td>Country aggregation variant</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitterMPW.json</code></td>
+<td>Mismanaged plastic waste bins</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="examples.html">Examples</a> for full configuration snippets that use color
+schemes in multi-experiment setups.</p>
+<h3 id="configuration-reference">Configuration reference</h3>
+<p>Add a color scheme to an experiment in the preprocessing section:</p>
 <pre><code class="language-json">{
   &quot;preprocessing&quot;: {
     &quot;experiments&quot;: [
-      {
-        &quot;name&quot;: &quot;Single Color&quot;,
-        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
-        &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 2 }
-      },
       {
         &quot;name&quot;: &quot;Color by Country&quot;,
         &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
         &quot;subsample&quot;: { &quot;desktop&quot;: 1, &quot;mobile&quot;: 9 },
         &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitterCountries.json&quot;
-      },
-      {
-        &quot;name&quot;: &quot;Color by MPW&quot;,
-        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
-        &quot;subsample&quot;: { &quot;desktop&quot;: 2, &quot;mobile&quot;: 2 },
-        &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitterMPW.json&quot;
       }
     ]
   }
 }
 </code></pre>
-<p>The file also includes <code>webapp</code> (title, map extent, logos, extra layers) and <code>advanced</code> (timesteps, file prefix, port) sections — see the <a href="https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json">full config on GitHub</a>.</p>
-<p>Use the <strong>Experiment</strong> dropdown in the navbar to switch between the three views.</p>
-<p><img src="/particleviz/media/example_advanced.gif" alt="Advanced multi-experiment example" class="demo-gif" /></p>
-<h3 id="one-line-cli-no-config-file">One-line CLI (no config file)</h3>
-<p>Equivalent to the simplest example:</p>
-<pre><code class="language-shell">uv run python ParticleViz.py --input_file ExampleData/Global_Marine_Debris.nc
-</code></pre>
-<p>See <a href="quick-start.html">Quick Start</a> for a walkthrough and <a href="configuration.html">Configuration</a> to customize the web map.</p>
+<p>When no <code>color_scheme</code> is provided, all particles use <code>webapp.particles_color</code>.</p>
       </div>
     </main>
   </div>

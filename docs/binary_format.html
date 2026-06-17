@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Binary File Format | ParticleViz</title>
+<meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/binary_format.html" />
+<meta property="og:title" content="Binary File Format | ParticleViz" />
+<meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/binary_format.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-bg" aria-hidden="true">
+    <div class="site-bg__gradient"></div>
+    <div class="site-bg__particles"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/particleviz/">
+        <img
+          class="brand-logo"
+          src="/particleviz/logos/logo_sm.png"
+          alt="ParticleViz logo"
+          width="160"
+          height="auto"
+        >
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          
+          <li><a href="/particleviz/">Home</a></li>
+          
+          <li><a href="/particleviz/install.html">Install</a></li>
+          
+          <li><a href="/particleviz/showcases.html">Showcases</a></li>
+          
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          
+          <li><a href="/particleviz/examples.html">Examples</a></li>
+          
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
+          
+          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          
+          <li><a href="/particleviz/binary_format.html" class="is-active" aria-current="page">Binary Format</a></li>
+          
+          <li><a href="/particleviz/color_schemes.html">Color Schemes</a></li>
+          
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
+          
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          
+        </ul>
+        <ul class="site-nav__actions">
+          
+          <li>
+            <a class="btn btn--demo" href="https://ozavala.coaps.fsu.edu/particleviz/GlobalLitter/" target="_blank" rel="noopener noreferrer">
+              Live Demo
+            </a>
+          </li>
+          
+          <li>
+            <a class="btn btn--github" href="https://github.com/olmozavala/particleviz" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    
+    <button
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="page-sidebar"
+    >
+      <span class="sidebar-toggle__label">On this page</span>
+      <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <aside id="page-sidebar" class="sidebar" aria-label="On this page">
+      <nav class="sidebar-nav">
+        <p class="sidebar-nav__label">On this page</p>
+        <div class="toc">
+<ul>
+<li><a href="#binary-file-format">Binary file format</a><ul>
+<li><a href="#preprocessing-flow">Preprocessing flow</a></li>
+<li><a href="#header-file-txt">Header file (.txt)</a></li>
+<li><a href="#dense-binary-layout-raggedfalse">Dense binary layout (ragged=False)</a></li>
+<li><a href="#ragged-binary-layout-raggedtrue">Ragged binary layout (ragged=True)</a></li>
+<li><a href="#file-naming">File naming</a></li>
+<li><a href="#reading-a-chunk-in-python">Reading a chunk in Python</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+      </nav>
+    </aside>
+    
+
+    <main id="main-content" class="content">
+      <div class="content-inner">
+        <h2 id="binary-file-format">Binary file format</h2>
+<p>ParticleViz preprocessing converts Lagrangian trajectory data into compact binary
+chunks that the React web app loads on demand. Each chunk is shipped as a <code>.zip</code>
+archive containing a single <code>.bin</code> file. A companion <code>.txt</code> header file sits
+next to the archive and is fetched first by the browser.</p>
+<h3 id="preprocessing-flow">Preprocessing flow</h3>
+<ol>
+<li>Read NetCDF or Zarr trajectories (OceanParcels, OpenDrift, or compatible).</li>
+<li>Subsample particles separately for desktop and mobile clients.</li>
+<li>Split the time axis into chunks (default: 50 timesteps per file).</li>
+<li>Write one header (<code>.txt</code>) and one zipped binary payload (<code>.zip</code>) per chunk.</li>
+<li>Store outputs under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>.</li>
+</ol>
+<p>See also <a href="code_flow.html">Code Flow</a> for the full pipeline.</p>
+<h3 id="header-file-txt">Header file (<code>.txt</code>)</h3>
+<p>Each header is a single CSV-like line with seven fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>integer</td>
+<td>Number of particles after subsampling</td>
+</tr>
+<tr>
+<td>2</td>
+<td>integer</td>
+<td>Number of timesteps in this chunk</td>
+</tr>
+<tr>
+<td>3</td>
+<td>string</td>
+<td>Simulation start date/time</td>
+</tr>
+<tr>
+<td>4</td>
+<td>string</td>
+<td>Time unit (<code>seconds</code>, <code>hours</code>, <code>days</code>, …)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>number</td>
+<td>Time step magnitude in field 4</td>
+</tr>
+<tr>
+<td>6</td>
+<td>boolean</td>
+<td><code>True</code> when the source data contains missing positions</td>
+</tr>
+<tr>
+<td>7</td>
+<td>boolean</td>
+<td><code>True</code> when the binary payload uses the ragged layout</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-text">16150, 50, 2021-12-01T00:00:00, days, 1.0, True, True
+</code></pre>
+<p>Legacy files with only six fields are still supported; they are treated as dense
+(<code>ragged=False</code>).</p>
+<h3 id="dense-binary-layout-raggedfalse">Dense binary layout (<code>ragged=False</code>)</h3>
+<p>Used when every particle position is valid for every timestep.</p>
+<ol>
+<li><strong>Latitudes</strong> — <code>num_particles × timesteps</code> values as signed 16-bit integers
+   (degrees × 100, little-endian).</li>
+<li><strong>Longitudes</strong> — same shape and encoding as latitudes.</li>
+<li><strong>Visibility mask</strong> <em>(only when field 6 is <code>True</code>)</em> — one bit per
+   particle/timestep pair, packed with <code>numpy.packbits</code> (MSB first within each
+   byte). The mask marks positions that should be drawn.</li>
+</ol>
+<h3 id="ragged-binary-layout-raggedtrue">Ragged binary layout (<code>ragged=True</code>)</h3>
+<p>Used when many particles are inactive (NaN) for large parts of the simulation.
+Only visible positions are stored, which reduces download size and parsing time.</p>
+<p>For each timestep in the chunk:</p>
+<table>
+<thead>
+<tr>
+<th>Segment</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Count</td>
+<td><code>uint32</code></td>
+<td>Number of visible particles at this timestep</td>
+</tr>
+<tr>
+<td>Records</td>
+<td>repeated <code>count</code> times</td>
+<td><code>uint16</code> particle index, <code>int16</code> lat×100, <code>int16</code> lon×100</td>
+</tr>
+</tbody>
+</table>
+<p>All multi-byte integers are little-endian. The web app expands ragged data back
+into per-particle arrays and rebuilds the visibility mask while loading.</p>
+<h3 id="file-naming">File naming</h3>
+<p>Given <code>file_prefix = "pviz"</code> and experiment name <code>Global Litter</code>:</p>
+<pre><code class="language-text">ParticleViz_WebApp/data/global_litter/2/pviz_global_litter_00.txt
+ParticleViz_WebApp/data/global_litter/2/pviz_global_litter_00.zip
+</code></pre>
+<p>The zip archive contains <code>pviz_global_litter_00.bin</code>.</p>
+<h3 id="reading-a-chunk-in-python">Reading a chunk in Python</h3>
+<pre><code class="language-python">import zipfile
+from ParticleViz_DataPreproc.BinaryFormat import decode_chunk, parse_header
+
+with open(&quot;pviz_global_litter_00.txt&quot;) as header_file:
+    header = parse_header(header_file.readline())
+
+with zipfile.ZipFile(&quot;pviz_global_litter_00.zip&quot;) as archive:
+    bin_name = archive.namelist()[0]
+    payload = archive.read(bin_name)
+
+num_particles, timesteps, *_ , has_nans, ragged = header
+lats, lons, visible = decode_chunk(payload, num_particles, timesteps, has_nans, ragged)
+</code></pre>
+<p><code>PreprocParticleViz.testBinaryAndHeaderFiles()</code> provides a quick visual check of
+a processed chunk.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">Visualizing Lagrangian model outputs the easy way.</p>
+      <p class="footer-meta">
+        <small>
+          Hosted on <a href="https://pages.github.com">GitHub Pages</a>.
+          Logo design by <a href="https://www.behance.net/elizabethhuerta">Elizabeth Huerta</a>.
+        </small>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/particleviz/assets/js/site.js" defer></script>
+</body>
+</html>

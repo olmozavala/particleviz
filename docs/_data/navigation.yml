@@ -13,6 +13,10 @@ main:
     url: "/configuration.html"
   - title: Parameters
     url: "/parameters.html"
+  - title: Binary Format
+    url: "/binary_format.html"
+  - title: Color Schemes
+    url: "/color_schemes.html"
   - title: Deployment
     url: "/deployment.html"
   - title: Intro Video

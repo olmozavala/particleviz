@@ -14,6 +14,7 @@ from ParticleViz_DataPreproc.DatasetLoader import (
     is_zarr_store,
     parse_time_units,
 )
+from ParticleViz_DataPreproc.BinaryFormat import parse_header
 from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz
 from ParticleViz_DataPreproc.PreprocConstants import ModelType
 
@@ -102,7 +103,7 @@ def test_create_binary_file_from_zarr(tmp_path):
     preproc = PreprocParticleViz(config)
     preproc.createBinaryFileMultiple()
 
-    desktop_dir = output_dir / "1"
+    desktop_dir = output_dir / "zarrmodel" / "1"
     assert desktop_dir.exists()
     assert (desktop_dir / "test_pviz_zarrmodel_00.txt").exists()
     assert (desktop_dir / "test_pviz_zarrmodel_00.zip").exists()
@@ -159,8 +160,8 @@ def test_create_binary_file_multiple(tmp_path):
     preproc.createBinaryFileMultiple()
     
     # Verify outputs
-    desktop_dir = output_dir / "2"
-    mobile_dir = output_dir / "4"
+    desktop_dir = output_dir / "testmodel" / "2"
+    mobile_dir = output_dir / "testmodel" / "4"
     assert desktop_dir.exists()
     assert mobile_dir.exists()
     
@@ -171,6 +172,10 @@ def test_create_binary_file_multiple(tmp_path):
         assert (desktop_dir / f"test_pviz_testmodel_{i:02d}.zip").exists()
         assert (mobile_dir / f"test_pviz_testmodel_{i:02d}.txt").exists()
         assert (mobile_dir / f"test_pviz_testmodel_{i:02d}.zip").exists()
+
+    with open(desktop_dir / "test_pviz_testmodel_00.txt") as header_file:
+        _, _, _, _, _, _, ragged = parse_header(header_file.readline())
+    assert ragged is True
     
     # Verify Current_Config.json update
     assert os.path.exists("Current_Config.json")
@@ -178,3 +183,4 @@ def test_create_binary_file_multiple(tmp_path):
         config_data = json.load(f)
         assert len(config_data["advanced"]["datasets"]) == 1
         assert "TestModel" in config_data["advanced"]["datasets"][0]
+        assert config_data["advanced"]["datasets"][0]["TestModel"]["data_folder"] == "testmodel"

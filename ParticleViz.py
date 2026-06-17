@@ -14,7 +14,7 @@ Options:
   <config_file>     The configuration file to use [default: Config.json]
   <input_file>      NetCDF (.nc) or Zarr store path. OceanParcels, OpenDrift, or convention-compatible output.
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Set
 import os
 import shutil
 import json
@@ -24,6 +24,52 @@ from os.path import join, dirname, abspath
 from docopt import docopt
 from ParticleViz_DataPreproc.PreprocParticleViz import PreprocParticleViz
 from ParticleViz_DataPreproc.ConfigParams import ConfigParams
+
+
+def collect_experiment_data_folders(config_json: Dict[str, Any]) -> Set[str]:
+    """Return experiment folder slugs referenced by the active configuration.
+
+    Args:
+        config_json: Merged ParticleViz configuration dictionary.
+
+    Returns:
+        Set of experiment folder names under the preprocessing output root.
+    """
+    folders: Set[str] = set()
+    for dataset_obj in config_json.get("advanced", {}).get("datasets", []):
+        for experiment_data in dataset_obj.values():
+            data_folder = experiment_data.get("data_folder")
+            if data_folder:
+                folders.add(data_folder)
+    return folders
+
+
+def copy_preprocessed_data(
+    preproc_data_folder: str,
+    public_data_folder: str,
+    config_json: Dict[str, Any],
+) -> None:
+    """Copy preprocessed experiment folders into the web app public data tree.
+
+    Args:
+        preproc_data_folder: Root directory created by preprocessing.
+        public_data_folder: Destination directory served by the React app.
+        config_json: Merged configuration with experiment metadata.
+    """
+    experiment_folders = collect_experiment_data_folders(config_json)
+    if not experiment_folders:
+        shutil.copytree(preproc_data_folder, public_data_folder)
+        return
+
+    os.makedirs(public_data_folder, exist_ok=True)
+    for folder_name in sorted(experiment_folders):
+        source_folder = join(preproc_data_folder, folder_name)
+        if os.path.isdir(source_folder):
+            shutil.copytree(
+                source_folder,
+                join(public_data_folder, folder_name),
+                dirs_exist_ok=True,
+            )
 
 
 def main() -> None:
@@ -87,7 +133,7 @@ def main() -> None:
 
         preproc_data_folder = join(base_path, app_dir, "data")
         print("Copying lagrangian data folder ...")
-        shutil.copytree(preproc_data_folder, pviz_data_folder)
+        copy_preprocessed_data(preproc_data_folder, pviz_data_folder, config_json)
 
         # Copy extra web data if specified
         try:

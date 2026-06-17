@@ -21,10 +21,14 @@ This is where the heavy lifting happens for data conversion.
     - **Mobile**: A lower-resolution subsample for better performance on mobile browsers.
 - **Binary Conversion**:
     - Converts Lat/Lon coordinates into **16-bit integers** (scaled by 100) to minimize file size.
+    - Uses a **ragged sparse layout** when particles contain NaNs, storing only visible positions per timestep.
     - Partitions the data into chunks (default 50 timesteps per file).
     - Saves data in binary format (`.bin`) accompanied by a metadata header (`.txt`).
     - Zips the binary files (the web app expects `.zip` files).
+    - Writes each experiment under `ParticleViz_WebApp/data/<experiment_slug>/<subsample>/`.
 - **Color Schemes**: If a specific color scheme is provided, `ColorByParticleUtils.py` adjusts the particle indexes in the scheme to match the subsampled data.
+
+See [Binary File Format](binary_format.html) and [Color Schemes](color_schemes.html) for full specifications.
 
 ## 4. Web App Setup
 - **`Current_Config.json`**: This file is generated during preprocessing and contains the final merged configuration, including paths to the generated data files.

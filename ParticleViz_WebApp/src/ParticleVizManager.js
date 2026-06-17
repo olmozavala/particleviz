@@ -28,10 +28,15 @@ for (const c_obj of datasets) {
         if (isMobile) {
             folder = c_dataset["subsample"]["mobile"]
         }
+        const data_folder = c_dataset["data_folder"]
+        const file_base = data_folder
+            ? `data/${data_folder}/${folder}/${c_dataset["file_name"]}`
+            : `data/${folder}/${c_dataset["file_name"]}`
         experiments.push({
             id: id_dataset,
             name: capitalize(c_dataset["name"]),
-            file: `data/${folder}/${c_dataset["file_name"]}`,
+            data_folder: data_folder || "",
+            file: file_base,
             num_files: c_dataset["total_files"],
             time_steps: config_adv["timesteps_by_file"],
             color_scheme: c_dataset["color_scheme"]
@@ -209,14 +214,12 @@ class  ParticleVizManager extends React.Component{
             // --------------------- DESKTOP ---------------------------------
             let chardin_offset = 2
             return (
-            <span>
-                <nav className="navbar navbar-expand-md navbar-light bg-light justify-content-center">
-                    {/* ---------- Logos ------------*/}
-                    <span className="navbar-brand align-middle">
+            <Container fluid className="bg-light pv-desktop-toolbar py-1">
+                <Row className="align-items-center g-2">
+                    <Col xs="auto" className="pv-toolbar-item">
                         <Logos url={this.props.url}/>
-                    </span>
-                    {/* ---------- Home ------------*/}
-                    <span className="navbar-brand align-middle" data-intro="Main" data-oz-position={chardin_offset}>
+                    </Col>
+                    <Col xs="auto" className="pv-toolbar-item" data-intro="Main" data-oz-position={chardin_offset}>
                         <OverlayTrigger
                             placement="bottom"
                             delay={{show: 1, hide: 1}}
@@ -225,32 +228,20 @@ class  ParticleVizManager extends React.Component{
                                 <House size="14px"/>
                             </a>
                         </OverlayTrigger>
-                    </span>
-                    {/* ---------- Particles menu ------------*/}
-                    {/* ---------- All options from particles ------------*/}
-                    <span className="navbar-brand align-middle"> {/* data-intro="Particles" */}
+                    </Col>
+                    <Col xs={12} xl className="pv-toolbar-item pv-toolbar-particles">
                         <ParticlesLayer map={this.props.map}
                                         url={this.props.url}
                                         chardin={this.state.chardin}
                                         particle_color={this.state.particle_color}
                                         selected_experiment={this.state.selected_experiment}/>
-                    </span>
-                    {/* ---------- Background selection ------------*/}
-                    <span className="navbar-brand align-middle" data-intro="Map Style" data-oz-position={chardin_offset} >
+                    </Col>
+                    <Col xs="auto" className="pv-toolbar-item" data-intro="Map Style" data-oz-position={chardin_offset}>
                         <BackgroundLayerManager background_layer={this.props.background_layer}
                                                 map={this.props.map}
                                                 url={this.props.url}/>
-                    </span>
-                    {/*/!* ---------- Stats button ------------*!/*/}
-                    {/*<span className="navbar-brand my-2" data-intro="Help" data-position="bottom">*/}
-                    {/*        <div className="m-1 d-inline">*/}
-                    {/*            <button title="Statistics" className="btn btn-info btn-sm">*/}
-                    {/*                <Activity/>*/}
-                    {/*            </button>*/}
-                    {/*        </div>*/}
-                    {/*    </span>*/}
-                    {/* ---------- Experiment selection ------------*/}
-                    <span className="navbar-brand align-middle" >
+                    </Col>
+                    <Col xs="auto" className="pv-toolbar-item">
                         <OverlayTrigger placement="right" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_exp_sel" {...props}> Experiments</Tooltip>)}>
                             <Dropdown className="d-inline me-1" data-intro="Experiment Selection" data-oz-position={chardin_offset + 10} >
                                 <Dropdown.Toggle variant="info" size="sm">
@@ -265,15 +256,14 @@ class  ParticleVizManager extends React.Component{
                                 </Dropdown.Menu>
                             </Dropdown>
                         </OverlayTrigger>
-                        {/* ---------- Help toggle ------------*/}
                         <OverlayTrigger placement="bottom" delay={{show: 1, hide: 1}} overlay={(props) => (<Tooltip id="tooltip_help" {...props}> Help </Tooltip>)}>
                             <button className="btn btn-info btn-sm" onClick={this.toggleHelp} data-intro="Help"  data-oz-position={chardin_offset + 5}>
                                 <QuestionCircle size={default_size}/>
                             </button>
                         </OverlayTrigger>
-                    </span>
-                </nav>
-            </span>
+                    </Col>
+                </Row>
+            </Container>
             )
         }
     }

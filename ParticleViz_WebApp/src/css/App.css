@@ -204,3 +204,34 @@
     max-width: 100%;
   }
 }
+
+.pv-desktop-toolbar {
+  position: relative;
+  z-index: 103;
+  opacity: 0.95;
+}
+
+.pv-toolbar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.pv-toolbar-particles {
+  justify-content: flex-start;
+  overflow-x: auto;
+}
+
+@media (max-width: 1199px) {
+  .pv-toolbar-particles {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 991px) {
+  .pv-desktop-toolbar .pv-toolbar-item {
+    width: 100%;
+  }
+}
