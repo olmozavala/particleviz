@@ -83,7 +83,7 @@ If global metadata does not identify the model, ParticleViz falls back to these 
 
 <a class="doc-card" href="{{ '/examples.html' | relative_url }}">
   <h3>Examples</h3>
-  <p>Run bundled ConfigExamples with Global_Marine_Debris.nc and OpenDrift.nc.</p>
+  <p>Run bundled <code>ConfigExamples/</code> with <code>ExampleData/Global_Marine_Debris.nc</code> (see <a href="examples.html">Examples</a>).</p>
 </a>
 
 <a class="doc-card" href="{{ '/configuration.html' | relative_url }}">

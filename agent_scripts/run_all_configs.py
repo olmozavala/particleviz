@@ -27,20 +27,9 @@ INSTANCES_ROOT = REPO_ROOT / ".pviz_instances"
 
 CONFIG_FILES: List[str] = [
     "Config_Advanced_Example.json",
-    "Config_Blue_Hack.json",
-    "Config_Blue_HackBK.json",
-    "Config_Caribbean_MPW.json",
-    "Config_Caribbean_Uniform.json",
     "Config_Colored_Particles.json",
     "Config_GlobalLitter.json",
-    "Config_GlobalLitter_Agregated.json",
-    "Config_GlobalLitterComplete.json",
-    "Config_OpenDrift.json",
-    "Config_NOAA.json",
-    "Config_Sea_Clearly.json",
     "Config_Simplest.json",
-    "Config_Test.json",
-    "Config_TidalForcing.json",
 ]
 
 BASE_PORT = 3001

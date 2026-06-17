@@ -1,9 +1,0 @@
-{
-  "preprocessing": {
-    "experiments": [{
-        "name": "Dataset 1",
-        "file_name": "/home/olmozavala/Dropbox/MyProjects/EOAS/COAPS/noaa_marine_debris_caribbean/output/current_op_run.nc",
-        "subsample": { "desktop":2, "mobile":4 }}
-    ]
-    }
-}

@@ -44,10 +44,20 @@ ParticleViz_WebApp/public/data
 ParticleViz_WebApp/build
 /Current_Config.json
 /ParticleViz_WebApp/package-lock.json
-/ConfigExamples/Config_Test.json
-/ConfigExamples/Config_GlobalLitterComplete.json
-/ConfigExamples/Config_Blue_HackBK.json
+# Local-only configs (not bundled with Global_Marine_Debris.nc)
 /ConfigExamples/Config_Blue_Hack.json
+/ConfigExamples/Config_Blue_HackBK.json
+/ConfigExamples/Config_Caribbean_MPW.json
+/ConfigExamples/Config_Caribbean_Uniform.json
+/ConfigExamples/Config_GlobalLitter_Agregated.json
+/ConfigExamples/Config_GlobalLitterComplete.json
+/ConfigExamples/Config_NOAA.json
+/ConfigExamples/Config_OpenDrift.json
+/ConfigExamples/Config_Sea_Clearly.json
+/ConfigExamples/Config_Test.json
+/ConfigExamples/Config_TidalForcing.json
+/ConfigExamples/Config_zar.json
+/ExampleData/OpenDrift.nc
 /ParticleViz_WebApp/BK.json
 /ParticleViz_WebApp/src/Config.json
 .pviz_instances/

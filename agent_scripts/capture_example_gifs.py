@@ -39,7 +39,6 @@ EXAMPLES: List[Tuple[str, str, int]] = [
     ("Config_Simplest.json", "example_simplest.gif", 3101),
     ("Config_GlobalLitter.json", "example_global_litter.gif", 3102),
     ("Config_Advanced_Example.json", "example_advanced.gif", 3103),
-    ("Config_OpenDrift.json", "example_opendrift.gif", 3104),
 ]
 
 
