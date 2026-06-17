@@ -113,11 +113,6 @@
 <li><a href="#use-a-config-file">Use a config file</a></li>
 </ul>
 </li>
-<li><a href="#building-the-docs-site-locally">Building the docs site locally</a><ul>
-<li><a href="#preview-like-github-pages-particleviz-urls">Preview like GitHub Pages (/particleviz/ URLs)</a></li>
-<li><a href="#publishing-on-github-pages">Publishing on GitHub Pages</a></li>
-</ul>
-</li>
 <li><a href="#js-dependencies-npm">JS dependencies (npm)</a></li>
 </ul>
 </div>
@@ -190,38 +185,6 @@ docker run --rm -it -p 3000:3000 particleviz:latest
   uv run python ParticleViz.py all --config_file /app/config.json
 </code></pre>
 <p>To change the default dataset baked into the image, edit <code>entrypoint.sh</code> before building, or pass a custom command as shown above.</p>
-<h2 id="building-the-docs-site-locally">Building the docs site locally</h2>
-<p>From the repository root:</p>
-<pre><code class="language-shell">uv sync --extra dev
-uv run python docs/build_site.py --local
-python -m http.server 4000 --directory docs
-</code></pre>
-<p>Open <strong>http://localhost:4000/</strong></p>
-<h3 id="preview-like-github-pages-particleviz-urls">Preview like GitHub Pages (<code>/particleviz/</code> URLs)</h3>
-<p>This matches the compiled site deployed to <strong>https://olmozavala.github.io/particleviz/</strong>:</p>
-<pre><code class="language-shell">./scripts/serve_docs_github.sh
-</code></pre>
-<p>Or manually:</p>
-<pre><code class="language-shell">uv run python docs/build_site.py
-ln -sfn docs particleviz
-python -m http.server 4000
-</code></pre>
-<p>Open <strong>http://localhost:4000/particleviz/</strong></p>
-<h3 id="publishing-on-github-pages">Publishing on GitHub Pages</h3>
-<p>Documentation is built and deployed automatically by GitHub Actions (<code>.github/workflows/docs.yml</code>) when changes are pushed to <code>main</code> under <code>docs/</code>.</p>
-<ol>
-<li>
-<p>In the repository settings, set <strong>GitHub Pages → Build and deployment → Source: GitHub Actions</strong>.</p>
-</li>
-<li>
-<p>Push changes to markdown, layouts, or assets in <code>docs/</code>. The workflow runs <code>uv run python docs/build_site.py</code> and publishes the result.</p>
-</li>
-</ol>
-<p>The site will be available at <strong>https://olmozavala.github.io/particleviz/</strong></p>
-<p>To build locally with production URLs (<code>/particleviz/...</code>):</p>
-<pre><code class="language-shell">uv run python docs/build_site.py
-</code></pre>
-<p>Source markdown (<code>.md</code>) and <code>build_site.py</code> stay in <code>docs/</code> for editing; only the built HTML and static assets are deployed.</p>
 <h2 id="js-dependencies-npm">JS dependencies (npm)</h2>
 <p>The web interface is a React app under <code>ParticleViz_WebApp/</code>. You need <a href="https://nodejs.org/">Node.js</a> installed on your system.</p>
 <p>The first time you run the web app, ParticleViz will call <code>npm install</code> automatically if <code>node_modules</code> is missing. You can also install manually:</p>

@@ -19,8 +19,8 @@ sys.path.insert(0, str(REPO_ROOT))
 
 
 def _load_run_all_configs():
-    """Load run_all_configs helpers without requiring a scripts package."""
-    module_path = REPO_ROOT / "scripts" / "run_all_configs.py"
+    """Load run_all_configs helpers without requiring an agent_scripts package."""
+    module_path = REPO_ROOT / "agent_scripts" / "run_all_configs.py"
     spec = importlib.util.spec_from_file_location("run_all_configs", module_path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load {module_path}")
