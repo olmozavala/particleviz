@@ -442,7 +442,7 @@ class  ParticlesLayer extends React.Component {
             if (startAnimation) {
                 console.log("2) Done reading and uncompressed the minimum number of files!!!!")
                 $(".btn").attr("disabled", false)  // Enable all the buttons
-                this.props.chardin.stop()
+                // this.props.chardin.stop()
                 for(let c_file_number=0; c_file_number < files_to_load - 1; c_file_number++) {
                     // make sure the next file is loaded
                     if(!_.isUndefined(current_data[experiment_id][c_file_number+1])) {
