@@ -3,8 +3,6 @@ main:
     url: "/"
   - title: Install
     url: "/install.html"
-  - title: Showcases
-    url: "/showcases.html"
   - title: Quick Start
     url: "/quick-start.html"
   - title: Examples

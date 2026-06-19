@@ -76,14 +76,9 @@ If global metadata does not identify the model, ParticleViz falls back to these 
   <p>Run ParticleViz on an example dataset in a few commands.</p>
 </a>
 
-<a class="doc-card" href="{{ '/showcases.html' | relative_url }}">
-  <h3>Showcases</h3>
-  <p>Explore published research visualizations built with ParticleViz.</p>
-</a>
-
 <a class="doc-card" href="{{ '/examples.html' | relative_url }}">
   <h3>Examples</h3>
-  <p>Run bundled <code>ConfigExamples/</code> with <code>ExampleData/Global_Marine_Debris.nc</code> (see <a href="examples.html">Examples</a>).</p>
+  <p>Explore published research showcases and run bundled configurations on example datasets.</p>
 </a>
 
 <a class="doc-card" href="{{ '/configuration.html' | relative_url }}">

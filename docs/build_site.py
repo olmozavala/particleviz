@@ -21,7 +21,6 @@ DESCRIPTION = "Visualizing Lagrangian model outputs the easy way."
 GENERATED_HTML = (
     "index.html",
     "install.html",
-    "showcases.html",
     "quick-start.html",
     "examples.html",
     "configuration.html",
@@ -291,7 +290,6 @@ def main() -> None:
     pages = [
         (DOCS_DIR / "index.md", output_dir / "index.html"),
         (DOCS_DIR / "install.md", output_dir / "install.html"),
-        (DOCS_DIR / "showcases.md", output_dir / "showcases.html"),
         (DOCS_DIR / "quick-start.md", output_dir / "quick-start.html"),
         (DOCS_DIR / "examples.md", output_dir / "examples.html"),
         (DOCS_DIR / "configuration.md", output_dir / "configuration.html"),

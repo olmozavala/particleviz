@@ -51,8 +51,6 @@
           
           <li><a href="/particleviz/install.html">Install</a></li>
           
-          <li><a href="/particleviz/showcases.html">Showcases</a></li>
-          
           <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
           
           <li><a href="/particleviz/examples.html" class="is-active" aria-current="page">Examples</a></li>
@@ -107,6 +105,8 @@
         <div class="toc">
 <ul>
 <li><a href="#examples">Examples</a><ul>
+<li><a href="#showcases">Showcases</a></li>
+<li><a href="#configurations-datasets">Configurations &amp; Datasets</a></li>
 <li><a href="#oceanparcels-global_marine_debrisnc">OceanParcels — Global_Marine_Debris.nc</a></li>
 <li><a href="#one-line-cli-no-config-file">One-line CLI (no config file)</a></li>
 </ul>
@@ -121,6 +121,51 @@
     <main id="main-content" class="content">
       <div class="content-inner">
         <h2 id="examples">Examples</h2>
+<h3 id="showcases">Showcases</h3>
+<p>Published research visualizations built with ParticleViz. Each showcase includes an interactive map you can explore in the browser, with particle trajectories from Lagrangian ocean models.</p>
+<div class="showcase-grid">
+
+<article class="showcase-card">
+  <h3 class="showcase-card__title">Caribbean Marine Debris</h3>
+  <p class="showcase-card__desc">
+    Interactive visualization of marine debris pathways in the Caribbean region, supporting
+    analysis of how floating litter moves through island arcs, basins, and coastal zones.
+    The underlying simulations and methods are described in
+    <a href="https://www.mdpi.com/2077-1312/12/2/319" target="_blank" rel="noopener noreferrer">this <em>Journal of Marine Science and Engineering</em> article</a>.
+  </p>
+  <p class="showcase-card__meta">Region: Caribbean Sea</p>
+  <a class="btn btn--demo showcase-card__link" href="https://ozavala.coaps.fsu.edu/particleviz/CaribbeanMarineDebris/" target="_blank" rel="noopener noreferrer">Open visualization</a>
+</article>
+
+<article class="showcase-card">
+  <h3 class="showcase-card__title">SeaClearly</h3>
+  <p class="showcase-card__desc">
+    Interactive web visualization created from the SeaClearly datasets archived on Zenodo.
+    The underlying dataset and metadata are available at
+    <a href="https://zenodo.org/records/7319767" target="_blank" rel="noopener noreferrer">Zenodo record 7319767</a>.
+    SeaClearly was recognized with the Blue Cloud Hackathon prize;
+    <a href="https://www.uu.nl/en/news/oceanographers-win-eu25000-blue-cloud-hackathon-prize" target="_blank" rel="noopener noreferrer">read the Utrecht University news story</a>.
+  </p>
+  <p class="showcase-card__meta">Dataset: SeaClearly</p>
+  <a class="btn btn--demo showcase-card__link" href="https://ozavala.coaps.fsu.edu/particleviz/SeaClearly/" target="_blank" rel="noopener noreferrer">Open visualization</a>
+</article>
+
+<article class="showcase-card">
+  <h3 class="showcase-card__title">Global Marine Litter</h3>
+  <p class="showcase-card__desc">
+    Basin-scale view of marine litter transport from a global Lagrangian model, illustrating
+    how debris accumulates along coastlines and in subtropical gyres over multi-year simulations.
+    Described in
+    <a href="https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2021.667591/full" target="_blank" rel="noopener noreferrer">this <em>Frontiers in Marine Science</em> paper</a>.
+  </p>
+  <p class="showcase-card__meta">Region: Global oceans</p>
+  <a class="btn btn--demo showcase-card__link" href="http://marinelitter.coaps.fsu.edu/" target="_blank" rel="noopener noreferrer">Open visualization</a>
+</article>
+
+</div>
+
+<hr>
+<h3 id="configurations-datasets">Configurations &amp; Datasets</h3>
 <p>These configurations use datasets shipped in <code>ExampleData/</code>. Each example below has been run with the commands shown; the animations are captured from the generated web interface.</p>
 <h3 id="oceanparcels-global_marine_debrisnc">OceanParcels — <code>Global_Marine_Debris.nc</code></h3>
 <h4 id="simplest-config">Simplest config</h4>
