@@ -1,7 +1,6 @@
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMap} from "@fortawesome/free-solid-svg-icons";
-import Stamen from "ol/source/Stamen";
 import Dropdown from "react-bootstrap/Dropdown";
 import * as d3 from "d3"
 
@@ -12,9 +11,9 @@ import img_map_osm from "./imgs/osm.jpg";
 import img_map_blank from "./imgs/blank.jpg";
 import DropdownToggle from "react-bootstrap/DropdownToggle";
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
-import BingMaps from "ol/source/BingMaps";
 import OSM from "ol/source/OSM";
 import TileWMS from "ol/source/TileWMS";
+import XYZ from "ol/source/XYZ";
 import StatesLayer from "./StatesLayer";
 import _ from "lodash";
 
@@ -29,6 +28,14 @@ const BACKGROUND_MAPS = {
     dark: 4,
     un: 5
 };
+
+const MAP_OPTIONS = [
+    { key: BACKGROUND_MAPS.empty, src: img_map_blank, alt: "White" },
+    { key: BACKGROUND_MAPS.osm, src: img_map_osm, alt: "OSM" },
+    { key: BACKGROUND_MAPS.stamen, src: img_map_stamen, alt: "Stamen" },
+    { key: BACKGROUND_MAPS.nature, src: img_map_bingaer, alt: "Nature" },
+    { key: BACKGROUND_MAPS.dark, src: img_map_dark, alt: "Dark" },
+];
 
 
 class  BackgroundLayerManager extends React.Component{
@@ -95,19 +102,22 @@ class  BackgroundLayerManager extends React.Component{
                 this.updateTitlesColors("#212529")
                 d3.select("#map").style("background-color", "#60C5D7")
                 bk_layer.setSource(
-                    new Stamen({
-                        layer: 'watercolor'
+                    new XYZ({
+                        url: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg',
+                        attributions: '© Stadia Maps © Stamen Design © OpenStreetMap',
+                        maxZoom: 16,
                     })
                 )
                 draw_states = true
                 break;
             case BACKGROUND_MAPS.dark:
                 this.updateTitlesColors("#d1d1e0")
-                d3.select("#map").style("background-color", "black")
+                d3.select("#map").style("background-color", "#2e2e2e")
                 bk_layer.setSource(
-                    new BingMaps({
-                        key: 'AsEfPuLqG-YV7GULoIjqTCW89vNTo4vktzl5Ca4FFRIc7bU4fhc--YTL6-g-Lp9N',
-                        imagerySet: 'CanvasDark'
+                    new XYZ({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                        attributions: 'Tiles © Esri',
+                        maxZoom: 16,
                     })
                 )
                 draw_states = false
@@ -116,9 +126,10 @@ class  BackgroundLayerManager extends React.Component{
                 this.updateTitlesColors("#d1d1e0")
                 d3.select("#map").style("background-color", "#00101D")
                 bk_layer.setSource(
-                    new BingMaps({
-                        key: 'AsEfPuLqG-YV7GULoIjqTCW89vNTo4vktzl5Ca4FFRIc7bU4fhc--YTL6-g-Lp9N',
-                        imagerySet: 'Aerial'
+                    new XYZ({
+                        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                        attributions: 'Tiles © Esri',
+                        maxZoom: 19,
                     })
                 )
                 draw_states = true
@@ -137,6 +148,26 @@ class  BackgroundLayerManager extends React.Component{
         })
     }
 
+    renderMapOption(option) {
+        const selected = this.state.selected_bk === option.key;
+        return (
+            <Dropdown.Item
+                key={option.key}
+                eventKey={option.key}
+                active={selected}
+                className="pv-bk-map-item"
+                aria-current={selected ? "true" : undefined}
+            >
+                <img
+                    src={option.src}
+                    className={`rounded pv-bk-map-thumb${selected ? " pv-bk-map-thumb--selected" : ""}`}
+                    width="100px"
+                    alt={option.alt}
+                />
+            </Dropdown.Item>
+        );
+    }
+
     render(){
         return (
             <span>
@@ -145,25 +176,8 @@ class  BackgroundLayerManager extends React.Component{
                         <DropdownToggle variant="light" size="sm" className="p-0">
                             <FontAwesomeIcon icon={faMap}/>
                         </DropdownToggle>
-                        <Dropdown.Menu  >
-                            <Dropdown.Item eventKey={BACKGROUND_MAPS.empty} >
-                                <img src={img_map_blank} className="rounded" width="100px" alt="White"/>
-                            </Dropdown.Item>
-                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.osm} >
-                                <img src={img_map_osm} className="rounded" width="100px" alt="OSM"/>
-                            </Dropdown.Item>
-                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.stamen} >
-                                <img src={img_map_stamen} className="rounded" width="100px" alt="Stamen"/>
-                            </Dropdown.Item>
-                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.nature} >
-                                <img src={img_map_bingaer} className="rounded" width="100px" alt="Nature"/>
-                            </Dropdown.Item>
-                            <Dropdown.Item  eventKey={BACKGROUND_MAPS.dark} >
-                                <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>
-                            </Dropdown.Item>
-                            {/*<Dropdown.Item  eventKey={BACKGROUND_MAPS.un} >*/}
-                            {/*    <img src={img_map_dark} className="rounded" width="100px" alt="Dark"/>*/}
-                            {/*</Dropdown.Item>*/}
+                        <Dropdown.Menu className="pv-bk-map-menu">
+                            {MAP_OPTIONS.map((option) => this.renderMapOption(option))}
                         </Dropdown.Menu>
                     </Dropdown>
                 </OverlayTrigger>

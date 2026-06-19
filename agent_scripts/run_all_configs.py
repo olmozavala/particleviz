@@ -121,6 +121,24 @@ def missing_datasets(config_json: Dict[str, Any]) -> List[str]:
     return missing
 
 
+def sync_webapp_source(webapp_dir: Path, config_path: Path) -> None:
+    """Refresh an instance webapp src tree from the main app.
+
+    Args:
+        webapp_dir: Instance webapp directory.
+        config_path: Instance-specific Current_Config.json to deploy as Config.json.
+    """
+    src_dest = webapp_dir / "src"
+    if src_dest.exists():
+        shutil.rmtree(src_dest)
+    shutil.copytree(
+        WEBAPP_SRC / "src",
+        src_dest,
+        ignore=shutil.ignore_patterns("Config.json"),
+    )
+    shutil.copyfile(config_path, src_dest / "Config.json")
+
+
 def prepare_instance_webapp(instance_dir: Path, data_dir: Path) -> Path:
     """Create an isolated webapp directory for one config instance.
 
@@ -162,7 +180,7 @@ def prepare_instance_webapp(instance_dir: Path, data_dir: Path) -> Path:
     if repo_assets.exists():
         shutil.copytree(repo_assets, public_data, dirs_exist_ok=True)
 
-    shutil.copyfile(current_config_path, webapp_dir / "src" / "Config.json")
+    sync_webapp_source(webapp_dir, current_config_path)
 
     return webapp_dir
 

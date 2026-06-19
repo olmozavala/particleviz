@@ -235,3 +235,23 @@
     width: 100%;
   }
 }
+
+.pv-bk-map-menu .dropdown-item.pv-bk-map-item {
+  padding: 0.35rem 0.75rem;
+}
+
+.pv-bk-map-menu .dropdown-item.pv-bk-map-item.active,
+.pv-bk-map-menu .dropdown-item.pv-bk-map-item:active {
+  background-color: #e7f1ff;
+  color: inherit;
+}
+
+.pv-bk-map-thumb {
+  display: block;
+  border: 2px solid transparent;
+}
+
+.pv-bk-map-thumb--selected {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
+}

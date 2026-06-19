@@ -81,7 +81,7 @@ Three experiments on the same file: single color, color by country, and color by
 uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
 ```
 
-Full config: [`ConfigExamples/Config_Advanced_Example.json`](https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json)
+Full config: [`ConfigExamples/Config_Advanced_Example.json`](https://github.com/olmozavala/particleviz/blob/master/ConfigExamples/Config_Advanced_Example.json)
 
 ```json
 {
@@ -109,7 +109,7 @@ Full config: [`ConfigExamples/Config_Advanced_Example.json`](https://github.com/
 }
 ```
 
-The file also includes `webapp` (title, map extent, logos, extra layers) and `advanced` (timesteps, file prefix, port) sections — see the [full config on GitHub](https://github.com/olmozavala/particleviz/blob/main/ConfigExamples/Config_Advanced_Example.json).
+The file also includes `webapp` (title, map extent, logos, extra layers) and `advanced` (timesteps, file prefix, port) sections — see the [full config on GitHub](https://github.com/olmozavala/particleviz/blob/master/ConfigExamples/Config_Advanced_Example.json).
 
 Use the **Experiment** dropdown in the navbar to switch between the three views.
 
