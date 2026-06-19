@@ -206,7 +206,10 @@
 }
 
 .pv-desktop-toolbar {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   z-index: 103;
   background-color: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(8px);
