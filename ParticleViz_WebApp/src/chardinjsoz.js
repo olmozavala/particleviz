@@ -54,6 +54,12 @@ export class chardinJs{
     refresh () {
         var el, i, len, ref, results
         if (this._overlay_visible()) {
+            this.$el.find('.chardinjs-helper-layer').each(function() {
+                var target = $(this).data('target_element')
+                if (!target || !$(target).closest('body').length || !$(target).is(':visible')) {
+                    $(this).remove()
+                }
+            })
             ref = this.$el.find('*[' + this.data_attribute + ']:visible')
             results = []
             for (i = 0, len = ref.length; i < len; i++) {
@@ -327,6 +333,7 @@ export class chardinJs{
             tooltip_layer.innerHTML = "<div class='chardinjs-tooltiptext'>" + helpref + "</div>"
 
         $(element).data('helper_layer', helper_layer).data('tooltip_layer', tooltip_layer)
+        $(helper_layer).data('target_element', element)
         if (element.id) {
             helper_layer.setAttribute("data-id", element.id)
         }
