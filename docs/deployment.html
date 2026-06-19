@@ -107,7 +107,11 @@
         <div class="toc">
 <ul>
 <li><a href="#documentation-site-github-pages">Documentation site (GitHub Pages)</a></li>
-<li><a href="#server-deployment">Server Deployment</a></li>
+<li><a href="#server-deployment">Server Deployment</a><ul>
+<li><a href="#production-deployment-methods">Production Deployment Methods</a></li>
+<li><a href="#host-subfolder-configuration">Host Subfolder Configuration</a></li>
+</ul>
+</li>
 </ul>
 </div>
 
@@ -136,10 +140,23 @@ to generate this build (inside a <code>build</code> folder).</li>
 npm run-script build
 </code></pre>
 <ol start="2">
-<li>Copy your <em>build</em> folder into you web server. For example, if you have an <a href="https://httpd.apache.org/">Apache</a>
-web server at <code>/var/www/html</code> you could copy your project to <code>/var/www/html/myawesomemodel</code>. If you don't
-know what I'm talking about ask your IT guy to help you.</li>
+<li>Copy your <em>build</em> folder into your web server. For example, if you have an <a href="https://httpd.apache.org/">Apache</a>
+web server at <code>/var/www/html</code> you could copy your project to <code>/var/www/html/myawesomemodel</code>.</li>
 </ol>
+<h3 id="production-deployment-methods">Production Deployment Methods</h3>
+<p>Once the <code>build/</code> folder is generated, there are two common ways to transfer it to your production server:</p>
+<h4 id="method-a-using-rsync-command-line">Method A: Using <code>rsync</code> (Command Line)</h4>
+<p>If you have SSH access to your web server, <code>rsync</code> is the fastest and most efficient way to upload changes. From the root of the <code>particleviz</code> repository, run:</p>
+<pre><code class="language-shell">rsync -avz --delete ParticleViz_WebApp/build/ username@yourserver.edu:/var/www/html/myawesomemodel/
+</code></pre>
+<p><em>Note: The trailing slash on <code>build/</code> ensures that only the contents of the folder are copied, not the folder itself.</em></p>
+<h4 id="method-b-using-sftp-gui-clients">Method B: Using SFTP (GUI Clients)</h4>
+<p>If you prefer a graphical interface:
+1. Connect to your server via an SFTP client (like FileZilla or Cyberduck) using your credentials.
+2. Navigate to your target web directory (e.g., <code>/var/www/html/myawesomemodel/</code>).
+3. Drag and drop the <strong>contents</strong> of the local <code>ParticleViz_WebApp/build/</code> folder into the remote directory.</p>
+<h3 id="host-subfolder-configuration">Host Subfolder Configuration</h3>
+<p>By default, the React app's <code>package.json</code> has <code>"homepage": "."</code> set, which means all resource links in the generated <code>index.html</code> are relative. This allows you to host the files in any subfolder on your web server without having to change any settings or rebuild the application.</p>
       </div>
     </main>
   </div>

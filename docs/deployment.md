@@ -31,6 +31,28 @@ cd ParticleViz_WebApp
 npm run-script build
 ```
 
-2. Copy your *build* folder into you web server. For example, if you have an [Apache](https://httpd.apache.org/)
-web server at `/var/www/html` you could copy your project to `/var/www/html/myawesomemodel`. If you don't
-know what I'm talking about ask your IT guy to help you.
+2. Copy your *build* folder into your web server. For example, if you have an [Apache](https://httpd.apache.org/)
+web server at `/var/www/html` you could copy your project to `/var/www/html/myawesomemodel`.
+
+### Production Deployment Methods
+
+Once the `build/` folder is generated, there are two common ways to transfer it to your production server:
+
+#### Method A: Using `rsync` (Command Line)
+If you have SSH access to your web server, `rsync` is the fastest and most efficient way to upload changes. From the root of the `particleviz` repository, run:
+
+```shell
+rsync -avz --delete ParticleViz_WebApp/build/ username@yourserver.edu:/var/www/html/myawesomemodel/
+```
+
+*Note: The trailing slash on `build/` ensures that only the contents of the folder are copied, not the folder itself.*
+
+#### Method B: Using SFTP (GUI Clients)
+If you prefer a graphical interface:
+1. Connect to your server via an SFTP client (like FileZilla or Cyberduck) using your credentials.
+2. Navigate to your target web directory (e.g., `/var/www/html/myawesomemodel/`).
+3. Drag and drop the **contents** of the local `ParticleViz_WebApp/build/` folder into the remote directory.
+
+### Host Subfolder Configuration
+By default, the React app's `package.json` has `"homepage": "."` set, which means all resource links in the generated `index.html` are relative. This allows you to host the files in any subfolder on your web server without having to change any settings or rebuild the application.
+
