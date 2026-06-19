@@ -74,7 +74,7 @@ def copy_preprocessed_data(
 
 def main() -> None:
     """Main entry point for ParticleViz CLI."""
-    args: Dict[str, Any] = docopt(__doc__, version='ParticleViz 0.0.1')
+    args: Dict[str, Any] = docopt(__doc__, version='ParticleViz 1.0.0')
     config_file: Optional[str] = args.get('<config_file>')
     is_preproc: bool = args.get('preproc', False)
     is_all: bool = args.get('all', False)

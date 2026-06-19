@@ -1,7 +1,7 @@
 {
   "homepage": ".",
   "name": "particleviz",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "This is the web app of ParticleViz, it allows you te create efficient webapps for visualizing geospatial particles",
   "private": true,
   "dependencies": {

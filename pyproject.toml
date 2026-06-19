@@ -1,6 +1,6 @@
 [project]
 name = "particleviz"
-version = "0.0.1"
+version = "1.0.0"
 description = "Animate large numbers of Lagrangian particles in dynamic web maps."
 readme = "README.md"
 requires-python = ">=3.10"
