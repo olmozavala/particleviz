@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Configuration | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/configuration.html" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/configuration.html" />
 <meta property="og:title" content="Configuration | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/configuration.html" />
-  <link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/configuration.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/logos/favicon.svg">
-<link rel="apple-touch-icon" href="/logos/logo_sm.png">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -27,10 +27,10 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/">
+      <a class="brand" href="/particleviz/">
         <img
           class="brand-logo"
-          src="/logos/logo_sm.png"
+          src="/particleviz/logos/logo_sm.png"
           alt="ParticleViz logo"
           width="160"
           height="auto"
@@ -47,21 +47,21 @@
       <nav id="site-nav" class="site-nav" aria-label="Primary">
         <ul class="site-nav__list">
           
-          <li><a href="/">Home</a></li>
+          <li><a href="/particleviz/">Home</a></li>
           
-          <li><a href="/install.html">Install</a></li>
+          <li><a href="/particleviz/install.html">Install</a></li>
           
-          <li><a href="/quick-start.html">Quick Start</a></li>
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
           
-          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/particleviz/examples.html">Examples</a></li>
           
-          <li><a href="/configuration.html" class="is-active" aria-current="page">Configuration</a></li>
+          <li><a href="/particleviz/configuration.html" class="is-active" aria-current="page">Configuration</a></li>
           
-          <li><a href="/binary_format.html">Binary Format</a></li>
+          <li><a href="/particleviz/dev_docs.html">Dev Docs</a></li>
           
-          <li><a href="/deployment.html">Deployment</a></li>
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
           
-          <li><a href="/intro-video.html">Intro Video</a></li>
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
           
         </ul>
         <ul class="site-nav__actions">
@@ -198,7 +198,7 @@ running <strong>webapp</strong>).</p>
 <p>You can test this <em>advanced</em> configuration file with:</p>
 <pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
 </code></pre>
-<p><img src="/media/advanced.gif" alt="Advanced configuration demonstration" class="demo-gif" /></p>
+<p><img src="/particleviz/media/advanced.gif" alt="Advanced configuration demonstration" class="demo-gif" /></p>
 <hr>
 <h2 id="parameters">Parameters</h2>
 <p>Even though most of the parameters are self-explanatory, the meaning of each of them for the <em>Preprocessing</em> section is the following. Default values come from <code>ParticleViz_DataPreproc/ConfigParams.py</code> unless noted.</p>
@@ -300,7 +300,7 @@ running <strong>webapp</strong>).</p>
 </tr>
 </tbody>
 </table>
-<p>Each preprocessed experiment is stored under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>. The slug is derived from the experiment <code>name</code> (lowercase, spaces to underscores). See <a href="binary_format.html">Binary File Format</a> for chunk layout details.</p>
+<p>Each preprocessed experiment is stored under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>. The slug is derived from the experiment <code>name</code> (lowercase, spaces to underscores). See <a href="dev_docs.html#binary-file-format">Dev Docs</a> for chunk layout details.</p>
 <p>The list of parameters for the <em>webapp</em> section is the following:</p>
 <table>
 <thead>
@@ -554,6 +554,6 @@ running <strong>webapp</strong>).</p>
     </div>
   </footer>
 
-  <script src="/assets/js/site.js" defer></script>
+  <script src="/particleviz/assets/js/site.js" defer></script>
 </body>
 </html>

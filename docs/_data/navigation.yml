@@ -9,8 +9,8 @@ main:
     url: "/examples.html"
   - title: Configuration
     url: "/configuration.html"
-  - title: Binary Format
-    url: "/binary_format.html"
+  - title: Dev Docs
+    url: "/dev_docs.html"
   - title: Deployment
     url: "/deployment.html"
   - title: Intro Video

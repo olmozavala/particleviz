@@ -606,7 +606,8 @@ body.nav-open {
 
 /* Images / demos */
 .content img,
-.demo-gif {
+.demo-gif,
+.code-flow-diagram {
   max-width: 100%;
   height: auto;
   margin: 1.25rem 0;

@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Deployment | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/deployment.html" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/deployment.html" />
 <meta property="og:title" content="Deployment | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/deployment.html" />
-  <link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/deployment.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/logos/favicon.svg">
-<link rel="apple-touch-icon" href="/logos/logo_sm.png">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -27,10 +27,10 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/">
+      <a class="brand" href="/particleviz/">
         <img
           class="brand-logo"
-          src="/logos/logo_sm.png"
+          src="/particleviz/logos/logo_sm.png"
           alt="ParticleViz logo"
           width="160"
           height="auto"
@@ -47,21 +47,21 @@
       <nav id="site-nav" class="site-nav" aria-label="Primary">
         <ul class="site-nav__list">
           
-          <li><a href="/">Home</a></li>
+          <li><a href="/particleviz/">Home</a></li>
           
-          <li><a href="/install.html">Install</a></li>
+          <li><a href="/particleviz/install.html">Install</a></li>
           
-          <li><a href="/quick-start.html">Quick Start</a></li>
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
           
-          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/particleviz/examples.html">Examples</a></li>
           
-          <li><a href="/configuration.html">Configuration</a></li>
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
           
-          <li><a href="/binary_format.html">Binary Format</a></li>
+          <li><a href="/particleviz/dev_docs.html">Dev Docs</a></li>
           
-          <li><a href="/deployment.html" class="is-active" aria-current="page">Deployment</a></li>
+          <li><a href="/particleviz/deployment.html" class="is-active" aria-current="page">Deployment</a></li>
           
-          <li><a href="/intro-video.html">Intro Video</a></li>
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
           
         </ul>
         <ul class="site-nav__actions">
@@ -100,7 +100,6 @@
         <p class="sidebar-nav__label">On this page</p>
         <div class="toc">
 <ul>
-<li><a href="#documentation-site-github-pages">Documentation site (GitHub Pages)</a></li>
 <li><a href="#server-deployment">Server Deployment</a><ul>
 <li><a href="#production-deployment-methods">Production Deployment Methods</a></li>
 <li><a href="#host-subfolder-configuration">Host Subfolder Configuration</a></li>
@@ -115,13 +114,7 @@
 
     <main id="main-content" class="content">
       <div class="content-inner">
-        <h2 id="documentation-site-github-pages">Documentation site (GitHub Pages)</h2>
-<p>The docs at <a href="https://olmozavala.github.io/particleviz/">olmozavala.github.io/particleviz</a> are built with <code>docs/build_site.py</code> and served as static HTML from the <code>docs/</code> folder (<code>.nojekyll</code> disables Jekyll).</p>
-<p>After editing markdown under <code>docs/</code>, rebuild and commit the generated HTML:</p>
-<pre><code class="language-shell">uv run python docs/build_site.py
-</code></pre>
-<p>Optional: enable <strong>Settings → Pages → Build and deployment → GitHub Actions</strong> so <code>.github/workflows/docs.yml</code> deploys on push without committing HTML.</p>
-<h2 id="server-deployment">Server Deployment</h2>
+        <h2 id="server-deployment">Server Deployment</h2>
 <p>If you want to share your visualization with the world, you will need to deploy your site on
 a computer with a public ip address or in an existing web server. The proper way to do it is
 to build an optimized version ready for production and add it into an existing web server.</p>
@@ -167,6 +160,6 @@ web server at <code>/var/www/html</code> you could copy your project to <code>/v
     </div>
   </footer>
 
-  <script src="/assets/js/site.js" defer></script>
+  <script src="/particleviz/assets/js/site.js" defer></script>
 </body>
 </html>

@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Binary File Format | ParticleViz</title>
+  <title>Dev Docs | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/binary_format.html" />
-<meta property="og:title" content="Binary File Format | ParticleViz" />
+<link rel="canonical" href="https://olmozavala.github.io/particleviz/dev_docs.html" />
+<meta property="og:title" content="Dev Docs | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/binary_format.html" />
-  <link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:url" content="https://olmozavala.github.io/particleviz/dev_docs.html" />
+  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/logos/favicon.svg">
-<link rel="apple-touch-icon" href="/logos/logo_sm.png">
+<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -27,10 +27,10 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/">
+      <a class="brand" href="/particleviz/">
         <img
           class="brand-logo"
-          src="/logos/logo_sm.png"
+          src="/particleviz/logos/logo_sm.png"
           alt="ParticleViz logo"
           width="160"
           height="auto"
@@ -47,21 +47,21 @@
       <nav id="site-nav" class="site-nav" aria-label="Primary">
         <ul class="site-nav__list">
           
-          <li><a href="/">Home</a></li>
+          <li><a href="/particleviz/">Home</a></li>
           
-          <li><a href="/install.html">Install</a></li>
+          <li><a href="/particleviz/install.html">Install</a></li>
           
-          <li><a href="/quick-start.html">Quick Start</a></li>
+          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
           
-          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/particleviz/examples.html">Examples</a></li>
           
-          <li><a href="/configuration.html">Configuration</a></li>
+          <li><a href="/particleviz/configuration.html">Configuration</a></li>
           
-          <li><a href="/binary_format.html" class="is-active" aria-current="page">Binary Format</a></li>
+          <li><a href="/particleviz/dev_docs.html" class="is-active" aria-current="page">Dev Docs</a></li>
           
-          <li><a href="/deployment.html">Deployment</a></li>
+          <li><a href="/particleviz/deployment.html">Deployment</a></li>
           
-          <li><a href="/intro-video.html">Intro Video</a></li>
+          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
           
         </ul>
         <ul class="site-nav__actions">
@@ -100,6 +100,15 @@
         <p class="sidebar-nav__label">On this page</p>
         <div class="toc">
 <ul>
+<li><a href="#dev-docs">Dev docs</a></li>
+<li><a href="#documentation-site-github-pages">Documentation site (GitHub Pages)</a></li>
+<li><a href="#code-flow">Code flow</a><ul>
+<li><a href="#1-entry-point-particlevizpy">1. Entry Point: ParticleViz.py</a></li>
+<li><a href="#2-configuration-management">2. Configuration Management</a></li>
+<li><a href="#3-preprocessing-preprocparticlevizpy">3. Preprocessing: PreprocParticleViz.py</a></li>
+<li><a href="#4-web-app-setup">4. Web App Setup</a></li>
+</ul>
+</li>
 <li><a href="#binary-file-format">Binary file format</a><ul>
 <li><a href="#preprocessing-flow">Preprocessing flow</a></li>
 <li><a href="#header-file-txt">Header file (.txt)</a></li>
@@ -118,7 +127,74 @@
 
     <main id="main-content" class="content">
       <div class="content-inner">
-        <h2 id="binary-file-format">Binary file format</h2>
+        <h2 id="dev-docs">Dev docs</h2>
+<blockquote>
+<p><strong>Note:</strong> This page is transparent to regular users — ParticleViz handles preprocessing and publishing automatically. It is here for developers and anyone who wants a deeper look at how the tool works internally.</p>
+</blockquote>
+<p>See also <a href="configuration.html">Configuration</a> for all settings and <a href="quick-start.html">Quick Start</a> to run your first dataset.</p>
+<h2 id="documentation-site-github-pages">Documentation site (GitHub Pages)</h2>
+<p>The docs at <a href="https://olmozavala.github.io/particleviz/">olmozavala.github.io/particleviz</a> are built with <code>docs/build_site.py</code> and served as static HTML from the <code>docs/</code> folder (<code>.nojekyll</code> disables Jekyll).</p>
+<p>After editing markdown under <code>docs/</code>, rebuild and commit the generated HTML:</p>
+<pre><code class="language-shell">uv run python docs/build_site.py
+</code></pre>
+<p>Optional: enable <strong>Settings → Pages → Build and deployment → GitHub Actions</strong> so <code>.github/workflows/docs.yml</code> deploys on push without committing HTML.</p>
+<p>Local preview:</p>
+<pre><code class="language-shell">uv run python docs/build_site.py --local
+python -m http.server 8083 --directory docs
+</code></pre>
+<p>Then open <a href="http://localhost:8083/">http://localhost:8083/</a>.</p>
+<h2 id="code-flow">Code flow</h2>
+<p>ParticleViz visualizes Lagrangian particle data (from OceanParcels, OpenDrift, or convention-compatible NetCDF/Zarr outputs) on the web. The process involves three main stages: configuration, preprocessing, and web app deployment.</p>
+<h3 id="1-entry-point-particlevizpy">1. Entry Point: <code>ParticleViz.py</code></h3>
+<p>The main CLI tool uses <code>docopt</code> to handle different modes:</p>
+<ul>
+<li><code>all</code>: Runs both preprocessing and web app setup.</li>
+<li><code>preproc</code>: Runs only the preprocessing stage.</li>
+<li><code>webapp</code>: Runs only the web app setup (assuming preprocessing is done).</li>
+</ul>
+<h3 id="2-configuration-management">2. Configuration Management</h3>
+<ul>
+<li><strong><code>ConfigParams.py</code></strong>: Defines default settings for both preprocessing and the web app.</li>
+<li><strong>Merge Logic</strong>: User-provided configuration files are merged with the defaults recursively. This ensures that even a minimal config can be used, with the system filling in the blanks.</li>
+<li><strong>Dynamic Configuration</strong>: If a user provides only a dataset path (<code>--input_file</code>), ParticleViz generates a temporary configuration on the fly.</li>
+</ul>
+<h3 id="3-preprocessing-preprocparticlevizpy">3. Preprocessing: <code>PreprocParticleViz.py</code></h3>
+<p>This is where the heavy lifting happens for data conversion.</p>
+<ul>
+<li><strong>Model Detection</strong>: Automatically detects <strong>OceanParcels</strong> vs <strong>OpenDrift</strong> from dataset attributes and variable names (works for NetCDF and Zarr).</li>
+<li><strong>Subsampling</strong>: To ensure performance on different devices, it generates two versions of the data:<ul>
+<li><strong>Desktop</strong>: A higher-resolution subsample.</li>
+<li><strong>Mobile</strong>: A lower-resolution subsample for better performance on mobile browsers.</li>
+</ul>
+</li>
+<li><strong>Binary Conversion</strong>:<ul>
+<li>Converts Lat/Lon coordinates into <strong>16-bit integers</strong> (scaled by 100) to minimize file size.</li>
+<li>Uses a <strong>ragged sparse layout</strong> when particles contain NaNs, storing only visible positions per timestep.</li>
+<li>Partitions the data into chunks (default 50 timesteps per file).</li>
+<li>Saves data in binary format (<code>.bin</code>) accompanied by a metadata header (<code>.txt</code>).</li>
+<li>Zips the binary files (the web app expects <code>.zip</code> files).</li>
+<li>Writes each experiment under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>.</li>
+</ul>
+</li>
+<li><strong>Color Schemes</strong>: If a specific color scheme is provided, <code>ColorByParticleUtils.py</code> adjusts the particle indexes in the scheme to match the subsampled data.</li>
+</ul>
+<p>See <a href="#binary-file-format">Binary file format</a> and <a href="configuration.html#color-schemes">Color Schemes</a> for full specifications.</p>
+<h3 id="4-web-app-setup">4. Web App Setup</h3>
+<ul>
+<li><strong><code>Current_Config.json</code></strong>: This file is generated during preprocessing and contains the final merged configuration, including paths to the generated data files.</li>
+<li><strong>Asset Deployment</strong>:<ul>
+<li><code>Current_Config.json</code> is copied to the web app's source folder as <code>Config.json</code>.</li>
+<li>Generated data chunks are copied to the web app's <code>public/data</code> directory.</li>
+</ul>
+</li>
+<li><strong>Server Initialization</strong>:<ul>
+<li>Checks for <code>node_modules</code> and runs <code>npm install</code> if necessary.</li>
+<li>Runs <code>npm start</code> to launch the React development server on the port set in <code>advanced.port</code> (default <code>3000</code>).</li>
+</ul>
+</li>
+</ul>
+<p><img src="/particleviz/media/particleviz_code_flow.svg" alt="ParticleViz code flow" class="code-flow-diagram" /></p>
+<h2 id="binary-file-format">Binary file format</h2>
 <p>ParticleViz preprocessing converts Lagrangian trajectory data into compact binary
 chunks that the React web app loads on demand. Each chunk is shipped as a <code>.zip</code>
 archive containing a single <code>.bin</code> file. A companion <code>.txt</code> header file sits
@@ -131,7 +207,6 @@ next to the archive and is fetched first by the browser.</p>
 <li>Write one header (<code>.txt</code>) and one zipped binary payload (<code>.zip</code>) per chunk.</li>
 <li>Store outputs under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>.</li>
 </ol>
-<p>See also <a href="code_flow.html">Code Flow</a> for the full pipeline.</p>
 <h3 id="header-file-txt">Header file (<code>.txt</code>)</h3>
 <p>Each header is a single CSV-like line with seven fields:</p>
 <table>
@@ -260,6 +335,6 @@ a processed chunk.</p>
     </div>
   </footer>
 
-  <script src="/assets/js/site.js" defer></script>
+  <script src="/particleviz/assets/js/site.js" defer></script>
 </body>
 </html>

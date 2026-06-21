@@ -1,0 +1,205 @@
+digraph ParticleVizCodeFlow {
+  graph [
+    rankdir=TB,
+    bgcolor="#fbfcfd",
+    pad="0.35",
+    nodesep="0.72",
+    ranksep="0.58",
+    splines=polyline,
+    outputorder=edgesfirst,
+    fontname="DejaVu Sans",
+    labelloc=t,
+    labeljust=c,
+    label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+        <TR><TD><FONT POINT-SIZE="26"><B>ParticleViz Code Flow</B></FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="12" COLOR="#51606f">NetCDF/Zarr trajectories to browser-based particle animation</FONT></TD></TR>
+      </TABLE>
+    >
+  ];
+
+  node [
+    shape=plain,
+    fontname="DejaVu Sans",
+    margin=0
+  ];
+
+  edge [
+    color="#51606f",
+    penwidth=1.7,
+    arrowsize=0.8,
+    fontname="DejaVu Sans",
+    fontsize=10
+  ];
+
+  cli [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#1f6f7a">
+        <TR><TD BGCOLOR="#1f6f7a"><FONT COLOR="white"><B>CLI entry point</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>ParticleViz.py</B></TD></TR>
+        <TR><TD BGCOLOR="#eef9fa">docopt parses modes:<BR ALIGN="LEFT"/>all, preproc, webapp,<BR ALIGN="LEFT"/>or --input_file</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  user_config [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#ba6b16">
+        <TR><TD BGCOLOR="#ba6b16"><FONT COLOR="white"><B>User inputs</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white">Config JSON</TD></TR>
+        <TR><TD BGCOLOR="white">NetCDF .nc or Zarr store</TD></TR>
+        <TR><TD BGCOLOR="#fff5e8">Temporary config is generated<BR ALIGN="LEFT"/>when only --input_file is used</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  config [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#ba6b16">
+        <TR><TD BGCOLOR="#ba6b16"><FONT COLOR="white"><B>Configuration merge</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>ConfigParams.py</B></TD></TR>
+        <TR><TD BGCOLOR="#fff5e8">Defaults + user settings<BR ALIGN="LEFT"/>preprocessing, webapp,<BR ALIGN="LEFT"/>advanced options</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  preproc [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#5460a8">
+        <TR><TD BGCOLOR="#5460a8"><FONT COLOR="white"><B>Preprocessing pipeline</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>PreprocParticleViz.py</B></TD></TR>
+        <TR><TD BGCOLOR="#f1f3ff">Loop over experiments<BR ALIGN="LEFT"/>and desktop/mobile subsamples</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  loader [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#5460a8">
+        <TR><TD BGCOLOR="#eef0ff"><B>DatasetLoader.py</B></TD></TR>
+        <TR><TD BGCOLOR="white">Open dataset with xarray<BR ALIGN="LEFT"/>normalize trajectory dims<BR ALIGN="LEFT"/>derive time metadata</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  detect [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#5460a8">
+        <TR><TD BGCOLOR="#eef0ff"><B>Model detection</B></TD></TR>
+        <TR><TD BGCOLOR="white">OpenDrift or OceanParcels<BR ALIGN="LEFT"/>from attrs, vars, dims</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  transform [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#5460a8">
+        <TR><TD BGCOLOR="#eef0ff"><B>Transform coordinates</B></TD></TR>
+        <TR><TD BGCOLOR="white">Clean bounds<BR ALIGN="LEFT"/>subsample particles<BR ALIGN="LEFT"/>chunk timesteps<BR ALIGN="LEFT"/>build visibility mask</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  binary [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2f8064">
+        <TR><TD BGCOLOR="#2f8064"><FONT COLOR="white"><B>Binary encoder</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>BinaryFormat.py</B></TD></TR>
+        <TR><TD BGCOLOR="#eef8f3">lat/lon x100 as int16<BR ALIGN="LEFT"/>dense or ragged sparse layout<BR ALIGN="LEFT"/>header parser/formatter</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  colors [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#d0474b">
+        <TR><TD BGCOLOR="#d0474b"><FONT COLOR="white"><B>Optional colors</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>ColorByParticleUtils.py</B></TD></TR>
+        <TR><TD BGCOLOR="#fff0f1">Remap particle indexes for<BR ALIGN="LEFT"/>desktop/mobile subsamples</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  outputs [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2f8064">
+        <TR><TD BGCOLOR="#2f8064"><FONT COLOR="white"><B>Preprocessed artifacts</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white">Current_Config.json</TD></TR>
+        <TR><TD BGCOLOR="white">data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</TD></TR>
+        <TR><TD BGCOLOR="#eef8f3">chunk.txt + chunk.zip<BR ALIGN="LEFT"/>zipped .bin payload</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  deploy [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#694b91">
+        <TR><TD BGCOLOR="#694b91"><FONT COLOR="white"><B>Web app setup</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>ParticleViz.py</B></TD></TR>
+        <TR><TD BGCOLOR="#f7f1ff">Copy Config.json into src<BR ALIGN="LEFT"/>copy data into public/data<BR ALIGN="LEFT"/>npm install, npm start</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  react [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2374ab">
+        <TR><TD BGCOLOR="#2374ab"><FONT COLOR="white"><B>React app boot</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white"><B>index.js</B></TD></TR>
+        <TR><TD BGCOLOR="#eef7ff">Create OpenLayers map<BR ALIGN="LEFT"/>background layer<BR ALIGN="LEFT"/>extra GeoJSON layers</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  manager [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2374ab">
+        <TR><TD BGCOLOR="#eef7ff"><B>ParticleVizManager.js</B></TD></TR>
+        <TR><TD BGCOLOR="white">Read Config.json<BR ALIGN="LEFT"/>build experiment list<BR ALIGN="LEFT"/>choose desktop/mobile data<BR ALIGN="LEFT"/>toolbar controls</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  layer [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2374ab">
+        <TR><TD BGCOLOR="#eef7ff"><B>ParticlesLayer.js</B></TD></TR>
+        <TR><TD BGCOLOR="white">Fetch header .txt<BR ALIGN="LEFT"/>download .zip with JSZip<BR ALIGN="LEFT"/>decode dense/ragged chunks<BR ALIGN="LEFT"/>cache by experiment/file</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  render [
+    label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#2374ab">
+        <TR><TD BGCOLOR="#2374ab"><FONT COLOR="white"><B>Browser visualization</B></FONT></TD></TR>
+        <TR><TD BGCOLOR="white">ImageCanvasSource canvas layer</TD></TR>
+        <TR><TD BGCOLOR="#eef7ff">Animate timesteps<BR ALIGN="LEFT"/>draw particles or trails<BR ALIGN="LEFT"/>apply layers/colors/speed controls</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  user_config -> cli [label="invokes"];
+  cli -> config [label="load/merge"];
+  config -> preproc [label="all or preproc"];
+  config -> deploy [label="all or webapp"];
+  preproc -> loader;
+  loader -> detect;
+  detect -> transform;
+  transform -> binary;
+  transform -> colors [label="when color_scheme exists"];
+  binary -> outputs;
+  colors -> outputs;
+  outputs -> deploy [label="Current_Config + data", style=dashed, constraint=false];
+  deploy -> react [label="localhost:<port>"];
+  react -> manager;
+  manager -> layer;
+  layer -> render;
+
+  { rank=same; preproc; deploy; }
+  { rank=same; loader; react; }
+  { rank=same; detect; manager; }
+  { rank=same; transform; layer; }
+  { rank=same; binary; colors; }
+  { rank=same; outputs; render; }
+}

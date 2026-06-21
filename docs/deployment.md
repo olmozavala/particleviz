@@ -3,18 +3,6 @@ layout: default
 title: Deployment
 ---
 
-## Documentation site (GitHub Pages)
-
-The docs at [olmozavala.github.io/particleviz](https://olmozavala.github.io/particleviz/) are built with `docs/build_site.py` and served as static HTML from the `docs/` folder (`.nojekyll` disables Jekyll).
-
-After editing markdown under `docs/`, rebuild and commit the generated HTML:
-
-```shell
-uv run python docs/build_site.py
-```
-
-Optional: enable **Settings → Pages → Build and deployment → GitHub Actions** so `.github/workflows/docs.yml` deploys on push without committing HTML.
-
 ## Server Deployment
 
 If you want to share your visualization with the world, you will need to deploy your site on

@@ -124,7 +124,7 @@ The *advanced* section controls preprocessing output and the local development s
 | **file_prefix** | False | 1 | `"pviz"` | Prefix for generated data files (e.g. `pviz_myexperiment_00.zip`). |
 | **port** | False | 1 | `3000` | TCP port for the local development server (`npm start`). Open `http://localhost:<port>/` in your browser. |
 
-Each preprocessed experiment is stored under `ParticleViz_WebApp/data/<experiment_slug>/<subsample>/`. The slug is derived from the experiment `name` (lowercase, spaces to underscores). See [Binary File Format](binary_format.html) for chunk layout details.
+Each preprocessed experiment is stored under `ParticleViz_WebApp/data/<experiment_slug>/<subsample>/`. The slug is derived from the experiment `name` (lowercase, spaces to underscores). See [Dev Docs](dev_docs.html#binary-file-format) for chunk layout details.
 
 The list of parameters for the *webapp* section is the following:
 
