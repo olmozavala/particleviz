@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Configuration | ParticleViz</title>
 <meta name="description" content="Visualizing Lagrangian model outputs the easy way." />
-<link rel="canonical" href="https://olmozavala.github.io/particleviz/configuration.html" />
+<link rel="canonical" href="https://olmozavala.github.io/configuration.html" />
 <meta property="og:title" content="Configuration | ParticleViz" />
 <meta property="og:description" content="Visualizing Lagrangian model outputs the easy way." />
-<meta property="og:url" content="https://olmozavala.github.io/particleviz/configuration.html" />
-  <link rel="stylesheet" href="/particleviz/assets/css/style.css">
+<meta property="og:url" content="https://olmozavala.github.io/configuration.html" />
+  <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/particleviz/logos/favicon.svg">
-<link rel="apple-touch-icon" href="/particleviz/logos/logo_sm.png">
+<link rel="icon" type="image/svg+xml" href="/logos/favicon.svg">
+<link rel="apple-touch-icon" href="/logos/logo_sm.png">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -27,10 +27,10 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/particleviz/">
+      <a class="brand" href="/">
         <img
           class="brand-logo"
-          src="/particleviz/logos/logo_sm.png"
+          src="/logos/logo_sm.png"
           alt="ParticleViz logo"
           width="160"
           height="auto"
@@ -47,25 +47,21 @@
       <nav id="site-nav" class="site-nav" aria-label="Primary">
         <ul class="site-nav__list">
           
-          <li><a href="/particleviz/">Home</a></li>
+          <li><a href="/">Home</a></li>
           
-          <li><a href="/particleviz/install.html">Install</a></li>
+          <li><a href="/install.html">Install</a></li>
           
-          <li><a href="/particleviz/quick-start.html">Quick Start</a></li>
+          <li><a href="/quick-start.html">Quick Start</a></li>
           
-          <li><a href="/particleviz/examples.html">Examples</a></li>
+          <li><a href="/examples.html">Examples</a></li>
           
-          <li><a href="/particleviz/configuration.html" class="is-active" aria-current="page">Configuration</a></li>
+          <li><a href="/configuration.html" class="is-active" aria-current="page">Configuration</a></li>
           
-          <li><a href="/particleviz/parameters.html">Parameters</a></li>
+          <li><a href="/binary_format.html">Binary Format</a></li>
           
-          <li><a href="/particleviz/binary_format.html">Binary Format</a></li>
+          <li><a href="/deployment.html">Deployment</a></li>
           
-          <li><a href="/particleviz/color_schemes.html">Color Schemes</a></li>
-          
-          <li><a href="/particleviz/deployment.html">Deployment</a></li>
-          
-          <li><a href="/particleviz/intro-video.html">Intro Video</a></li>
+          <li><a href="/intro-video.html">Intro Video</a></li>
           
         </ul>
         <ul class="site-nav__actions">
@@ -105,6 +101,15 @@
         <div class="toc">
 <ul>
 <li><a href="#advanced-configuration">Advanced Configuration</a></li>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#color-schemes">Color Schemes</a><ul>
+<li><a href="#json-format-top-level-structure">JSON format &amp; top-level structure</a></li>
+<li><a href="#layer-fields">Layer fields</a></li>
+<li><a href="#index-formats">Index formats</a></li>
+<li><a href="#example-files">Example files</a></li>
+<li><a href="#configuration-reference">Configuration reference</a></li>
+</ul>
+</li>
 </ul>
 </div>
 
@@ -193,8 +198,346 @@ running <strong>webapp</strong>).</p>
 <p>You can test this <em>advanced</em> configuration file with:</p>
 <pre><code class="language-shell">uv run python ParticleViz.py all --config_file ConfigExamples/Config_Advanced_Example.json
 </code></pre>
-<p><img src="/particleviz/media/advanced.gif" alt="Advanced configuration demonstration" class="demo-gif" /></p>
-<p>See <a href="parameters.html">Parameters</a> for the full list of configuration keys and their default values.</p>
+<p><img src="/media/advanced.gif" alt="Advanced configuration demonstration" class="demo-gif" /></p>
+<hr>
+<h2 id="parameters">Parameters</h2>
+<p>Even though most of the parameters are self-explanatory, the meaning of each of them for the <em>Preprocessing</em> section is the following. Default values come from <code>ParticleViz_DataPreproc/ConfigParams.py</code> unless noted.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>experiments</strong> (array)</td>
+<td>True</td>
+<td>1</td>
+<td>One built-in experiment (see below)</td>
+<td>List of experiments; each will appear in a dropdown in the visualization.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>True</td>
+<td>2</td>
+<td><code>"Dataset 1"</code></td>
+<td>Experiment name shown in the dropdown.</td>
+</tr>
+<tr>
+<td>file_name</td>
+<td>True</td>
+<td>2</td>
+<td>Required; no default</td>
+<td>Path to the experiment output: NetCDF (<code>.nc</code>) or Zarr store (<code>.zarr</code>).</td>
+</tr>
+<tr>
+<td>subsample</td>
+<td>False</td>
+<td>2</td>
+<td><code>{"desktop": 2, "mobile": 4}</code></td>
+<td>Subsampling factors for desktop and mobile clients.</td>
+</tr>
+<tr>
+<td>desktop</td>
+<td>True*</td>
+<td>3</td>
+<td><code>2</code></td>
+<td>Keep every <em>n</em>th particle (<code>2</code> = half the particles).</td>
+</tr>
+<tr>
+<td>mobile</td>
+<td>True*</td>
+<td>3</td>
+<td><code>4</code></td>
+<td>Mobile subsample factor (<code>4</code> = one quarter of the particles).</td>
+</tr>
+<tr>
+<td>color_scheme</td>
+<td>False</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>JSON file defining per-particle colors; preprocessed for each subsample level.</td>
+</tr>
+</tbody>
+</table>
+<p>*Required when <code>subsample</code> is present.</p>
+<p>The <em>advanced</em> section controls preprocessing output and the local development server:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>timesteps_by_file</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>50</code></td>
+<td>Number of timesteps stored in each binary chunk file.</td>
+</tr>
+<tr>
+<td><strong>file_prefix</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>"pviz"</code></td>
+<td>Prefix for generated data files (e.g. <code>pviz_myexperiment_00.zip</code>).</td>
+</tr>
+<tr>
+<td><strong>port</strong></td>
+<td>False</td>
+<td>1</td>
+<td><code>3000</code></td>
+<td>TCP port for the local development server (<code>npm start</code>). Open <code>http://localhost:&lt;port&gt;/</code> in your browser.</td>
+</tr>
+</tbody>
+</table>
+<p>Each preprocessed experiment is stored under <code>ParticleViz_WebApp/data/&lt;experiment_slug&gt;/&lt;subsample&gt;/</code>. The slug is derived from the experiment <code>name</code> (lowercase, spaces to underscores). See <a href="binary_format.html">Binary File Format</a> for chunk layout details.</p>
+<p>The list of parameters for the <em>webapp</em> section is the following:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Depth</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title</td>
+<td>1</td>
+<td><code>"ParticleViz Title"</code></td>
+<td>Title displayed on the map.</td>
+</tr>
+<tr>
+<td>particles_color</td>
+<td>1</td>
+<td><code>"rgba(255,105,0)"</code></td>
+<td>Default particle color when no color scheme is used.</td>
+</tr>
+<tr>
+<td>data_folder</td>
+<td>1</td>
+<td><code>ParticleViz_WebApp/data</code></td>
+<td>Root folder for logos, extra layers, and other static assets.</td>
+</tr>
+<tr>
+<td>intro_image</td>
+<td>1</td>
+<td><code>""</code> (empty)</td>
+<td>Relative path (from <code>data_folder</code>) for an intro splash image.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>1</td>
+<td><code>https://olmozavala.github.io/particleviz/</code></td>
+<td>URL opened by the home icon.</td>
+</tr>
+<tr>
+<td>intro</td>
+<td>1</td>
+<td><code>"This is an example intro text for ParticleViz. Customize it through the config file."</code></td>
+<td>Intro text on the splash page.</td>
+</tr>
+<tr>
+<td>zoom-levels</td>
+<td>1</td>
+<td><code>[0.36, 0.18, 0.09, 0.045, 0.0225, 0.01125, 0.005625, 0.0028125, 0.00140625]</code></td>
+<td>Allowed map resolutions, largest to smallest.</td>
+</tr>
+<tr>
+<td>def-zoom</td>
+<td>1</td>
+<td><code>1</code></td>
+<td>Index into <code>zoom-levels</code> for the initial zoom (0-based).</td>
+</tr>
+<tr>
+<td>map-extent</td>
+<td>1</td>
+<td><code>[-360, -90, 360, 90]</code></td>
+<td>Pan limits: <code>[min_lon, min_lat, max_lon, max_lat]</code>.</td>
+</tr>
+<tr>
+<td>map-center</td>
+<td>1</td>
+<td><code>[0, 0]</code></td>
+<td>Initial map center <code>[lon, lat]</code>.</td>
+</tr>
+<tr>
+<td>particle_size</td>
+<td>1</td>
+<td><code>3</code></td>
+<td>Default particle size (integer 1–5).</td>
+</tr>
+<tr>
+<td>trail_size</td>
+<td>1</td>
+<td><code>3</code></td>
+<td>Default trail opacity/size (integer 1–5).</td>
+</tr>
+<tr>
+<td>background</td>
+<td>1</td>
+<td><code>4</code></td>
+<td>Default basemap: <code>1</code>=empty, <code>2</code>=OSM, <code>3</code>=Stamen, <code>4</code>=Nature, <code>5</code>=Dark.</td>
+</tr>
+<tr>
+<td>shape_type</td>
+<td>1</td>
+<td><code>0</code></td>
+<td>Particle shape: <code>0</code>=squares/dots, <code>1</code>=lines.</td>
+</tr>
+<tr>
+<td>logos (array)</td>
+<td>1</td>
+<td><code>[]</code></td>
+<td>Additional logos in the header.</td>
+</tr>
+<tr>
+<td>img</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Logo image path, relative to <code>data_folder</code>.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>URL opened when the logo is clicked.</td>
+</tr>
+<tr>
+<td>extra_layers (array)</td>
+<td>1</td>
+<td><code>[]</code></td>
+<td>Extra <a href="https://geojson.org/">GeoJSON</a> overlays on the map.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Display name for the extra layer.</td>
+</tr>
+<tr>
+<td>file</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>GeoJSON path, relative to <code>data_folder</code>.</td>
+</tr>
+<tr>
+<td>color</td>
+<td>2</td>
+<td><em>(none)</em></td>
+<td>Stroke/fill color for the extra layer.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="color-schemes">Color Schemes</h2>
+<p>Color schemes assign per-particle colors in the web app. Provide a JSON file in the preprocessing <code>color_scheme</code> field; ParticleViz adjusts particle indexes for each subsample level and writes <code>_Desktop.json</code> and <code>_Mobile.json</code> variants into the experiment data folder.</p>
+<h3 id="json-format-top-level-structure">JSON format &amp; top-level structure</h3>
+<p>The file contains exactly one top-level key — the scheme name shown in the layer menu:</p>
+<pre><code class="language-json">{
+  &quot;Countries&quot;: [
+    {
+      &quot;name&quot;: &quot;Albania&quot;,
+      &quot;color&quot;: &quot;rgb(216.8, 65.0, 65.0, 255.0)&quot;,
+      &quot;index&quot;: &quot;2726,2731,2732&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Algeria&quot;,
+      &quot;color&quot;: &quot;rgb(53.3, 108.4, 242.2, 255.0)&quot;,
+      &quot;index&quot;: &quot;2040-2099&quot;
+    }
+  ]
+}
+</code></pre>
+<h3 id="layer-fields">Layer fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>yes</td>
+<td>Label shown in the layer toggle menu</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>yes</td>
+<td>CSS color string (<code>rgb(...)</code>, <code>rgba(...)</code>, or named color)</td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>yes</td>
+<td>Particle indexes covered by this layer</td>
+</tr>
+</tbody>
+</table>
+<h3 id="index-formats">Index formats</h3>
+<p><strong>Range</strong> — inclusive start and end, separated by a hyphen:</p>
+<pre><code class="language-json">&quot;index&quot;: &quot;0-1000&quot;
+</code></pre>
+<p><strong>List</strong> — comma-separated particle indexes:</p>
+<pre><code class="language-json">&quot;index&quot;: &quot;12,48,96,144&quot;
+</code></pre>
+<h3 id="example-files">Example files</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/color_schemes/ColorScheme_Example.json</code></td>
+<td>Minimal two-layer example</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitter.json</code></td>
+<td>Country-based global litter</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitterCountries.json</code></td>
+<td>Country aggregation variant</td>
+</tr>
+<tr>
+<td><code>data/color_schemes/ColorSchemeWorldLitterMPW.json</code></td>
+<td>Mismanaged plastic waste bins</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="examples.html">Examples</a> for full configuration snippets that use color schemes in multi-experiment setups.</p>
+<h3 id="configuration-reference">Configuration reference</h3>
+<p>Add a color scheme to an experiment in the preprocessing section:</p>
+<pre><code class="language-json">{
+  &quot;preprocessing&quot;: {
+    &quot;experiments&quot;: [
+      {
+        &quot;name&quot;: &quot;Color by Country&quot;,
+        &quot;file_name&quot;: &quot;./ExampleData/Global_Marine_Debris.nc&quot;,
+        &quot;subsample&quot;: { &quot;desktop&quot;: 1, &quot;mobile&quot;: 9 },
+        &quot;color_scheme&quot;: &quot;./data/color_schemes/ColorSchemeWorldLitterCountries.json&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<p>When no <code>color_scheme</code> is provided, all particles use <code>webapp.particles_color</code>.</p>
       </div>
     </main>
   </div>
@@ -211,6 +554,6 @@ running <strong>webapp</strong>).</p>
     </div>
   </footer>
 
-  <script src="/particleviz/assets/js/site.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
 </body>
 </html>
